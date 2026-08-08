@@ -44,6 +44,7 @@ import {
 } from './capability-rail.js';
 import { clearBuiltinToolContext, executeBuiltinTool, getBuiltinToolDefinitions, hasBuiltinTool, setBuiltinToolContext } from './mcp-tools/index.js';
 import { DEFAULT_LIMITS, checkLoop, type Attempt, type GuardLimits } from './loop-guard.js';
+import { estimateTokens, pruneHistory } from './context-prune.js';
 import type { AgentProvider, ProviderEvent, ChatMessage, ToolCall, ToolResult } from './providers/types.js';
 
 const POLL_INTERVAL_MS = 1000;
@@ -356,9 +357,19 @@ export async function executeAgentLoop(
     ];
     const allTools = [...CAPABILITY_TOOL_DEFINITIONS, ...nativeTools, ...builtinTools, ...mcpTools];
 
+    // Lịch sử được gửi lại NGUYÊN VẸN ở mỗi vòng, nên chi phí tăng theo bình
+    // phương số vòng nếu không cắt bớt. Cắt tỉa ngay trước khi gửi: bản đầy đủ
+    // vẫn giữ trong `conversationHistory` cho transcript và cho các vòng sau.
+    const outgoing = pruneHistory(conversationHistory);
+    if (outgoing !== conversationHistory) {
+      const before = estimateTokens(conversationHistory);
+      const after = estimateTokens(outgoing);
+      if (after < before) log(`Cắt tỉa ngữ cảnh: ~${before} → ~${after} token`);
+    }
+
     const query = config.provider.query({
       prompt: currentPrompt,
-      messages: conversationHistory,
+      messages: outgoing,
       continuation: sessionContinuation,
       systemContext: groundedContext,
       tools: allTools.length > 0 ? allTools : undefined,

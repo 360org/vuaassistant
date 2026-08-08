@@ -24,6 +24,23 @@ Ghi lại mọi thay đổi đáng chú ý của V Assistant. Định dạng the
   lần thử cùng một việc hỏng hiếm khi cho ra chuỗi giống hệt nhau (số cổng, id
   request, thời điểm đổi mỗi lần), nên so nguyên văn sẽ không bao giờ thấy
   "cùng một lỗi" và cái phanh thành vô dụng.
+- **Cắt tỉa ngữ cảnh, tất định** (`agent-runner/src/context-prune.ts`): lịch sử
+  hội thoại được gửi lại **nguyên vẹn** ở mỗi vòng lặp tool, nên chi phí tăng
+  theo bình phương số vòng nếu không cắt — và đến vòng 20 thì prompt đầy stack
+  trace cũ, model bơi trong rác rồi quên mất mục tiêu. Nay trước khi gửi:
+
+  - gộp lỗi lặp (dán lại nguyên văn cùng một lỗi 4 lần không thêm thông tin gì);
+  - cắt stack trace còn 8 khung đầu;
+  - rút gọn kết quả tool dài, **giữ cả đầu lẫn đuôi** (đầu nói lỗi gì, đuôi
+    thường mang mã lỗi hoặc gợi ý xử lý);
+  - bỏ cụm công cụ quá cũ khi lượt đã dài, nhưng luôn giữ mục tiêu ban đầu.
+
+  Đo trên bộ test: gộp lỗi lặp ~2420 → ~627 token; kết quả dài ~6826 → ~1593.
+  Mọi chỗ đều ghi rõ "đã bỏ bớt bao nhiêu" chứ không cắt lén.
+
+  Hai điều **bắt buộc giữ**, vì phá là hỏng nhà cung cấp chứ không phải chỉ tốn
+  tiền: mỗi `assistant` có tool call phải còn đủ `tool` đi kèm, và không được
+  để `tool` mồ côi — Gemini từ chối cả request khi function call không khớp cặp.
 - **Dừng sớm là báo cho người dùng, không im lặng bỏ cuộc**: khi phanh cắt vòng
   lặp, câu trả về nói rõ đã thử gì, hỏng vì sao và đề nghị bước tiếp — bằng
   tiếng Việt, có kèm lỗi thật, không lộ tên lý do nội bộ và không đổ JSON thô

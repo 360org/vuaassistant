@@ -836,11 +836,20 @@
       lỗi" và phanh thành vô dụng.
       Test: `agent-runner/scripts/loop-guard-check.mjs` (đã thử nghịch đảo — gỡ
       hai phanh là 9 mục đỏ ngay).
-- [ ] **Sổ lần thử + cắt tỉa ngữ cảnh tất định:** hiện mỗi vòng đẩy nguyên
-      `result.content` vào `conversationHistory` không cắt, nên tới vòng 20
-      prompt đầy stack trace cũ (context rot) — vừa đắt vừa làm model quên mục
-      tiêu. Gộp lỗi lặp, cắt trace, giữ cửa sổ gần nhất; đo token trước/sau để
-      chứng minh rẻ đi thật.
+- [x] **Sổ lần thử + cắt tỉa ngữ cảnh tất định** (`agent-runner/src/context-prune.ts`):
+      gộp lỗi lặp, cắt stack trace còn 8 khung đầu, rút gọn kết quả tool giữ cả
+      đầu lẫn đuôi, và bỏ cụm công cụ quá cũ khi lượt đã dài. Không gọi model.
+      Đo được: gộp lỗi lặp ~2420 → ~627 token, kết quả dài ~6826 → ~1593 token.
+      Test: `agent-runner/scripts/context-prune-check.mjs`.
+
+      > **Hai cái bẫy đã vấp và đã khoá lại bằng test:**
+      > 1. Dấu vân tay lỗi bỏ hết chữ số, nên nếu đem gộp **mọi** kết quả tool
+      >    thì "Chi nhánh 1: 120000000đ" và "Chi nhánh 2: 340000000đ" thành
+      >    trùng nhau — xoá mất số liệu thật. Chỉ được gộp thứ **trông như lỗi**.
+      > 2. Bỏ tin lệch một nhịp sẽ để lại một `tool` **mồ côi** không có
+      >    `assistant` đứng trước ⇒ Gemini từ chối nguyên request. Phải bỏ trọn
+      >    cụm, và test phải kiểm **cả hai chiều** (assistant có đủ tool, và
+      >    tool nào cũng có assistant) — chỉ kiểm một chiều là lọt.
 - [x] **Dừng sớm phải nói cho người dùng biết:** `stopMessage()` trả câu tiếng
       Việt nói rõ đã thử gì, hỏng vì sao, đề nghị bước tiếp. Test khoá luôn ba
       điều: không lộ tên lý do nội bộ (`stagnation`…), có kèm lỗi thật, và không
