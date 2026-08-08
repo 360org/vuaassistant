@@ -828,19 +828,23 @@
 > một tool hỏng rồi lặp lại y hệt 25 lần, người dùng trả tiền 25 lượt gọi model
 > để nhận về một thông báo lỗi.
 
-- [ ] **Circuit breaker cho vòng lặp agentic:** ngoài trần số vòng, thêm phát
-      hiện giậm chân (cùng một lỗi 3 lần liên tiếp), không tiến triển (5 tool
-      call hỏng liên tiếp) và trần token. Ba trạng thái ra: tiếp tục / chỉ báo
-      cáo / hỏi người dùng. Phải **tất định, không gọi model** để rẻ đủ chạy mọi
-      vòng. Test phải dựng đúng tình huống lặp vô ích và khẳng định dừng sớm.
+- [x] **Circuit breaker cho vòng lặp agentic** (`agent-runner/src/loop-guard.ts`):
+      ngoài trần số vòng, đã có phát hiện giậm chân (cùng một lỗi 3 lần liên
+      tiếp), không tiến triển (5 tool call hỏng liên tiếp) và trần token tuỳ
+      chọn. Tất định, không gọi model. So lỗi bằng **dấu vân tay** (bỏ số cổng,
+      id request, thời điểm) — so nguyên văn thì không bao giờ thấy "cùng một
+      lỗi" và phanh thành vô dụng.
+      Test: `agent-runner/scripts/loop-guard-check.mjs` (đã thử nghịch đảo — gỡ
+      hai phanh là 9 mục đỏ ngay).
 - [ ] **Sổ lần thử + cắt tỉa ngữ cảnh tất định:** hiện mỗi vòng đẩy nguyên
       `result.content` vào `conversationHistory` không cắt, nên tới vòng 20
       prompt đầy stack trace cũ (context rot) — vừa đắt vừa làm model quên mục
       tiêu. Gộp lỗi lặp, cắt trace, giữ cửa sổ gần nhất; đo token trước/sau để
       chứng minh rẻ đi thật.
-- [ ] **Dừng sớm phải nói cho người dùng biết:** câu tiếng Việt nói rõ đã thử
-      gì, hỏng vì sao, đề nghị bước tiếp — không im lặng bỏ cuộc, không đổ JSON
-      thô (cùng chuẩn với #13).
+- [x] **Dừng sớm phải nói cho người dùng biết:** `stopMessage()` trả câu tiếng
+      Việt nói rõ đã thử gì, hỏng vì sao, đề nghị bước tiếp. Test khoá luôn ba
+      điều: không lộ tên lý do nội bộ (`stagnation`…), có kèm lỗi thật, và không
+      đổ JSON thô — cùng chuẩn với #13.
 - [ ] **Vai kiểm độc lập (maker/checker) trước hành động có hậu quả thật:**
       phiên riêng với vai làm, mặc định TỪ CHỐI cho tới khi có bằng chứng, chỉ
       trả `DUYỆT` / `TỪ CHỐI + lý do` / `HỎI NGƯỜI DÙNG`.

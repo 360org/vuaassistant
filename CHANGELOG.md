@@ -6,6 +6,29 @@ Ghi lại mọi thay đổi đáng chú ý của V Assistant. Định dạng the
 
 ## [Chưa phát hành]
 
+### Tính năng mới
+- **Phanh cho vòng lặp agentic** (`agent-runner/src/loop-guard.ts`): trước đây
+  vòng lặp tool-calling chỉ có đúng một cái phanh là trần 25 vòng. Đó là phanh
+  cùn — agent gọi một tool hỏng, nhận về cùng một lỗi, rồi gọi lại y hệt cho
+  tới hết 25 vòng; người dùng trả tiền cho 25 lượt gọi model để nhận về đúng
+  một thông báo lỗi. Nay có thêm ba điều kiện dừng, **hoàn toàn tất định**
+  (không gọi model để quyết định, nên rẻ đủ để chạy ở mọi vòng):
+
+  | Điều kiện | Ngưỡng | Ý nghĩa |
+  |---|---|---|
+  | Giậm chân | cùng một lỗi 3 lần liên tiếp | Agent đang lặp vô ích |
+  | Không tiến triển | 5 tool call hỏng liên tiếp | Hướng đi sai |
+  | Trần token | theo cấu hình | Chỉ bật khi có ngân sách |
+
+  Điểm mấu chốt: lỗi được so bằng **dấu vân tay** chứ không so nguyên văn. Hai
+  lần thử cùng một việc hỏng hiếm khi cho ra chuỗi giống hệt nhau (số cổng, id
+  request, thời điểm đổi mỗi lần), nên so nguyên văn sẽ không bao giờ thấy
+  "cùng một lỗi" và cái phanh thành vô dụng.
+- **Dừng sớm là báo cho người dùng, không im lặng bỏ cuộc**: khi phanh cắt vòng
+  lặp, câu trả về nói rõ đã thử gì, hỏng vì sao và đề nghị bước tiếp — bằng
+  tiếng Việt, có kèm lỗi thật, không lộ tên lý do nội bộ và không đổ JSON thô
+  (cùng chuẩn với #13).
+
 ## [1.1.57] - 2026-08-08
 
 > Bản này sửa lỗi nặng nhất từ trước tới nay: **Windows 11 cài xong không mở

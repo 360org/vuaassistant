@@ -43,11 +43,15 @@ import {
   type Capability,
 } from './capability-rail.js';
 import { clearBuiltinToolContext, executeBuiltinTool, getBuiltinToolDefinitions, hasBuiltinTool, setBuiltinToolContext } from './mcp-tools/index.js';
+import { DEFAULT_LIMITS, checkLoop, type Attempt, type GuardLimits } from './loop-guard.js';
 import type { AgentProvider, ProviderEvent, ChatMessage, ToolCall, ToolResult } from './providers/types.js';
 
 const POLL_INTERVAL_MS = 1000;
 const ACTIVE_POLL_INTERVAL_MS = 500;
 const MAX_TOOL_ITERATIONS = 25;
+
+/** Ngưỡng phanh vòng lặp; xem `loop-guard.ts` cho lý do từng con số. */
+const LOOP_LIMITS: GuardLimits = { ...DEFAULT_LIMITS, maxIterations: MAX_TOOL_ITERATIONS };
 
 function log(msg: string): void {
   console.error(`[poll-loop] ${msg}`);
@@ -329,7 +333,19 @@ export async function executeAgentLoop(
     log(`Knowledge lookup skipped: ${error instanceof Error ? error.message : String(error)}`);
   }
 
+  // Sổ lần thử, nuôi phanh vòng lặp bên dưới. Giữ trong bộ nhớ theo từng lượt.
+  const attempts: Attempt[] = [];
+
   for (let iteration = 0; iteration < MAX_TOOL_ITERATIONS; iteration++) {
+    // Phanh chạy TRƯỚC mỗi vòng: trần số vòng không đủ để chặn cảnh agent gọi
+    // một tool hỏng rồi lặp lại y hệt cho tới hết 25 vòng — người dùng trả tiền
+    // 25 lượt gọi model để nhận về đúng một thông báo lỗi.
+    const verdict = checkLoop(attempts, iteration, LOOP_LIMITS);
+    if (verdict.action === 'stop') {
+      log(`Dừng vòng lặp sớm (${verdict.reason}) sau ${attempts.length} lần gọi công cụ`);
+      return { text: verdict.message, continuation: sessionContinuation };
+    }
+
     const nativeTools = getToolDefinitions();
     const builtinTools = getBuiltinToolDefinitions();
     const mcpTools = await mcpManager.listAllTools();
@@ -460,6 +476,16 @@ export async function executeAgentLoop(
       });
 
       log(`Tool result (${tc.name}): ${result.content.slice(0, 200)}...`);
+
+      // Ghi vào sổ để phanh vòng lặp có căn cứ ở vòng sau. `is_error` là tín
+      // hiệu chính; một số tool báo hỏng ngay trong nội dung nên bắt thêm.
+      const failed = result.is_error === true || /^error[: ]/i.test(result.content.trim());
+      attempts.push({
+        tool: tc.name,
+        ok: !failed,
+        error: failed ? result.content : undefined,
+      });
+
       if (
         result.content.includes('PERMISSION_REQUEST:') ||
         result.content.includes('APPROVAL_REQUIRED:') ||
