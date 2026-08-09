@@ -61,6 +61,8 @@ jobs:
       - run: node scripts/desktop-oauth-check.mjs
       - run: node scripts/pack-rebind-check.mjs
       - run: node scripts/host-process-contract-check.mjs
+      # Kết nối tốt không bị báo hỏng chỉ vì gói dịch vụ thiếu một model.
+      - run: node scripts/connection-test-check.mjs
       - run: node scripts/ai-router-contract-check.mjs
       - run: node scripts/ai-router-multi-account-check.mjs
       - run: node scripts/credential-boundary-check.mjs

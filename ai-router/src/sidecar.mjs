@@ -598,9 +598,10 @@ async function persistRefreshedCredentials(connection, refreshed) {
 
 function connectionErrorSummary(connection, status, detail = "") {
   const label = connection?.label || connection?.name || connection?.provider || "This provider";
-  const authFailure = status === 401 || status === 403 ||
-    /authentication_error|invalid_api_key|invalid credentials|access token has been revoked|permissiondenied/i.test(detail);
-  if (authFailure) {
+  // Một 403 vì "gói dịch vụ không có model này" KHÔNG phải đăng nhập hỏng.
+  // Gộp chung hai thứ là đẩy người dùng đi tạo khoá mới trong khi khoá của họ
+  // vẫn tốt — họ làm mãi cũng không hết lỗi vì đang sửa nhầm chỗ.
+  if (isAccountAuthError(status, detail)) {
     return `${label} sign-in expired or was revoked. Reset and sign in again.`;
   }
   return detail || `${label} returned HTTP ${status}.`;
@@ -1005,79 +1006,157 @@ async function handleChat(request, response, input) {
   else response.end(await upstream.text());
 }
 
+/**
+ * Một lỗi thuộc về TÀI KHOẢN (khoá sai, hết hạn, bị thu hồi) hay chỉ thuộc về
+ * MODEL đang dò (gói dịch vụ không có model đó, model đã bị gỡ)?
+ *
+ * Phân biệt được hai thứ này là điều kiện để không chẩn đoán sai. Trước đây
+ * mọi lỗi đều bị gộp thành "đăng nhập hết hạn", nên người dùng có tài khoản
+ * hoàn toàn tốt vẫn bị bảo đi tạo khoá mới — làm mãi cũng không hết lỗi vì họ
+ * đang sửa nhầm chỗ.
+ */
+function isModelAccessError(status, detail = "") {
+  if (status === 404) return true;
+  const text = String(detail);
+  // Không ép thứ tự chữ: nhà cung cấp viết đủ kiểu — "model X not supported",
+  // "your plan does not include model X", "no access to this model". Bắt theo
+  // thứ tự cố định là bỏ sót đúng những câu hay gặp nhất.
+  const mentionsModel = /\bmodels?\b/i.test(text);
+  const accessPhrase =
+    /(not found|not supported|unsupported|does not exist|does not include|not included|unavailable|no access|not allowed|not enabled|not entitled|invalid model|no quota|quota exceeded)/i
+      .test(text);
+  if (mentionsModel && accessPhrase) return true;
+  // Câu nói về GÓI DỊCH VỤ cũng thuộc về quyền dùng model, không phải khoá hỏng.
+  return /(plan|tier|subscription)[^\n]{0,60}(does not include|not included|upgrade|not entitled)/i
+    .test(text);
+}
+
+function isAccountAuthError(status, detail = "") {
+  if (status === 401) return true;
+  if (isModelAccessError(status, detail)) return false;
+  return status === 403 ||
+    /authentication_error|invalid_api_key|invalid credentials|access token has been revoked|permissiondenied/i.test(detail);
+}
+
+/**
+ * Danh sách model để dò, xếp theo thứ tự đáng thử nhất.
+ *
+ * Với nhà cung cấp có `passthroughModels` (Gemini CLI, Antigravity, endpoint
+ * tuỳ chỉnh), danh sách ĐỘNG mới là thứ tài khoản thật sự có quyền dùng — lấy
+ * từ chính API quota của nhà cung cấp. Trước đây danh sách động chỉ được dùng
+ * khi registry tĩnh RỖNG, mà registry luôn có sẵn model, nên thực tế không bao
+ * giờ chạy tới: bài kiểm tra luôn dò đúng một model tĩnh cứng
+ * (`gemini-2.5-flash`, `gemini-3.6-flash-high`). Gói dịch vụ nào không có đúng
+ * model đó là bị báo hỏng cả kết nối, dù 13 model còn lại vẫn chạy tốt.
+ */
+async function testableModels(connection, provider) {
+  const candidates = [];
+  const seen = new Set();
+  const add = (id, name) => {
+    if (!id || seen.has(id)) return;
+    seen.add(id);
+    candidates.push({ id, name: name || id });
+  };
+
+  if (provider?.passthroughModels || connection.provider === "ai-compatible") {
+    const dynamic = await dynamicModelsForConnection(connection).catch(() => []);
+    // Model rẻ nhất trước: bài kiểm tra không nên tốn tiền của người dùng.
+    const ordered = [
+      ...dynamic.filter((item) => /free|flash|mini|lite|small/i.test(item.id)),
+      ...dynamic,
+    ];
+    for (const item of ordered) {
+      add(modelAccount(item.id).modelId.slice(connection.provider.length + 1), item.name);
+    }
+  }
+
+  for (const item of provider?.models || []) {
+    if (item.kind && item.kind !== "llm") continue;
+    add(item.id, item.name);
+  }
+  return candidates;
+}
+
 async function testConnection(id) {
   const connection = await findConnection(id);
   if (!connection) throw new Error("AI Router connection was not found.");
   const provider = REGISTRY.find((entry) => entry.id === connection.provider);
-  let model = provider?.models?.find((item) => !item.kind || item.kind === "llm");
-  if (connection.provider === "ai-compatible") {
-    const dynamic = await dynamicModelsForConnection(connection);
-    const testModel = dynamic[0];
-    if (testModel) {
-      const resolved = modelAccount(testModel.id);
-      model = {
-        id: resolved.modelId.slice(connection.provider.length + 1),
-        name: testModel.name,
-      };
-    } else {
-      throw new Error("Không thể tải danh sách model từ Custom Endpoint để chạy kiểm tra.");
-    }
-  } else if (provider && !model && provider.passthroughModels) {
-    const dynamic = await dynamicModelsForConnection(connection);
-    const testModel = dynamic.find((item) => item.id.endsWith(":free")) || dynamic[0];
-    if (testModel) model = {
-      id: modelAccount(testModel.id).modelId.slice(provider.id.length + 1),
-      name: testModel.name,
-    };
-  }
   const provId = provider?.id || connection.provider;
-  if (!provId || !model) throw new Error("This provider returned no testable language model.");
-
-  try {
-    const credentials = await credentialsFromVault(connection);
-    const body = {
-      model: `${provId}/${model.id}`,
-      messages: [{ role: "user", content: "Reply with OK." }],
-      max_tokens: 16,
-      stream: false,
-    };
-    const result = await handleChatCore({
-      body,
-      modelInfo: { provider: provId, model: model.id },
-      credentials,
-      connectionId: connection.id,
-      apiKey: credentials.apiKey || credentials.accessToken,
-      log: routerLog(),
-      clientRawRequest: { endpoint: "/v1/providers/test", body, headers: {} },
-      onCredentialsRefreshed: (refreshed) => persistRefreshedCredentials(connection, refreshed),
-    });
-    const upstream = result?.response;
-    if (!upstream) throw new Error(result?.error || "AI Router received no provider response.");
-    const responseText = await upstream.text();
-    if (!upstream.ok) {
-      throw new Error(responseText.slice(0, 500) || `Provider returned HTTP ${upstream.status}.`);
-    }
-    const identity = await providerAccountIdentity(connection, credentials);
-    const updated = await updateConnection(connection.id, {
-      testStatus: "Verified",
-      lastError: undefined,
-      lastTestedAt: new Date().toISOString(),
-      ...(identity ? {
-        email: identity.includes("@") ? identity : connection.email,
-        accountLabel: connection.email || identity,
-      } : {}),
-    });
-    return { valid: true, connection: updated, model: `${provider.id}/${model.id}` };
-  } catch (error) {
-    const detail = error instanceof Error ? error.message : String(error);
-    const message = connectionErrorSummary(connection, 0, detail);
-    await updateConnection(connection.id, {
-      testStatus: "Failed",
-      lastError: message,
-      lastTestedAt: new Date().toISOString(),
-    });
-    throw new Error(message);
+  const candidates = await testableModels(connection, provider);
+  if (!provId || candidates.length === 0) {
+    throw new Error("This provider returned no testable language model.");
   }
+
+  const credentials = await credentialsFromVault(connection);
+  // Dò tối đa vài model. Một tài khoản không có quyền dùng model A nhưng dùng
+  // tốt model B thì KHÔNG phải là kết nối hỏng — báo hỏng là chẩn đoán sai và
+  // đẩy người dùng đi đăng nhập lại vô ích.
+  const attempts = candidates.slice(0, 4);
+  let lastStatus = 0;
+  let lastDetail = "";
+  let lastModel = "";
+
+  for (const model of attempts) {
+    lastModel = model.id;
+    try {
+      const body = {
+        model: `${provId}/${model.id}`,
+        messages: [{ role: "user", content: "Reply with OK." }],
+        max_tokens: 16,
+        stream: false,
+      };
+      const result = await handleChatCore({
+        body,
+        modelInfo: { provider: provId, model: model.id },
+        credentials,
+        connectionId: connection.id,
+        apiKey: credentials.apiKey || credentials.accessToken,
+        log: routerLog(),
+        clientRawRequest: { endpoint: "/v1/providers/test", body, headers: {} },
+        onCredentialsRefreshed: (refreshed) => persistRefreshedCredentials(connection, refreshed),
+      });
+      const upstream = result?.response;
+      if (!upstream) {
+        lastStatus = 0;
+        lastDetail = result?.error || "AI Router received no provider response.";
+      } else {
+        const responseText = await upstream.text();
+        if (upstream.ok) {
+          const identity = await providerAccountIdentity(connection, credentials);
+          const updated = await updateConnection(connection.id, {
+            testStatus: "Verified",
+            lastError: undefined,
+            lastTestedAt: new Date().toISOString(),
+            ...(identity ? {
+              email: identity.includes("@") ? identity : connection.email,
+              accountLabel: connection.email || identity,
+            } : {}),
+          });
+          return { valid: true, connection: updated, model: `${provId}/${model.id}` };
+        }
+        lastStatus = upstream.status;
+        lastDetail = responseText.slice(0, 500) || `Provider returned HTTP ${upstream.status}.`;
+      }
+    } catch (error) {
+      lastStatus = 0;
+      lastDetail = error instanceof Error ? error.message : String(error);
+    }
+
+    // Khoá/tài khoản hỏng thì dò thêm model nữa cũng vô ích — dừng ngay.
+    if (isAccountAuthError(lastStatus, lastDetail)) break;
+  }
+
+  const message = isModelAccessError(lastStatus, lastDetail)
+    ? `Tài khoản này đăng nhập được nhưng không dùng được model đã thử (${lastModel}). ` +
+      `Chi tiết: ${lastDetail.slice(0, 300)}`
+    : connectionErrorSummary(connection, lastStatus, lastDetail);
+
+  await updateConnection(connection.id, {
+    testStatus: "Failed",
+    lastError: message,
+    lastTestedAt: new Date().toISOString(),
+  });
+  throw new Error(message);
 }
 
 function sendJson(response, status, payload) {
