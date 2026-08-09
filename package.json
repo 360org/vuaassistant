@@ -23,7 +23,7 @@
     "validate:skills": "node scripts/validate-skills.mjs",
     "preview": "vite preview",
     "install:local": "node scripts/install-local.mjs",
-    "build:local": "npx tauri build --config '{\"bundle\":{\"createUpdaterArtifacts\":false}}' && node scripts/install-local.mjs",
+    "build:local": "APPLE_SIGNING_IDENTITY='Developer ID Application: W360S JOINT STOCK COMPANY (ZC3H8887XS)' npx tauri build --config '{\"bundle\":{\"createUpdaterArtifacts\":false}}' && node scripts/install-local.mjs",
     "tauri:dev": "npx tauri dev",
     "tauri": "tauri"
   },
