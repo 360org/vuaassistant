@@ -20,13 +20,6 @@ export function GeneralSettings() {
     return localStorage.getItem("v-assistant-autostart") === "true";
   });
 
-  // Default global shortcuts (from Rust)
-  const defaultShortcuts = [
-    { key: "Cmd+Shift+Q", description: language === "en" ? "Show/Hide window" : "Hiện/Ẩn cửa sổ" },
-    { key: "Cmd+Shift+R", description: language === "en" ? "Reload app" : "Tải lại ứng dụng" },
-    { key: "Cmd+Shift+E", description: language === "en" ? "External editor trigger" : "Kích hoạt trình soạn thảo bên ngoài" },
-  ];
-
   const handleToggleAutostart = async (enable: boolean) => {
     setRunOnStartup(enable);
     localStorage.setItem("v-assistant-autostart", enable ? "true" : "false");
@@ -101,36 +94,6 @@ export function GeneralSettings() {
               )}
             />
           </button>
-        </Card>
-      </section>
-
-      {/* Keyboard Shortcuts */}
-      <section className="mt-8">
-        <h2 className="text-sm font-semibold text-neutral-300">
-          {language === "en" ? "Keyboard Shortcuts" : "Phím tắt"}
-        </h2>
-        <Card className="mt-3 p-4">
-          <div className="text-xs text-neutral-400 mb-3">
-            {language === "en"
-              ? "Global shortcuts work system-wide even when the app is not focused."
-              : "Phím tắt toàn cục hoạt động ngay cả khi ứng dụng không được focus."}
-          </div>
-          <div className="space-y-2">
-            {defaultShortcuts.map((shortcut, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between gap-3 p-2 rounded-lg bg-neutral-900/50 border border-neutral-800/50"
-              >
-                <div className="flex items-center gap-3">
-                  <kbd className="inline-flex items-center gap-1.5 rounded bg-neutral-950 border border-neutral-800 px-2.5 py-1 text-[11px] font-mono text-neutral-300">
-                    {shortcut.key}
-                  </kbd>
-                  <span className="text-sm text-neutral-200">{shortcut.description}</span>
-                </div>
-                <span className="text-[10px] text-neutral-500 font-mono">Global</span>
-              </div>
-            ))}
-          </div>
         </Card>
       </section>
 

@@ -232,7 +232,7 @@ export function createEngine(): Engine {
         }
       }
       const { engineRunning, nanoclawEngine } = await import("./nanoclaw");
-      if (await engineRunning() && options.config?.authMode !== "antigravity") {
+      if (await engineRunning()) {
         let runnerEmitted = false;
         try {
           for await (const chunk of nanoclawEngine.chat(messages, options)) {

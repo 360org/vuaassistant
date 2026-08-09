@@ -9,7 +9,9 @@ import { getBuiltinToolContext } from './context.js';
 const WORKSPACE_ROOT = path.resolve(
   process.env.VUA_AGENT_WORKSPACE || path.join(process.env.VUA_DATA_DIR || '/tmp/v-assistant', 'workspace'),
 );
-const OUTBOX_ROOT = path.resolve(process.env.VUA_DATA_DIR || '/tmp/v-assistant', 'outbox');
+const OUTBOX_ROOT = process.env.VUA_AGENT_WORKSPACE
+  ? path.resolve(process.env.VUA_AGENT_WORKSPACE, '..', 'outbox')
+  : path.resolve(process.env.VUA_DATA_DIR || '/tmp/v-assistant', 'outbox');
 
 export interface BuiltinTool {
   definition: ToolDefinition;

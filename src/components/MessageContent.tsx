@@ -1,6 +1,6 @@
 import { Fragment, type ReactNode, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { ShieldAlert, CheckCircle2, XCircle, Copy, Check, HelpCircle, Send } from "lucide-react";
+import { ShieldAlert, CheckCircle2, XCircle, Copy, Check, HelpCircle, Send, FileText, ExternalLink, FolderOpen } from "lucide-react";
 
 /**
  * Provider reasoning is transport metadata, not chat content. Keeping an
@@ -279,13 +279,16 @@ export function MessageContent({
   assistant,
   onApprovePermission,
   onAnswerQuestion,
+  onApproveCapability,
 }: {
   content: string;
   assistant: boolean;
   onApprovePermission?: (path: string) => Promise<void>;
   onAnswerQuestion?: (answer: string) => Promise<void>;
+  onApproveCapability?: (capabilityName: string) => Promise<void>;
 }) {
   const [permissionStatus, setPermissionStatus] = useState<"pending" | "approved" | "denied">("pending");
+  const [approvalStatus, setApprovalStatus] = useState<"pending" | "approved" | "denied">("pending");
   const [questionStatus, setQuestionStatus] = useState<"pending" | "answered">("pending");
   const [selectedAnswer, setSelectedAnswer] = useState("");
   const [textAnswer, setTextAnswer] = useState("");
@@ -324,8 +327,40 @@ export function MessageContent({
     detectedPath = legacyPermissionMatch[1];
   }
 
-  // Nếu detectedPath hoặc questionPayload có giá trị, chúng ta đang hiển thị thẻ tương tác, không cần parse markdown cho nội dung khác.
-  const blocks = parseMarkdownBlocks((detectedPath || questionPayload) ? "" : visible);
+  // Detect File Payload JSON
+  let filePayload: { filePath: string; fileName: string; caption?: string } | null = null;
+  try {
+    if (content.trim().startsWith("{") && content.trim().endsWith("}")) {
+      const parsed = JSON.parse(content);
+      if (parsed && typeof parsed.filePath === "string" && typeof parsed.fileName === "string") {
+        filePayload = parsed;
+      }
+    }
+  } catch {
+    // Không phải JSON file payload
+  }
+
+  // Detect APPROVAL_REQUIRED
+  const approvalMatch = content.match(/(?:Tool error:\s*)?APPROVAL_REQUIRED:\s*(.+)$/);
+  let approvalMsg: string | null = null;
+  let approvalCapabilityName = "";
+  if (approvalMatch) {
+    approvalMsg = approvalMatch[1];
+    const firstWordMatch = approvalMsg.match(/^([a-zA-Z0-9_-]+)/);
+    if (firstWordMatch && firstWordMatch[1] !== "Sếp") {
+      approvalCapabilityName = firstWordMatch[1];
+    } else {
+      const useMatch = approvalMsg.match(/dùng\s+([a-zA-Z0-9_-]+)/);
+      if (useMatch) {
+        approvalCapabilityName = useMatch[1];
+      } else {
+        approvalCapabilityName = "hành động";
+      }
+    }
+  }
+
+  // Nếu detectedPath hoặc questionPayload hoặc filePayload hoặc approvalMsg có giá trị, chúng ta đang hiển thị thẻ tương tác, không cần parse markdown cho nội dung khác.
+  const blocks = parseMarkdownBlocks((detectedPath || questionPayload || filePayload || approvalMsg) ? "" : visible);
 
   return (
     <div className="space-y-2 leading-relaxed">
@@ -530,6 +565,98 @@ export function MessageContent({
             <div className="mt-3 flex items-center gap-1.5 text-xs font-medium text-gold-400 bg-gold-500/5 border border-gold-500/20 rounded-lg px-2.5 py-1.5">
               <Check className="size-4 shrink-0 text-emerald-400" />
               <span>Đã trả lời: <strong className="text-neutral-100">{selectedAnswer}</strong>. Agent đang tiếp tục xử lý...</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {assistant && filePayload && (
+        <div className="my-3 rounded-xl border border-neutral-800 bg-neutral-950/90 p-4 shadow-md max-w-md select-none">
+          <div className="flex items-start gap-3">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-gold-500/10 text-gold-400 border border-gold-500/25 shrink-0">
+              <FileText className="size-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className="text-sm font-semibold text-neutral-100 truncate" title={filePayload.fileName}>
+                {filePayload.fileName}
+              </h4>
+              {filePayload.caption && (
+                <p className="mt-1 text-xs text-neutral-400 leading-normal">
+                  {filePayload.caption}
+                </p>
+              )}
+              <div className="mt-1 text-[10px] text-neutral-500 truncate" title={filePayload.filePath}>
+                Đường dẫn: {filePayload.filePath}
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 flex items-center gap-2 border-t border-neutral-900 pt-3">
+            <button
+              onClick={() => {
+                void openExternalUrl(filePayload!.filePath);
+              }}
+              className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-gold-500 hover:bg-gold-400 px-3.5 py-1.5 text-xs font-semibold text-neutral-950 transition-all active:scale-95"
+            >
+              <ExternalLink className="size-3.5" /> Mở tệp tin
+            </button>
+            <button
+              onClick={() => {
+                const pathStr = filePayload!.filePath;
+                const lastSlash = Math.max(pathStr.lastIndexOf("/"), pathStr.lastIndexOf("\\"));
+                const folderPath = lastSlash > 0 ? pathStr.substring(0, lastSlash) : pathStr;
+                void openExternalUrl(folderPath);
+              }}
+              className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-neutral-700 bg-neutral-900 hover:bg-neutral-850 px-3.5 py-1.5 text-xs font-medium text-neutral-300 transition-colors"
+            >
+              <FolderOpen className="size-3.5" /> Mở thư mục
+            </button>
+          </div>
+        </div>
+      )}
+
+      {assistant && approvalMsg && onApproveCapability && (
+        <div className="my-3 rounded-xl border border-amber-500/40 bg-neutral-950/90 p-3.5 shadow-md select-none">
+          <div className="flex items-center gap-2 text-xs font-semibold text-amber-400">
+            <ShieldAlert className="size-4 text-amber-400 shrink-0" />
+            <span>Yêu cầu duyệt hành động bảo mật</span>
+          </div>
+          <div className="mt-2 rounded-lg border border-neutral-800 bg-neutral-900/60 px-3 py-2 text-xs text-neutral-200 leading-relaxed">
+            {approvalMsg}
+          </div>
+          {approvalStatus === "pending" && (
+            <>
+              <p className="mt-2 text-xs text-neutral-400">
+                Hãy xác nhận duyệt để Agent tiếp tục thực thi hành động này.
+              </p>
+              <div className="mt-3 flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    setApprovalStatus("approved");
+                    void onApproveCapability(approvalCapabilityName).catch(() => setApprovalStatus("denied"));
+                  }}
+                  className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-emerald-500 active:scale-95"
+                >
+                  <CheckCircle2 className="size-3.5" /> Đồng ý thực thi
+                </button>
+                <button
+                  onClick={() => setApprovalStatus("denied")}
+                  className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-1.5 text-xs font-medium text-neutral-300 transition-colors hover:bg-neutral-700"
+                >
+                  <XCircle className="size-3.5" /> Từ chối
+                </button>
+              </div>
+            </>
+          )}
+
+          {approvalStatus === "approved" && (
+            <div className="mt-2 flex items-center gap-1.5 text-xs font-medium text-emerald-400">
+              <CheckCircle2 className="size-4" /> Đã duyệt hành động. Agent đang chạy tiếp...
+            </div>
+          )}
+
+          {approvalStatus === "denied" && (
+            <div className="mt-2 flex items-center gap-1.5 text-xs font-medium text-red-400">
+              <XCircle className="size-4" /> Đã từ chối thực thi hành động này.
             </div>
           )}
         </div>

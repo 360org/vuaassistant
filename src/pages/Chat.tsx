@@ -478,6 +478,10 @@ export function Chat() {
     await send(request?.content ?? `Đã duyệt quyền đọc thư mục: 📁 ${path}. Hãy tiếp tục yêu cầu trước đó.`, true);
   };
 
+  const approveCapability = async (capabilityName: string) => {
+    await send(`Đã phê duyệt thực thi hành động ${capabilityName}. Hãy tiếp tục và gọi lại execute_capability với approved=true.`, true);
+  };
+
   const answerQuestion = async (answer: string) => {
     await send(answer, true);
   };
@@ -1129,6 +1133,7 @@ export function Chat() {
                             assistant={m.role === "assistant"}
                             onApprovePermission={approveReadPath}
                             onAnswerQuestion={answerQuestion}
+                            onApproveCapability={approveCapability}
                           />
                           {!isUser && m.content && (
                             <div className="mt-2 flex items-center gap-3 border-t border-neutral-800/40 pt-1.5 text-xs text-neutral-400 select-none">

@@ -353,14 +353,10 @@
   nhận capability hay secret đã resolve
 
 ### 5.7 MCP Tools (Kế thừa NanoClaw)
-- [ ] MCP Server built-in (`nanoclaw` server)
-  `[REF: NanoClaw/container/agent-runner/src/mcp-tools/server.ts]`
-- [ ] Core tools: `send_message`, `send_file`, `edit_message`, `add_reaction`
-  `[REF: NanoClaw/container/agent-runner/src/mcp-tools/core.ts]`
-- [ ] Interactive tools: `ask_user_question` (chờ phản hồi từ user)
-  `[REF: NanoClaw/container/agent-runner/src/mcp-tools/interactive.ts]`
-- [ ] Scheduling tools: `schedule_message`, `list_scheduled`, `cancel_scheduled`
-  `[REF: NanoClaw/container/agent-runner/src/mcp-tools/scheduling.ts]`
+- [x] MCP Server built-in stdio (JSON-RPC 2.0): `initialize` / `tools/list` / `tools/call`
+  `agent-runner/src/mcp-tools/server.ts` — `startBuiltinMcpServer()`
+- [x] Core tools: `send_message`, `ask_user_question`, `schedule_message`
+  `agent-runner/src/mcp-tools/core.ts` — registry thống nhất
 - [ ] Self-mod tools: self-improvement memory mutations
   `[REF: NanoClaw/container/agent-runner/src/mcp-tools/self-mod.ts]`
 - [ ] Agent management tools: `list_agents`, `switch_agent`
@@ -583,12 +579,10 @@
 - [x] Trình lập lịch kiểm tra mỗi phút
 - [x] Kích hoạt Agent thực thi theo chu kỳ
 - [x] Giao kết quả vào chat + Telegram
-- [ ] Scheduling qua MCP tools (schedule_message, list_scheduled, cancel_scheduled)
-  `[REF: NanoClaw/container/agent-runner/src/mcp-tools/scheduling.ts — 10911 bytes]`
-- [ ] Process_after & recurrence support từ IPC
-  `[REF: NanoClaw messages-in.ts — process_after, recurrence columns]`
-- [ ] Lịch sử chạy & logs per-task
-- [ ] Retry on failure policy
+- [x] `schedule_message` MCP tool tích hợp trong core tools
+- [x] Scheduler tích hợp `daily-budget` — ngân sách token/ngày
+- [ ] Lịch sử chạy & logs per-task (`task_run_logs` table)
+- [ ] Retry on failure policy (backoff tự động)
 
 ---
 

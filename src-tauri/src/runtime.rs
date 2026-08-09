@@ -787,7 +787,7 @@ impl Runtime {
         let conn = Connection::open(self.outbound()).map_err(err)?;
         let mut stmt = conn
             .prepare(
-                "SELECT seq, content, channel_type, thread_id FROM messages_out
+                "SELECT seq, content, channel_type, thread_id, kind FROM messages_out
                  WHERE seq > ?1
                  ORDER BY seq ASC",
             )
@@ -799,21 +799,21 @@ impl Runtime {
                 let content: String = row.get(1)?;
                 let channel_type: Option<String> = row.get(2)?;
                 let thread_id: Option<String> = row.get(3)?;
+                let kind: String = row.get(4)?;
 
                 let mut text = content.clone();
                 let mut role = None;
                 let mut status = None;
                 let mut duration_ms = None;
-                let mut message_type = None;
+                let mut message_type = Some(kind);
                 let mut permission = None;
                 if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(&content) {
                     if let Some(t) = parsed.get("text").and_then(|x| x.as_str()) {
                         text = t.to_string();
                     }
-                    message_type = parsed
-                        .get("type")
-                        .and_then(|x| x.as_str())
-                        .map(|x| x.to_string());
+                    if let Some(t) = parsed.get("type").and_then(|x| x.as_str()) {
+                        message_type = Some(t.to_string());
+                    }
                     permission = parsed.get("permission").cloned();
                     role = parsed
                         .get("role")

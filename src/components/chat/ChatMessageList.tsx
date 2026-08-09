@@ -9,6 +9,7 @@ interface ChatMessageListProps {
   streaming: boolean;
   streamingContent?: string;
   onApprovePermission: (path: string) => Promise<void>;
+  onApproveCapability?: (capabilityName: string) => Promise<void>;
   onRetry: () => void;
   onOpenPreview: (att: { id: string; name: string; dataUrl?: string }) => void;
 }
@@ -18,6 +19,7 @@ export function ChatMessageList({
   streaming,
   streamingContent,
   onApprovePermission,
+  onApproveCapability,
   onRetry,
   onOpenPreview,
 }: ChatMessageListProps) {
@@ -59,6 +61,7 @@ export function ChatMessageList({
                 content={m.content}
                 assistant={!isUser}
                 onApprovePermission={onApprovePermission}
+                onApproveCapability={onApproveCapability}
               />
 
               {/* Attachments preview */}
@@ -107,7 +110,12 @@ export function ChatMessageList({
             </div>
             {streamingContent && (
               <div className="mt-2">
-                <MessageContent content={streamingContent} assistant={true} />
+                <MessageContent
+                  content={streamingContent}
+                  assistant={true}
+                  onApprovePermission={onApprovePermission}
+                  onApproveCapability={onApproveCapability}
+                />
               </div>
             )}
           </div>
