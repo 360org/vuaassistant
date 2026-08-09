@@ -4,6 +4,7 @@ import { VaultSettings } from "@/components/settings/VaultSettings";
 import { WorkspaceSettingsSection } from "@/components/settings/WorkspaceSettingsSection";
 import { AppUpdateSection } from "@/components/settings/AppUpdateSection";
 import { McpSettingsSection } from "@/components/settings/McpSettingsSection";
+import { PolicySettingsSection } from "@/components/settings/PolicySettingsSection";
 import { DiagnosticsSection } from "@/components/settings/DiagnosticsSection";
 import { useApp } from "@/lib/store";
 import { t } from "@/lib/i18n";
@@ -34,6 +35,9 @@ export function Settings() {
 
       {/* Model capabilities run only through user-approved MCP servers. */}
       <McpSettingsSection />
+
+      {/* Giới hạn người dùng đặt, được capability rail thi hành. */}
+      <PolicySettingsSection />
 
       {/* Redacted health/support bundle for local-first debugging. */}
       <DiagnosticsSection />

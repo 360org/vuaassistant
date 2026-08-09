@@ -39,9 +39,11 @@ import {
   CAPABILITY_TOOL_DEFINITIONS,
   capabilityFromTool,
   searchCapabilities,
+  policyDenied,
   sideEffectDenied,
   type Capability,
 } from './capability-rail.js';
+import { OutboundLimiter, readPolicy } from './policy.js';
 import { clearBuiltinToolContext, executeBuiltinTool, getBuiltinToolDefinitions, hasBuiltinTool, setBuiltinToolContext } from './mcp-tools/index.js';
 import { DEFAULT_LIMITS, checkLoop, type Attempt, type GuardLimits } from './loop-guard.js';
 import { estimateTokens, pruneHistory } from './context-prune.js';
@@ -346,6 +348,10 @@ export async function executeAgentLoop(
   // Sổ lần thử, nuôi phanh vòng lặp bên dưới. Giữ trong bộ nhớ theo từng lượt.
   const attempts: Attempt[] = [];
   let tokensEstimate = 0;
+  // Đọc chính sách một lần mỗi lượt: người dùng đổi luật giữa chừng thì lượt
+  // sau mới áp dụng, nhưng trong một lượt luật không đổi giữa các bước.
+  const policy = readPolicy();
+  const outboundLimiter = new OutboundLimiter(policy);
 
   for (let iteration = 0; iteration < MAX_TOOL_ITERATIONS; iteration++) {
     // Phanh chạy TRƯỚC mỗi vòng: trần số vòng không đủ để chặn cảnh agent gọi
@@ -436,7 +442,10 @@ export async function executeAgentLoop(
       let result: ToolResult;
       
       const directCapability = capabilities.find((item) => item.name === tc.name);
-      const directDenied = directCapability ? sideEffectDenied(directCapability, tc.arguments.approved) : null;
+      const directDenied = directCapability
+        ? policyDenied(directCapability, tc.arguments, tc.arguments.approved, policy, outboundLimiter)
+          ?? sideEffectDenied(directCapability, tc.arguments.approved)
+        : null;
       if (tc.name === 'search_capabilities') {
         result = {
           tool_call_id: tc.id,
@@ -454,7 +463,10 @@ export async function executeAgentLoop(
         const capabilityArgs = tc.arguments.arguments && typeof tc.arguments.arguments === 'object'
           ? tc.arguments.arguments as Record<string, unknown>
           : {};
-        const denied = capability ? sideEffectDenied(capability, tc.arguments.approved) : null;
+        const denied = capability
+          ? policyDenied(capability, capabilityArgs, tc.arguments.approved, policy, outboundLimiter)
+            ?? sideEffectDenied(capability, tc.arguments.approved)
+          : null;
         if (!capability) {
           result = { tool_call_id: tc.id, content: `Unknown capability: ${capabilityName}`, is_error: true };
         } else if (denied) {

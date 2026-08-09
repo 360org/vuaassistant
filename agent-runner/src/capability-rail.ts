@@ -1,4 +1,5 @@
 import type { ToolDefinition, ToolResult } from './providers/types.js';
+import { OutboundLimiter, pathDenied, readPolicy, requiresAsk, type Policy } from './policy.js';
 
 export type CapabilityKind = 'native' | 'builtin' | 'mcp';
 
@@ -91,6 +92,59 @@ export function searchCapabilities(capabilities: Capability[], query: string, li
     }));
 
   return scored.length ? JSON.stringify({ capabilities: scored }, null, 2) : 'Không tìm thấy capability phù hợp.';
+}
+
+/**
+ * Chặn theo chính sách của người dùng, TRƯỚC khi capability được chạy.
+ *
+ * Đây là chỗ luật thật sự có hiệu lực. Nhét luật vào system prompt chỉ là gợi
+ * ý — model có thể bỏ qua, và với việc tiêu tiền thật thì "có thể bỏ qua" là
+ * không chấp nhận được. Mọi capability đều đi qua đây nên chặn ở đây là chặn
+ * được thật.
+ *
+ * Ba luật: đường dẫn bị cấm, capability luôn phải hỏi, và hạn mức gửi ra ngoài
+ * mỗi giờ. Ba luật đều đọc từ tệp chính sách; tệp hỏng thì quay về mặc định
+ * chặt hơn chứ không lỏng hơn.
+ */
+export function policyDenied(
+  capability: Capability,
+  args: Record<string, unknown>,
+  approved: unknown,
+  policy: Policy = readPolicy(),
+  limiter?: OutboundLimiter,
+): ToolResult | null {
+  const deny = (content: string): ToolResult => ({ tool_call_id: '', is_error: true, content });
+
+  // 1. Đường dẫn bị cấm — kiểm mọi tham số trông như đường dẫn.
+  for (const [key, value] of Object.entries(args)) {
+    if (typeof value !== 'string') continue;
+    if (!/(path|file|dir|folder|duong_dan)/i.test(key)) continue;
+    const rule = pathDenied(value, policy);
+    if (rule) {
+      return deny(
+        `POLICY_DENIED: Sếp đã đặt luật không cho đụng tới "${rule}", nên em không mở ` +
+          `"${value}". Nếu Sếp thật sự cần, hãy bỏ luật đó trong phần Cài đặt trước.`,
+      );
+    }
+  }
+
+  // 2. Capability người dùng bắt luôn phải hỏi.
+  if (requiresAsk(capability.name, policy) && approved !== true) {
+    return deny(
+      `APPROVAL_REQUIRED: Sếp đã đặt luật luôn hỏi trước khi dùng ${capability.name}. ` +
+        `Hãy xin người dùng duyệt đúng hành động này, rồi gọi lại với approved=true.`,
+    );
+  }
+
+  // 3. Hạn mức gửi ra ngoài. Chỉ tính khi hành động THẬT SỰ sắp chạy, tức là
+  //    sau khi đã qua mọi cửa duyệt — nếu tính sớm thì một lần bị từ chối vẫn
+  //    ăn mất hạn mức của người dùng.
+  if (limiter && capability.side_effect) {
+    const refused = limiter.take();
+    if (refused) return deny(`POLICY_DENIED: ${refused}`);
+  }
+
+  return null;
 }
 
 export function sideEffectDenied(capability: Capability, approved: unknown): ToolResult | null {

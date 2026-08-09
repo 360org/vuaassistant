@@ -57,6 +57,20 @@ Ghi lại mọi thay đổi đáng chú ý của V Assistant. Định dạng the
   Con số là **ước lượng** (~4 ký tự một token) vì các nhà cung cấp không trả về
   usage trong luồng sự kiện. Nó đủ để chặn chạy hoang nhưng **không phải hoá
   đơn thật**, và mọi câu hiện ra cho người dùng đều nói rõ điều đó.
+- **Giới hạn cho Agent do người dùng đặt** (Cài đặt → "Giới hạn cho Agent"):
+  đường dẫn Agent không được đụng tới, công cụ luôn phải hỏi trước khi dùng, và
+  số lần gửi ra ngoài tối đa mỗi giờ. Trước đây mọi luật đều nằm **trong mã**,
+  muốn đổi phải chờ bản phát hành mới.
+
+  Điểm quan trọng nhất: luật được thi hành ở **capability rail** — nơi mọi công
+  cụ bắt buộc đi qua trước khi chạy — chứ không nhét vào system prompt. Nhét vào
+  prompt thì đó là gợi ý, model có thể bỏ qua; với việc tiêu tiền thật thì "có
+  thể bỏ qua" là không chấp nhận được.
+
+  Đường dẫn khớp theo **từng đoạn**, nên `.env` chặn đúng tệp `.env` mà không
+  chặn oan thư mục `duan-env/`. Hạn mức tính theo **cửa sổ trượt** một giờ, nên
+  không thể gửi dồn quanh mốc giao giờ. Tệp chính sách hỏng thì quay về mặc
+  định **chặt hơn** theo từng trường, chứ không gỡ sạch giới hạn.
 - **Dừng sớm là báo cho người dùng, không im lặng bỏ cuộc**: khi phanh cắt vòng
   lặp, câu trả về nói rõ đã thử gì, hỏng vì sao và đề nghị bước tiếp — bằng
   tiếng Việt, có kèm lỗi thật, không lộ tên lý do nội bộ và không đổ JSON thô

@@ -857,10 +857,23 @@
 - [ ] **Vai kiểm độc lập (maker/checker) trước hành động có hậu quả thật:**
       phiên riêng với vai làm, mặc định TỪ CHỐI cho tới khi có bằng chứng, chỉ
       trả `DUYỆT` / `TỪ CHỐI + lý do` / `HỎI NGƯỜI DÙNG`.
-- [ ] **Màn hình chính sách trong Settings:** giới hạn do người dùng đặt (số tin
-      gửi ra ngoài mỗi giờ, trần ngân sách quảng cáo mỗi ngày, đường dẫn cấm)
-      ghi xuống tệp chính sách và **được capability rail thi hành** — luật nằm
-      trong rail, không phải nhét vào system prompt rồi mong model nghe lời.
+- [x] **Màn hình chính sách trong Settings** (`PolicySettingsSection.tsx` →
+      `policy.json` → `agent-runner/src/policy.ts` → capability rail): người
+      dùng đặt đường dẫn cấm, công cụ luôn phải hỏi, và số lần gửi ra ngoài mỗi
+      giờ. Luật được thi hành ở **rail** — nơi mọi capability bắt buộc đi qua
+      trước khi chạy — chứ không nhét vào system prompt.
+      Test: `agent-runner/scripts/policy-check.mjs`.
+
+      > **Ba cách làm luật thành đồ trang trí, đã khoá lại bằng test:**
+      > 1. So đường dẫn bằng `includes` trên chuỗi thô: vừa **lọt** (`..%2f`,
+      >    gạch ngược Windows) vừa **chặn oan** (`/home/an/duan-env/ghi-chu.txt`
+      >    dính luật `.env`). Phải so theo **từng đoạn** đường dẫn.
+      > 2. Tệp chính sách hỏng mà bỏ qua cả tệp ⇒ một dấu phẩy thừa âm thầm gỡ
+      >    sạch mọi giới hạn. Phải quay về mặc định **chặt hơn**, theo từng
+      >    trường.
+      > 3. Hạn mức reset theo **giờ tròn** ⇒ gửi hết hạn mức lúc 8:59 rồi gửi
+      >    tiếp cả hạn mức mới lúc 9:01, người dùng nhận gấp đôi trong hai phút.
+      >    Phải dùng **cửa sổ trượt** một giờ.
 - [x] **Ngân sách token theo ngày cho tác vụ lịch** (`agent-runner/src/daily-budget.ts`):
       <80% chạy im lặng; >=80% cảnh báo **một lần** rồi vẫn chạy; >=100% dừng
       tác vụ lịch tới hết ngày và báo **một lần**. Sổ nằm chung `session_state`
