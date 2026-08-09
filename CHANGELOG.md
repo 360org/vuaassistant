@@ -41,6 +41,22 @@ Ghi lại mọi thay đổi đáng chú ý của V Assistant. Định dạng the
   Hai điều **bắt buộc giữ**, vì phá là hỏng nhà cung cấp chứ không phải chỉ tốn
   tiền: mỗi `assistant` có tool call phải còn đủ `tool` đi kèm, và không được
   để `tool` mồ côi — Gemini từ chối cả request khi function call không khớp cặp.
+- **Ngân sách token theo ngày cho tác vụ lịch** (`agent-runner/src/daily-budget.ts`):
+  phanh vòng lặp chặn được **một** lượt chạy hoang, nhưng tác vụ theo lịch chạy
+  khi không ai ngồi trước máy — một tác vụ hỏng lúc 2 giờ sáng có thể chạy lại
+  mỗi giờ tới sáng, mỗi lượt đều dưới ngưỡng của phanh mà cộng dồn thì thành
+  hoá đơn thật. Nay: dưới 80% chạy im lặng; từ 80% cảnh báo **một lần** rồi vẫn
+  chạy; chạm trần thì dừng tác vụ lịch tới hết ngày và báo **một lần**.
+
+  Sổ chi tiêu nằm chung `session_state` với `lastRun` nên sống sót qua mọi lần
+  bật/tắt app — cần thiết, vì một vòng chạy hoang qua đêm vắt qua nhiều lần
+  khởi động. Ngày tính theo **giờ máy người dùng**: dùng UTC thì ở Việt Nam
+  ngân sách reset lúc 7 giờ sáng. Trần mặc định 1.000.000 token/ngày, đổi bằng
+  `VUA_DAILY_TOKEN_BUDGET` (đặt `0` để tắt).
+
+  Con số là **ước lượng** (~4 ký tự một token) vì các nhà cung cấp không trả về
+  usage trong luồng sự kiện. Nó đủ để chặn chạy hoang nhưng **không phải hoá
+  đơn thật**, và mọi câu hiện ra cho người dùng đều nói rõ điều đó.
 - **Dừng sớm là báo cho người dùng, không im lặng bỏ cuộc**: khi phanh cắt vòng
   lặp, câu trả về nói rõ đã thử gì, hỏng vì sao và đề nghị bước tiếp — bằng
   tiếng Việt, có kèm lỗi thật, không lộ tên lý do nội bộ và không đổ JSON thô

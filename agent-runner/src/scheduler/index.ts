@@ -17,6 +17,7 @@
 import fs from 'fs';
 import path from 'path';
 import { getSessionState, setSessionState, writeMessageOut } from '../db/index.js';
+import { checkBudget, recordSpend, type BudgetStore } from '../daily-budget.js';
 import { executeAgentLoop, type PollLoopConfig } from '../poll-loop.js';
 import { notifyTelegram } from '../channels/telegram.js';
 import { isDue } from './schedule.js';
@@ -70,6 +71,29 @@ export function readTasks(): ScheduledTask[] {
 const lastRunKey = (taskId: string) => `scheduler:lastRun:${taskId}`;
 
 /**
+ * Sổ ngân sách dùng chung kho `session_state` với `lastRun`, nên nó sống sót
+ * qua mọi lần khởi động lại — đúng thứ cần thiết, vì một vòng lặp chạy hoang
+ * suốt đêm có thể vắt qua nhiều lần app bật/tắt.
+ */
+const budgetStore: BudgetStore = {
+  get: (key) => getSessionState(key),
+  set: (key, value) => setSessionState(key, value),
+};
+
+/** Đẩy một câu thông báo của hệ thống lên giao diện và Telegram. */
+function announce(text: string): void {
+  writeMessageOut({
+    id: generateId(),
+    kind: 'chat',
+    platform_id: CHANNEL,
+    channel_type: CHANNEL,
+    thread_id: 'budget',
+    content: JSON.stringify({ text, status: 'notice' }),
+  });
+  void notifyTelegram(text);
+}
+
+/**
  * When the runner has never fired a task, fall back to the `lastRun` stamped
  * into the file at creation time. Without that a task created minutes ago with
  * a "daily at 09:00" schedule would fire immediately on the next tick.
@@ -106,6 +130,19 @@ export async function runDueTasks(config: PollLoopConfig, now = new Date()): Pro
   const due = dueTasks(readTasks(), now);
   const fired: string[] = [];
 
+  // Kiểm ngân sách TRƯỚC khi chạy bất cứ việc gì. Phanh vòng lặp chặn được một
+  // lượt chạy hoang; cái này chặn nhiều lượt cộng dồn qua cả đêm.
+  const budget = checkBudget(budgetStore, { now });
+  if (budget.notice) announce(budget.notice);
+  if (budget.mode === 'stop') {
+    if (due.length > 0) {
+      log(`Bỏ qua ${due.length} tác vụ: đã chạm trần ngân sách hôm nay (~${budget.spent} token)`);
+      // Vẫn ghi lastRun để sang ngày mai không dồn lại chạy một loạt.
+      for (const task of due) setLastRun(task.id, now.getTime());
+    }
+    return fired;
+  }
+
   for (const task of due) {
     setLastRun(task.id, now.getTime());
     fired.push(task.id);
@@ -120,6 +157,7 @@ export async function runDueTasks(config: PollLoopConfig, now = new Date()): Pro
         { platformId: null, channelType: null, threadId: null },
         config.systemContext,
       );
+      recordSpend(budgetStore, result.tokensEstimate ?? 0, now);
       if (result.text) {
         writeMessageOut({
           id: generateId(),

@@ -861,8 +861,25 @@
       gửi ra ngoài mỗi giờ, trần ngân sách quảng cáo mỗi ngày, đường dẫn cấm)
       ghi xuống tệp chính sách và **được capability rail thi hành** — luật nằm
       trong rail, không phải nhét vào system prompt rồi mong model nghe lời.
-- [ ] **Ngân sách token theo ngày cho tác vụ lịch:** chạm 80% chuyển sang chỉ
-      báo cáo, chạm trần thì dừng và báo người dùng.
+- [x] **Ngân sách token theo ngày cho tác vụ lịch** (`agent-runner/src/daily-budget.ts`):
+      <80% chạy im lặng; >=80% cảnh báo **một lần** rồi vẫn chạy; >=100% dừng
+      tác vụ lịch tới hết ngày và báo **một lần**. Sổ nằm chung `session_state`
+      với `lastRun` nên sống sót qua mọi lần bật/tắt app — cần thiết vì một
+      vòng chạy hoang qua đêm vắt qua nhiều lần khởi động. Trần mặc định
+      1.000.000 token/ngày, đổi bằng `VUA_DAILY_TOKEN_BUDGET` (đặt `0` để tắt).
+      Test: `agent-runner/scripts/daily-budget-check.mjs`.
+
+      > **Ba điều đã khoá lại bằng test:**
+      > 1. Cảnh báo chỉ kêu **một lần** mỗi ngày. Kêu lại mỗi 30 giây tới nửa
+      >    đêm thì người dùng tắt app, và ta mất luôn cái cảnh báo.
+      > 2. Ngày tính theo **giờ máy người dùng**, không phải UTC. Ở Việt Nam
+      >    dùng UTC thì ngân sách reset lúc 7 giờ sáng — vừa khó hiểu vừa cho
+      >    vòng chạy hoang thêm một suất giữa buổi. Máy CI chạy giờ UTC nên
+      >    mục test này phải chạy trong tiến trình con đặt `TZ=Asia/Ho_Chi_Minh`
+      >    mới kiểm được thật; để nguyên là mục test **rỗng nghĩa**.
+      > 3. Con số là **ước lượng** (~4 ký tự/token) vì nhà cung cấp không trả
+      >    usage. Mọi câu hiện ra cho người dùng phải nói rõ, đừng để họ tưởng
+      >    là hoá đơn.
 
 - [x] **Web Search & HTTP Fetch**: Tìm kiếm thông tin web công khai và đọc trang HTML/Markdown (`web_search`, `http_request`)
 - [ ] **Interactive Browser Automation (Playwright / Puppeteer MCP)**: Tự động tương tác với website phức tạp đòi hỏi JavaScript (click nút, điền form, chụp ảnh màn hình web, xử lý captcha)

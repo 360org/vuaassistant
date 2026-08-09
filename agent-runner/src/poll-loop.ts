@@ -285,6 +285,15 @@ export async function runPollLoop(config: PollLoopConfig): Promise<void> {
 export interface AgentLoopResult {
   text: string | null;
   continuation?: string;
+  /**
+   * Token ƯỚC LƯỢNG đã gửi đi trong cả lượt.
+   *
+   * Cộng dồn theo từng vòng vì lịch sử được gửi lại mỗi vòng — đó chính là
+   * chỗ chi phí phình ra. Nhà cung cấp không trả về usage trong luồng sự kiện
+   * nên đây là con số duy nhất lấy được mà không gọi thêm API; dùng để chặn
+   * chạy hoang, không phải để tính tiền.
+   */
+  tokensEstimate?: number;
 }
 
 /**
@@ -336,6 +345,7 @@ export async function executeAgentLoop(
 
   // Sổ lần thử, nuôi phanh vòng lặp bên dưới. Giữ trong bộ nhớ theo từng lượt.
   const attempts: Attempt[] = [];
+  let tokensEstimate = 0;
 
   for (let iteration = 0; iteration < MAX_TOOL_ITERATIONS; iteration++) {
     // Phanh chạy TRƯỚC mỗi vòng: trần số vòng không đủ để chặn cảnh agent gọi
@@ -344,7 +354,7 @@ export async function executeAgentLoop(
     const verdict = checkLoop(attempts, iteration, LOOP_LIMITS);
     if (verdict.action === 'stop') {
       log(`Dừng vòng lặp sớm (${verdict.reason}) sau ${attempts.length} lần gọi công cụ`);
-      return { text: verdict.message, continuation: sessionContinuation };
+      return { text: verdict.message, continuation: sessionContinuation, tokensEstimate };
     }
 
     const nativeTools = getToolDefinitions();
@@ -361,11 +371,11 @@ export async function executeAgentLoop(
     // phương số vòng nếu không cắt bớt. Cắt tỉa ngay trước khi gửi: bản đầy đủ
     // vẫn giữ trong `conversationHistory` cho transcript và cho các vòng sau.
     const outgoing = pruneHistory(conversationHistory);
-    if (outgoing !== conversationHistory) {
-      const before = estimateTokens(conversationHistory);
-      const after = estimateTokens(outgoing);
-      if (after < before) log(`Cắt tỉa ngữ cảnh: ~${before} → ~${after} token`);
-    }
+    const before = estimateTokens(conversationHistory);
+    const after = estimateTokens(outgoing);
+    if (after < before) log(`Cắt tỉa ngữ cảnh: ~${before} → ~${after} token`);
+    // Đếm đúng thứ THẬT SỰ gửi đi, sau khi đã cắt tỉa.
+    tokensEstimate += after;
 
     const query = config.provider.query({
       prompt: currentPrompt,
@@ -502,7 +512,7 @@ export async function executeAgentLoop(
         result.content.includes('APPROVAL_REQUIRED:') ||
         result.content.startsWith('INTERACTIVE_QUESTION_PENDING:')
       ) {
-        return { text: result.content, continuation: sessionContinuation };
+        return { text: result.content, continuation: sessionContinuation, tokensEstimate };
       }
     }
 
@@ -513,5 +523,6 @@ export async function executeAgentLoop(
   return {
     text: finalText,
     continuation: sessionContinuation,
+    tokensEstimate,
   };
 }
