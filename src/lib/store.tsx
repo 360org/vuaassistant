@@ -211,6 +211,10 @@ export interface ScheduledTask {
   createdAt: number;
   /** When the task last ran (ms), so it isn't fired twice. */
   lastRun?: number;
+  /** Autonomy Loop (#14): parent task id for DAG delegation. Undefined = root task. */
+  parentTaskId?: string;
+  /** Status for Kanban view. "pending" | "running" | "done" | "failed" */
+  kanbanStatus?: "pending" | "running" | "done" | "failed";
 }
 
 /** History is unbounded otherwise; a scheduled task runs forever. */
@@ -470,6 +474,32 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const info = await checkAppUpdate();
     setAppUpdate(info);
     return info;
+  }, []);
+
+  // Task #10: Disk-fallback session hydration.
+  // Khi localStorage bị xóa (storage migration, privacy mode, clear site data),
+  // chatSessions sẽ chỉ có 1 session mới toanh. Load lại từ disk để khôi phục.
+  useEffect(() => {
+    if (state.chatSessions.length > 1) return; // đã có sessions — không cần
+    if (state.chatSessions[0]?.messages.length) return; // session có tin nhắn — không cần
+    if (typeof window === "undefined" || !("__TAURI_INTERNALS__" in window)) return;
+    const dataDir = state.customDataPath || localStorage.getItem("vua:custom-data-path") || "~/vuaai-data";
+    import("@tauri-apps/api/core").then(({ invoke }) =>
+      invoke<string>("load_sessions_from_disk", { customDir: dataDir })
+        .then((raw) => {
+          if (!raw) return;
+          const sessions = JSON.parse(raw) as ChatSession[];
+          if (!Array.isArray(sessions) || sessions.length === 0) return;
+          setState((s) => {
+            if (s.chatSessions.length > 1) return s; // đã được cập nhật bởi effect khác
+            const active = sessions.find((session) => session.id === s.activeSessionId) ?? sessions[0];
+            return { ...s, chatSessions: sessions, activeSessionId: active.id, messages: active.messages, activeAgentId: active.agentId };
+          });
+        })
+        .catch(() => {})
+    ).catch(() => {});
+  // ponytail: chỉ chạy một lần sau mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

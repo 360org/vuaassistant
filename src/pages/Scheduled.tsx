@@ -60,19 +60,25 @@ export function Scheduled() {
       id: "active",
       title: "Đang chạy",
       description: "Sẽ chạy theo lịch",
-      tasks: visibleTasks.filter((task) => statusFor(task) === "active"),
+      tasks: visibleTasks.filter((task) => statusFor(task) === "active" && !task.kanbanStatus),
     },
     {
       id: "paused",
       title: "Tạm dừng",
       description: "Chưa chạy lại",
-      tasks: visibleTasks.filter((task) => statusFor(task) === "paused"),
+      tasks: visibleTasks.filter((task) => statusFor(task) === "paused" && !task.kanbanStatus),
     },
     {
       id: "needs-attention",
       title: "Cần chú ý",
       description: "Lần chạy gần nhất lỗi",
-      tasks: visibleTasks.filter((task) => statusFor(task) === "attention"),
+      tasks: visibleTasks.filter((task) => statusFor(task) === "attention" && task.kanbanStatus !== "done"),
+    },
+    {
+      id: "done",
+      title: "Đã xong",
+      description: "Task uỷ quyền hoàn thành",
+      tasks: visibleTasks.filter((task) => task.kanbanStatus === "done"),
     },
   ];
 
@@ -197,7 +203,7 @@ export function Scheduled() {
         </Card>
       ) : (
         <>
-        {view === "board" && <div className="mt-6 grid gap-4 xl:grid-cols-3">
+        {view === "board" && <div className="mt-6 grid gap-4 xl:grid-cols-4">
           {columns.map((column) => (
             <section
               key={column.id}
@@ -251,6 +257,9 @@ export function Scheduled() {
                           <div className="min-w-0 flex-1">
                             <h3 className="line-clamp-2 text-sm font-medium text-neutral-100">{task.name}</h3>
                             <p className="mt-1 text-xs text-neutral-400">{task.schedule}</p>
+                            {task.parentTaskId && (
+                              <p className="mt-0.5 text-[10px] text-neutral-600">↳ sub-task</p>
+                            )}
                           </div>
                         </div>
                         <p className="mt-3 line-clamp-3 text-xs leading-5 text-neutral-500">{task.prompt}</p>

@@ -8,6 +8,7 @@
 
 pub mod agent_fs;
 pub mod auth;
+pub mod computer_action;
 pub mod knowledge;
 pub mod runtime;
 #[cfg(feature = "sandbox")]
@@ -272,6 +273,16 @@ fn save_custom_data_text(custom_dir: String, relative_path: String, content: Str
     fs::write(&target_file, content).map_err(|e| e.to_string())?;
 
     Ok(target_file.to_string_lossy().to_string())
+}
+
+/// Load chat sessions from disk as fallback when localStorage is empty.
+/// Reads `chats/sessions.json` from the custom data dir (or ~/vuaai-data).
+/// Returns the raw JSON string; empty-string on any error so the UI can
+/// fall through to its own defaults without throwing.
+#[tauri::command]
+fn load_sessions_from_disk(custom_dir: String) -> String {
+    let path = resolve_data_dir(&custom_dir).join("chats/sessions.json");
+    std::fs::read_to_string(&path).unwrap_or_default()
 }
 
 #[tauri::command]
@@ -616,13 +627,24 @@ pub fn run() {
             set_workspace_path,
             save_custom_data_file,
             save_custom_data_text,
+            load_sessions_from_disk,
             read_host_file,
             write_host_file,
             list_host_dir,
             agent_read_file,
             agent_write_file,
             agent_list_dir,
-            set_autostart
+            set_autostart,
+            computer_action::computer_mouse_move,
+            computer_action::computer_mouse_click,
+            computer_action::computer_mouse_down,
+            computer_action::computer_mouse_up,
+            computer_action::computer_type_text,
+            computer_action::computer_key_press,
+            computer_action::computer_key_down,
+            computer_action::computer_key_up,
+            computer_action::computer_screenshot,
+            computer_action::computer_list_displays
         ])
         .build(tauri::generate_context!())
         .expect("error while building V Assistant")

@@ -6,6 +6,22 @@ Ghi lại mọi thay đổi đáng chú ý của V Assistant. Định dạng the
 
 ## [Chưa phát hành]
 
+## [1.1.58] - 2026-08-09
+
+### Tính năng mới
+- **Host-side Session Management** (`src/lib/store.tsx`): disk-fallback hydration — khi UI reload mà localStorage trống, tự động đọc `chats/sessions.json` từ disk qua Tauri command `load_sessions_from_disk`, zero data-loss khi F5.
+- **Computer Use & OS Control** (`src-tauri/src/computer_action.rs`): 10 Tauri commands cho Agent điều khiển chuột/bàn phím và chụp màn hình — `computer_mouse_move`, `computer_mouse_click`, `computer_mouse_down`, `computer_mouse_up`, `computer_type_text`, `computer_key_press`, `computer_key_down`, `computer_key_up`, `computer_screenshot` (trả base64 PNG cho Vision LLM), `computer_list_displays`.
+- **Computer Use native tool** (`agent-runner/src/native-tools/index.ts`): Agent Runner gọi `computer_use` tool qua AI Router bridge — hỗ trợ đầy đủ mouse/keyboard/screenshot actions.
+- **Delegate Task native tool** (`agent-runner/src/native-tools/index.ts`): `delegate_task` tool ghi vào `inbound.db` SQLite để spawn sub-agent, trả task-id để tracking.
+- **Kanban 4 cột** (`src/pages/Scheduled.tsx`): thêm cột "Đã xong" (`kanbanStatus === "done"`), grid chuyển sang `xl:grid-cols-4`, card hiển thị badge "↳ sub-task" nếu có `parentTaskId`.
+- **DAG Task Tree** (`src/lib/store.tsx`): `ScheduledTask` mở rộng thêm `parentTaskId` và `kanbanStatus` để hỗ trợ cây tác vụ cha/con.
+
+### Kỹ thuật
+- `Enigo` được tạo fresh mỗi lần gọi command (không dùng `static Mutex`) — tránh lỗi `NonNull<CGEventSource>` không `Send` trên macOS.
+- PNG encoding dùng `screenshots::image::codecs::png::PngEncoder` với `ColorType::Rgba8` — không cần thêm crate `image` riêng.
+
+
+
 ### Tính năng mới
 - **Phanh cho vòng lặp agentic** (`agent-runner/src/loop-guard.ts`): trước đây
   vòng lặp tool-calling chỉ có đúng một cái phanh là trần 25 vòng. Đó là phanh

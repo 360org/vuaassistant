@@ -696,7 +696,178 @@ const searchMemoryTool: NativeTool = {
   },
 };
 
-// --- Registry ---
+// --- Computer Use Tool ---
+// Calls the Tauri computer_action commands via HTTP to the Tauri IPC bridge.
+// When running inside the desktop app, Tauri exposes a local IPC; the Agent
+// Runner (Node.js sidecar) calls back through the AI Router which proxies
+// whitelisted Tauri commands. When not in Tauri, this tool is simply absent.
+//
+// ponytail: single tool covering all actions to avoid polluting the model's
+// tool list. Upgrade path: split per-action when capability-rail needs
+// per-action gates (e.g. allow screenshot but not keyboard).
+const computerUseTool: NativeTool = {
+  definition: {
+    name: 'computer_use',
+    description:
+      'Control the host computer: move the mouse, click, type text, press keyboard shortcuts, ' +
+      'or take a screenshot of the screen. Only available when the user has granted Computer Use ' +
+      'in Settings → Agent Limits. Actions run on the real desktop — use carefully.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        action: {
+          type: 'string',
+          description:
+            'One of: "mouse_move", "mouse_click", "mouse_down", "mouse_up", ' +
+            '"type_text", "key_press", "key_down", "key_up", "screenshot", "list_displays".',
+        },
+        x: { type: 'number', description: 'X coordinate for mouse_move (absolute screen pixels).' },
+        y: { type: 'number', description: 'Y coordinate for mouse_move (absolute screen pixels).' },
+        button: { type: 'string', description: '"left" | "right" | "middle" for mouse actions (default "left").' },
+        text: { type: 'string', description: 'Text to type (for type_text action).' },
+        key: { type: 'string', description: 'Key name for key_press/key_down/key_up (e.g. "return", "ctrl", "f5").' },
+        display_index: { type: 'number', description: 'Display index for screenshot (0 = primary, default 0).' },
+      },
+      required: ['action'],
+    },
+  },
+  async execute(args): Promise<string> {
+    const routerUrl = AI_ROUTER_URL;
+    const action = String(args.action || '');
+    // Map action → Tauri command + params, forwarded via AI Router tauri-bridge.
+    const payload: Record<string, unknown> = { command: '' };
+    switch (action) {
+      case 'mouse_move':
+        payload.command = 'computer_mouse_move';
+        payload.x = args.x ?? 0;
+        payload.y = args.y ?? 0;
+        break;
+      case 'mouse_click':
+        payload.command = 'computer_mouse_click';
+        payload.button = args.button ?? 'left';
+        break;
+      case 'mouse_down':
+        payload.command = 'computer_mouse_down';
+        payload.button = args.button ?? 'left';
+        break;
+      case 'mouse_up':
+        payload.command = 'computer_mouse_up';
+        payload.button = args.button ?? 'left';
+        break;
+      case 'type_text':
+        payload.command = 'computer_type_text';
+        payload.text = String(args.text ?? '');
+        break;
+      case 'key_press':
+        payload.command = 'computer_key_press';
+        payload.key = String(args.key ?? '');
+        break;
+      case 'key_down':
+        payload.command = 'computer_key_down';
+        payload.key = String(args.key ?? '');
+        break;
+      case 'key_up':
+        payload.command = 'computer_key_up';
+        payload.key = String(args.key ?? '');
+        break;
+      case 'screenshot':
+        payload.command = 'computer_screenshot';
+        payload.display_index = args.display_index ?? 0;
+        break;
+      case 'list_displays':
+        payload.command = 'computer_list_displays';
+        break;
+      default:
+        return `Unknown computer_use action: "${action}". Valid: mouse_move, mouse_click, mouse_down, mouse_up, type_text, key_press, key_down, key_up, screenshot, list_displays.`;
+    }
+    try {
+      const res = await fetch(`${routerUrl}/v1/tauri-bridge`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const err = await res.text();
+        return `Computer use error (${res.status}): ${err}`;
+      }
+      const data = await res.json() as { result?: unknown; error?: string };
+      if (data.error) return `Computer use error: ${data.error}`;
+      // screenshot returns base64 PNG — tell the model it's an image data URL
+      if (action === 'screenshot' && typeof data.result === 'string') {
+        return `data:image/png;base64,${data.result}`;
+      }
+      return typeof data.result === 'string' ? data.result : JSON.stringify(data.result ?? 'OK');
+    } catch (err) {
+      return `Computer use unavailable: ${err instanceof Error ? err.message : String(err)}`;
+    }
+  },
+};
+
+// --- Delegate Task Tool (#14 Autonomy Loop) ---
+// Allows an Agent to spawn a child task (sub-agent run) by writing to the
+// inbound IPC queue. The parent continues; the child result comes back as a
+// scheduled outbound message tagged with the delegated task id.
+//
+// ponytail: writes to messages_in directly using the same DB the host uses.
+// Upgrade path: full DAG parentTaskId tracking in a separate task_tree table.
+const delegateTaskTool: NativeTool = {
+  definition: {
+    name: 'delegate_task',
+    description:
+      'Delegate a sub-task to a child Agent. The child runs independently and ' +
+      'its result is delivered back to the current session. Use this to break a ' +
+      'large goal into parallel workstreams. Each child runs in the same workspace.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        task_name: { type: 'string', description: 'Short name for the delegated task (shown in UI).' },
+        prompt: { type: 'string', description: 'Full instructions for the child agent.' },
+        agent_name: { type: 'string', description: 'Target agent name/group (default: current agent).' },
+      },
+      required: ['task_name', 'prompt'],
+    },
+  },
+  async execute(args): Promise<string> {
+    const dataDir = DATA_DIR;
+    const ipcDir = path.join(dataDir, 'ipc');
+    const inboundDb = path.join(ipcDir, 'inbound.db');
+
+    if (!fs.existsSync(inboundDb)) {
+      return 'Delegate unavailable: IPC database not found. Ensure the Agent Runner is active.';
+    }
+
+    const taskId = `delegate-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+    const taskName = String(args.task_name || 'Delegated task');
+    const prompt = String(args.prompt || '');
+    const agentName = String(args.agent_name || loadConfig().agentName);
+
+    // Write to inbound.db as a new message for the target agent.
+    // Uses even sequence number (host-side) to avoid collision with container (odd).
+    try {
+      const { execFileSync: exec } = await import('child_process');
+      const sql = `
+        INSERT INTO messages_in (id, seq, kind, timestamp, status, platform_id, channel_type, thread_id, content, trigger)
+        VALUES (
+          '${taskId}',
+          (SELECT COALESCE(MAX(seq), 0) + 2 FROM messages_in WHERE seq % 2 = 0),
+          'chat',
+          ${Date.now()},
+          'pending',
+          '${agentName}',
+          'agent',
+          '${taskId}',
+          ${JSON.stringify(JSON.stringify({ role: 'user', content: `[DELEGATED TASK: ${taskName}]\n\n${prompt}` }))},
+          1
+        );
+      `;
+      exec('sqlite3', [inboundDb, sql]);
+      log(`Delegated task "${taskName}" → ${agentName} (id=${taskId})`);
+      return `✅ Task delegated: "${taskName}" → agent "${agentName}" (id: ${taskId}). The result will appear in your session when complete.`;
+    } catch (err) {
+      return `Failed to delegate task: ${err instanceof Error ? err.message : String(err)}`;
+    }
+  },
+};
 
 /** All built-in native tools */
 export const NATIVE_TOOLS: NativeTool[] = [
@@ -711,6 +882,8 @@ export const NATIVE_TOOLS: NativeTool[] = [
   vaultListTool,
   scheduleTaskTool,
   searchMemoryTool,
+  computerUseTool,
+  delegateTaskTool,
 ];
 
 /** Get tool definitions for all native tools (for sending to LLM) */
