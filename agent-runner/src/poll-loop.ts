@@ -44,6 +44,7 @@ import {
   type Capability,
 } from './capability-rail.js';
 import { OutboundLimiter, readPolicy } from './policy.js';
+import { refusalMessage, verifyAction } from './verifier.js';
 import { clearBuiltinToolContext, executeBuiltinTool, getBuiltinToolDefinitions, hasBuiltinTool, setBuiltinToolContext } from './mcp-tools/index.js';
 import { DEFAULT_LIMITS, checkLoop, type Attempt, type GuardLimits } from './loop-guard.js';
 import { estimateTokens, pruneHistory } from './context-prune.js';
@@ -463,10 +464,32 @@ export async function executeAgentLoop(
         const capabilityArgs = tc.arguments.arguments && typeof tc.arguments.arguments === 'object'
           ? tc.arguments.arguments as Record<string, unknown>
           : {};
-        const denied = capability
+        let denied = capability
           ? policyDenied(capability, capabilityArgs, tc.arguments.approved, policy, outboundLimiter)
             ?? sideEffectDenied(capability, tc.arguments.approved)
           : null;
+
+        // Vai kiểm độc lập, chạy TRƯỚC khi hành động chạy — trong phiên riêng
+        // và không cầm công cụ nào. Chỉ bật khi người dùng đã yêu cầu, vì nó
+        // tốn thêm một lượt gọi model cho mỗi hành động.
+        if (capability && !denied && policy.verifySideEffects && capability.side_effect) {
+          const action = {
+            name: capability.name,
+            summary: capability.summary,
+            args: capabilityArgs,
+            goal: prompt,
+          };
+          const decision = await verifyAction(config.provider, action);
+          if (decision.verdict !== 'DUYET') {
+            log(`Người kiểm không duyệt ${capability.name}: ${decision.reason}`);
+            denied = {
+              tool_call_id: tc.id,
+              is_error: true,
+              content: refusalMessage(action, decision),
+            };
+          }
+        }
+
         if (!capability) {
           result = { tool_call_id: tc.id, content: `Unknown capability: ${capabilityName}`, is_error: true };
         } else if (denied) {

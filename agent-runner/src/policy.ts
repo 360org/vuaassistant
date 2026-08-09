@@ -25,6 +25,13 @@ export interface Policy {
   alwaysAsk: string[];
   /** Số hành động gửi ra ngoài tối đa mỗi giờ; 0 là không giới hạn. */
   maxOutboundPerHour: number;
+  /**
+   * Bật vai kiểm độc lập trước mỗi hành động có hậu quả thật.
+   *
+   * Tốn thêm một lượt gọi model cho mỗi hành động, nên mặc định tắt: người
+   * dùng bật khi giao cho Agent những việc tiêu tiền hoặc gửi ra ngoài.
+   */
+  verifySideEffects: boolean;
 }
 
 export const DEFAULT_POLICY: Policy = {
@@ -33,6 +40,7 @@ export const DEFAULT_POLICY: Policy = {
   deniedPaths: ['.env', '.ssh', '.aws', '.gnupg', 'id_rsa', 'credentials', 'wallet'],
   alwaysAsk: [],
   maxOutboundPerHour: 0,
+  verifySideEffects: false,
 };
 
 function policyFile(): string {
@@ -69,6 +77,10 @@ export function readPolicy(file: string = policyFile()): Policy {
     alwaysAsk: stringList(data.alwaysAsk) ?? DEFAULT_POLICY.alwaysAsk,
     maxOutboundPerHour:
       Number.isFinite(limit) && limit >= 0 ? Math.floor(limit) : DEFAULT_POLICY.maxOutboundPerHour,
+    verifySideEffects:
+      typeof data.verifySideEffects === 'boolean'
+        ? data.verifySideEffects
+        : DEFAULT_POLICY.verifySideEffects,
   };
 }
 

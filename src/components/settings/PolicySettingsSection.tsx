@@ -17,6 +17,7 @@ interface Policy {
   deniedPaths: string[];
   alwaysAsk: string[];
   maxOutboundPerHour: number;
+  verifySideEffects: boolean;
 }
 
 /** Giống `DEFAULT_POLICY` của runner: mặc định phải an toàn, không mở toang. */
@@ -24,6 +25,7 @@ const DEFAULT_POLICY: Policy = {
   deniedPaths: [".env", ".ssh", ".aws", ".gnupg", "id_rsa", "credentials", "wallet"],
   alwaysAsk: [],
   maxOutboundPerHour: 0,
+  verifySideEffects: false,
 };
 
 const toLines = (list: string[]) => list.join("\n");
@@ -38,6 +40,7 @@ export function PolicySettingsSection() {
   const [deniedPaths, setDeniedPaths] = useState(toLines(DEFAULT_POLICY.deniedPaths));
   const [alwaysAsk, setAlwaysAsk] = useState("");
   const [maxOutbound, setMaxOutbound] = useState("0");
+  const [verify, setVerify] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,6 +56,7 @@ export function PolicySettingsSection() {
         if (typeof parsed.maxOutboundPerHour === "number") {
           setMaxOutbound(String(parsed.maxOutboundPerHour));
         }
+        if (typeof parsed.verifySideEffects === "boolean") setVerify(parsed.verifySideEffects);
       } catch {
         // Chưa có tệp là chuyện bình thường — giữ nguyên giá trị mặc định.
       }
@@ -70,6 +74,7 @@ export function PolicySettingsSection() {
       deniedPaths: fromLines(deniedPaths),
       alwaysAsk: fromLines(alwaysAsk),
       maxOutboundPerHour: Math.floor(limit),
+      verifySideEffects: verify,
     };
     try {
       const { invoke } = await import("@tauri-apps/api/core");
@@ -146,6 +151,28 @@ export function PolicySettingsSection() {
             Đặt <code>0</code> để không giới hạn. Tính theo cửa sổ trượt một giờ, nên
             không thể gửi dồn quanh mốc giao giờ.
           </p>
+        </div>
+
+        <div>
+          <label className="flex items-start gap-2">
+            <input
+              type="checkbox"
+              checked={verify}
+              onChange={(e) => setVerify(e.target.checked)}
+              className="mt-0.5"
+            />
+            <span>
+              <span className="text-xs font-medium text-neutral-300">
+                Bắt một Agent thứ hai kiểm lại trước khi hành động
+              </span>
+              <span className="mt-1 block text-[11px] text-neutral-500">
+                Agent kiểm chạy trong phiên riêng, không cầm công cụ nào, và mặc định
+                là <strong>từ chối</strong> cho tới khi thấy đủ căn cứ. Bật cái này khi
+                giao cho Agent việc tiêu tiền hoặc gửi ra ngoài. Đổi lại, mỗi hành động
+                tốn thêm một lượt gọi model.
+              </span>
+            </span>
+          </label>
         </div>
       </div>
 

@@ -854,9 +854,23 @@
       Việt nói rõ đã thử gì, hỏng vì sao, đề nghị bước tiếp. Test khoá luôn ba
       điều: không lộ tên lý do nội bộ (`stagnation`…), có kèm lỗi thật, và không
       đổ JSON thô — cùng chuẩn với #13.
-- [ ] **Vai kiểm độc lập (maker/checker) trước hành động có hậu quả thật:**
-      phiên riêng với vai làm, mặc định TỪ CHỐI cho tới khi có bằng chứng, chỉ
-      trả `DUYỆT` / `TỪ CHỐI + lý do` / `HỎI NGƯỜI DÙNG`.
+- [x] **Vai kiểm độc lập (maker/checker)** (`agent-runner/src/verifier.ts`):
+      chạy trước mỗi capability có `side_effect`, trong **phiên riêng**,
+      **không cầm công cụ nào**, mặc định **TỪ CHỐI**. Bật trong Cài đặt →
+      "Giới hạn cho Agent" (mặc định tắt vì tốn thêm một lượt gọi model cho mỗi
+      hành động). Test: `agent-runner/scripts/verifier-check.mjs`.
+
+      > **Ba cách biến vai kiểm thành con dấu đóng sẵn, đã khoá lại bằng test:**
+      > 1. Dùng **chung phiên** với vai làm ⇒ nó đọc lại lý lẽ của chính mình
+      >    rồi gật đầu. Không kiểm gì cả, chỉ tự khen.
+      > 2. **Đưa công cụ** cho vai kiểm ⇒ mở thêm một đường chạy side effect
+      >    không ai canh. Vai kiểm xem xét rồi phán, không hành động.
+      > 3. Lỗi mạng / trả lời rỗng / sai định dạng mà **cho qua** ⇒ mọi cách
+      >    hỏng đều thành "duyệt". Phải nghiêng hết về phía **không chạy**.
+      >
+      > Một lỗ hổng thật do test bắt: model trả JSON **mảng**
+      > (`[{"verdict":"DUYET"}]`) thì regex vẫn moi được object bên trong và
+      > duyệt. Nay câu trả lời bắt đầu bằng `[` là từ chối luôn.
 - [x] **Màn hình chính sách trong Settings** (`PolicySettingsSection.tsx` →
       `policy.json` → `agent-runner/src/policy.ts` → capability rail): người
       dùng đặt đường dẫn cấm, công cụ luôn phải hỏi, và số lần gửi ra ngoài mỗi

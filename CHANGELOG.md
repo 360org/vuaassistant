@@ -71,6 +71,20 @@ Ghi lại mọi thay đổi đáng chú ý của V Assistant. Định dạng the
   chặn oan thư mục `duan-env/`. Hạn mức tính theo **cửa sổ trượt** một giờ, nên
   không thể gửi dồn quanh mốc giao giờ. Tệp chính sách hỏng thì quay về mặc
   định **chặt hơn** theo từng trường, chứ không gỡ sạch giới hạn.
+- **Vai kiểm độc lập trước hành động có hậu quả thật** (`agent-runner/src/verifier.ts`,
+  bật trong Cài đặt → "Giới hạn cho Agent"): Agent gửi email cho khách hay tiêu
+  tiền quảng cáo thì không nên tự chấm bài của chính mình. Nay có một Agent thứ
+  hai xem lại trước khi hành động chạy — trong **phiên riêng**, **không cầm công
+  cụ nào**, và mặc định **TỪ CHỐI** cho tới khi thấy đủ căn cứ. Ba kết quả:
+  duyệt, từ chối kèm lý do, hoặc hỏi người dùng.
+
+  Mặc định tắt, vì mỗi hành động tốn thêm một lượt gọi model — người dùng bật
+  khi giao cho Agent việc thật sự có hậu quả.
+
+  Mọi cách hỏng đều nghiêng về phía **không chạy**: lỗi mạng, trả lời rỗng, sai
+  định dạng, phán quyết lạ đều thành "không duyệt". Một vai kiểm gật đầu với
+  mọi thứ còn tệ hơn không có, vì nó tốn tiền mà vẫn để người dùng tưởng đã có
+  ai đó canh.
 - **Dừng sớm là báo cho người dùng, không im lặng bỏ cuộc**: khi phanh cắt vòng
   lặp, câu trả về nói rõ đã thử gì, hỏng vì sao và đề nghị bước tiếp — bằng
   tiếng Việt, có kèm lỗi thật, không lộ tên lý do nội bộ và không đổ JSON thô
