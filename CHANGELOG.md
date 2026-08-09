@@ -8,6 +8,30 @@ Ghi lại mọi thay đổi đáng chú ý của V Assistant. Định dạng the
 
 ## [1.1.58] - 2026-08-09
 
+### Sửa lỗi
+- **Bản cài không khởi động được AI Router** (#5/#7/#9): `tauri.conf.json` đóng
+  gói `../ai-router/**/*`, nhưng `ai-router/` không có `node_modules` riêng —
+  khi chạy từ mã nguồn, Node đi ngược lên thư mục cha và tìm thấy `undici` ở
+  `node_modules` gốc của dự án. Bản cài thì `ai-router/` đứng một mình, nên
+  sidecar chết ngay khi khởi động:
+
+  ```
+  Cannot find package 'undici' imported from
+    /usr/lib/V Assistant/_up_/ai-router/core/open-sse/translator/concerns/image.js
+  ```
+
+  Hệ quả với người dùng: cài xong, AI Router không bao giờ lên, không có model,
+  không chat được. **Chạy từ mã nguồn thì mọi thứ vẫn tốt**, nên lỗi này sống
+  sót qua mọi lần kiểm tra — cả bộ smoke test desktop, vì bộ đó chạy binary
+  `debug` chứ không phải bản đã đóng gói.
+
+  Nay `npm run build` cài dependency của ai-router vào chính nó trước khi Tauri
+  gom resource. Đã kiểm chứng bằng cách build `.deb` thật, `dpkg -i` vào máy,
+  rồi chạy: AI Router trả `/health` 200.
+- **Build Linux đứt vì thiếu `libxdo`**: tính năng computer use kéo theo thư
+  viện này, nhưng CI không cài — khâu liên kết đứt với `unable to find library
+  -lxdo`, và chỉ đứt ở bản release nên job `cargo check` không thấy.
+
 ### Tính năng mới
 - **Host-side Session Management** (`src/lib/store.tsx`): disk-fallback hydration — khi UI reload mà localStorage trống, tự động đọc `chats/sessions.json` từ disk qua Tauri command `load_sessions_from_disk`, zero data-loss khi F5.
 - **Computer Use & OS Control** (`src-tauri/src/computer_action.rs`): 10 Tauri commands cho Agent điều khiển chuột/bàn phím và chụp màn hình — `computer_mouse_move`, `computer_mouse_click`, `computer_mouse_down`, `computer_mouse_up`, `computer_type_text`, `computer_key_press`, `computer_key_down`, `computer_key_up`, `computer_screenshot` (trả base64 PNG cho Vision LLM), `computer_list_displays`.

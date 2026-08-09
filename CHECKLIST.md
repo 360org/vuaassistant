@@ -745,6 +745,22 @@
   `[REF: NanoClaw/container/agent-runner/src/formatter.test.ts — 7670 bytes]`
 
 ### 14.3 CI/CD & Đóng gói
+- [x] **Kiểm BẢN ĐÃ ĐÓNG GÓI trên cả ba nền tảng**
+      (`.github/workflows/packaged-smoke.yml` + `scripts/packaged-smoke-check.mjs`):
+      build bản cài thật rồi chạy nó, không chạy binary `debug`.
+
+      > **Vì sao phải có, dù đã có smoke test desktop:** binary `debug` nạp giao
+      > diện từ `devUrl` (do chính bài test dựng lên) và phân giải thư viện qua
+      > `node_modules` gốc của repo. Bản cài khác ở **cả hai** điểm. Chính khác
+      > biệt đó đã giấu lỗi `Cannot find package 'undici'` — cài xong AI Router
+      > không lên, mà mọi bài kiểm tra trong repo vẫn xanh. Bài mới **không**
+      > dựng server ở 1420: giao diện không tự nạp được từ gói là phải trượt.
+      >
+      > Không chạy mỗi push vì `tauri build` rất lâu — chạy khi phát hành và
+      > bấm tay được bất cứ lúc nào.
+- [x] **Kiểm thư viện của AI Router** (`scripts/ai-router-deps-check.mjs`): copy
+      `ai-router` ra ngoài repo — nơi không có `node_modules` cha nào — rồi mới
+      nạp. Mọi bài chạy trong repo đều không bắt được lớp lỗi này.
 - [x] GitHub Actions workflow (build installer)
 - [x] Bản phát hành v0.1.0
 - [x] Đã xoá Docker live-dev cũ; dev/test dùng Tauri Host Process native

@@ -61,6 +61,8 @@ jobs:
       - run: node scripts/desktop-oauth-check.mjs
       - run: node scripts/pack-rebind-check.mjs
       - run: node scripts/host-process-contract-check.mjs
+      # AI Router phải mang đủ thư viện vào bản cài, không mượn node_modules gốc.
+      - run: node scripts/ai-router-deps-check.mjs
       # Kết nối tốt không bị báo hỏng chỉ vì gói dịch vụ thiếu một model.
       - run: node scripts/connection-test-check.mjs
       - run: node scripts/ai-router-contract-check.mjs
@@ -98,7 +100,8 @@ jobs:
             libappindicator3-dev \
             librsvg2-dev \
             patchelf \
-            libgtk-3-dev
+            libgtk-3-dev \
+            libxdo-dev
       # tauri.conf.json bundles agent-runner/dist and runtime/node as resources.
       # Without them the Tauri build script aborts with "glob pattern … didn't
       # match any files", so `cargo check` failed on every push and the two Rust

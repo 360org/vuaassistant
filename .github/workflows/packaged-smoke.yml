@@ -1,0 +1,113 @@
+name: Packaged Smoke
+
+# Kiểm ĐÚNG THỨ NGƯỜI DÙNG CÀI, trên cả ba nền tảng.
+#
+# CI thường chỉ chạy binary `debug`, mà binary debug nạp giao diện từ
+# `devUrl` (localhost:1420) và phân giải thư viện qua `node_modules` gốc của
+# repo. Bản cài thật thì khác hẳn: nó nạp giao diện đóng gói sẵn và mỗi resource
+# đứng một mình dưới thư mục cài đặt.
+#
+# Chính khác biệt đó đã giấu một lỗi chết người: `ai-router` được đóng gói mà
+# không có `node_modules` riêng, nên sidecar chết ngay khi khởi động với
+# `Cannot find package 'undici'` — người dùng cài xong thấy "không có model,
+# không chat được" (#5/#7/#9), trong khi mọi bài kiểm tra trong repo vẫn xanh.
+#
+# Job này build bản cài thật rồi chạy nó, nên lớp lỗi đó không lọt được nữa.
+# Không chạy mỗi push vì `tauri build` rất lâu: chạy khi phát hành, và bấm tay
+# được bất cứ lúc nào.
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+jobs:
+  packaged:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            node_archive: node-v24.18.0-linux-x64
+          - os: windows-latest
+            node_archive: node-v24.18.0-win-x64
+          - os: macos-latest
+            node_archive: node-v24.18.0-darwin-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      # `libxdo` là thư viện của tính năng computer use; thiếu nó thì khâu liên
+      # kết đứt với `unable to find library -lxdo`, và chỉ đứt ở bản release.
+      - name: Cài phụ thuộc Linux
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libgtk-3-dev \
+            libxdo-dev \
+            xvfb
+
+      - name: Cài phụ thuộc
+        shell: bash
+        run: |
+          npm ci
+          npm ci --prefix agent-runner
+
+      - name: Dựng Node đóng gói
+        shell: bash
+        run: |
+          archive="${{ matrix.node_archive }}"
+          mkdir -p runtime/node
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            curl --fail --location --retry 3 "https://nodejs.org/dist/v24.18.0/${archive}.zip" -o node.zip
+            unzip -q node.zip
+            cp "${archive}/node.exe" runtime/node/node.exe
+          else
+            curl --fail --location --retry 3 "https://nodejs.org/dist/v24.18.0/${archive}.tar.gz" -o node.tar.gz
+            tar -xzf node.tar.gz
+            install -m 755 "${archive}/bin/node" runtime/node/node
+          fi
+
+      # `npm run build` gọi cả `bundle:ai-router`, nên AI Router mang theo thư
+      # viện của chính nó vào bản cài.
+      - name: Build giao diện và resource
+        run: npm run build
+
+      - name: Đóng gói bản cài thật
+        run: npx tauri build --config '{"bundle":{"createUpdaterArtifacts":false}}'
+
+      - name: Chạy bản đã đóng gói như người dùng
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            xvfb-run -a node scripts/packaged-smoke-check.mjs
+          else
+            node scripts/packaged-smoke-check.mjs
+          fi
+
+      # Bản cài là bằng chứng: giữ lại để tải về xem khi có nghi vấn.
+      - name: Giữ bản cài
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ban-cai-${{ matrix.os }}
+          path: |
+            src-tauri/target/release/bundle/**/*.deb
+            src-tauri/target/release/bundle/**/*.AppImage
+            src-tauri/target/release/bundle/**/*.dmg
+            src-tauri/target/release/bundle/**/*.msi
+            src-tauri/target/release/bundle/**/*.exe
+          if-no-files-found: warn
+          retention-days: 7
