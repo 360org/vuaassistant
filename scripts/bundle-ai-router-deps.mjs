@@ -31,13 +31,24 @@ if (deps.length === 0) {
 }
 
 console.log(`▸ cài dependency của ai-router vào chính nó: ${deps.join(", ")}`);
+// Trên Windows `npm` là `npm.cmd`, không phải file thực thi — `spawnSync("npm")`
+// hỏng ngay với ENOENT nếu không qua shell. Bước này từng làm đỏ job Windows
+// trong CI, mà thông báo lúc đó chỉ nói "không cài được" nên nhìn log không
+// biết vì sao.
 const install = spawnSync(
   "npm",
   ["install", "--omit=dev", "--no-audit", "--no-fund", "--prefix", aiRouter],
-  { stdio: "inherit", cwd: root },
+  { stdio: "inherit", cwd: root, shell: process.platform === "win32" },
 );
-if (install.status !== 0) {
-  console.error("✗ không cài được dependency cho ai-router");
+if (install.error || install.status !== 0) {
+  // In ra nguyên nhân thật, không nuốt: một thông báo chung chung biến lỗi
+  // hai phút thành lỗi hai tiếng.
+  console.error(
+    `✗ không cài được dependency cho ai-router\n` +
+      `  nền tảng : ${process.platform}\n` +
+      `  mã thoát : ${install.status}${install.signal ? ` (tín hiệu ${install.signal})` : ""}\n` +
+      (install.error ? `  lỗi spawn: ${install.error.message}\n` : ""),
+  );
   process.exit(1);
 }
 
