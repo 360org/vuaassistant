@@ -1,0 +1,130 @@
+name: Tag Release
+
+# Tạo tag phát hành mà KHÔNG cần terminal.
+#
+# Bấm "Run workflow" trên GitHub (web hoặc app điện thoại) là đủ. Workflow tự
+# lấy phiên bản trong `package.json`, tạo tag, rồi khởi động build bản cài cho
+# cả bốn nền tảng.
+#
+# Vì sao phải tự khởi động build: tag do Actions đẩy bằng `GITHUB_TOKEN` **không**
+# kích hoạt workflow khác (GitHub chặn để tránh lặp vô hạn). Nếu chỉ đẩy tag rồi
+# đứng nhìn thì sẽ không có bản cài nào được dựng — nên ở đây gọi thẳng
+# "Production Release" theo đúng hai nhóm nền tảng mà nó nhận.
+#
+# Ba cửa an toàn trước khi tạo tag, vì tag là thứ ra tới tay người dùng:
+#   1. Phiên bản phải đúng dạng x.y.z và khớp `package.json`.
+#   2. Tag đó chưa tồn tại.
+#   3. CI trên đúng commit này phải XANH — trừ khi cố ý bỏ qua.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Phiên bản (bỏ trống = lấy từ package.json)"
+        required: false
+        type: string
+      skip_ci_check:
+        description: "Phát hành dù CI chưa xanh (chỉ dùng khi biết rõ mình đang làm gì)"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Chốt phiên bản
+        id: version
+        shell: bash
+        run: |
+          manifest="$(node -p "require('./package.json').version")"
+          version="${{ inputs.version }}"
+          [ -n "$version" ] || version="$manifest"
+          version="${version#v}"
+
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Phiên bản phải có dạng x.y.z, nhận được: $version"
+            exit 1
+          fi
+          if [ "$version" != "$manifest" ]; then
+            echo "::error::Phiên bản $version không khớp package.json ($manifest). Hãy bump phiên bản trước."
+            exit 1
+          fi
+          if git rev-parse "v$version" >/dev/null 2>&1; then
+            echo "::error::Tag v$version đã tồn tại. Bump phiên bản rồi chạy lại."
+            exit 1
+          fi
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+          echo "▸ sẽ tạo tag v$version tại $GITHUB_SHA"
+
+      # Tag là thứ ra tới tay người dùng, nên không phát hành trên một commit
+      # mà CI đang đỏ. Đã từng suýt phát hành khi job `rust` đỏ vì thiếu
+      # `libxdo` — bản cài Linux khi đó sẽ hỏng.
+      - name: Đòi CI xanh trên đúng commit này
+        if: ${{ !inputs.skip_ci_check }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          state="$(gh run list --workflow ci.yml --commit "$GITHUB_SHA" \
+            --json status,conclusion --jq '.[0] | "\(.status):\(.conclusion)"' || echo "")"
+          echo "CI trên commit này: ${state:-chưa có}"
+          case "$state" in
+            completed:success) echo "✓ CI xanh" ;;
+            "" ) echo "::error::Chưa có kết quả CI cho commit này. Chờ CI chạy xong, hoặc bật skip_ci_check."; exit 1 ;;
+            completed:*) echo "::error::CI KHÔNG xanh ($state). Sửa xong hãy phát hành."; exit 1 ;;
+            *) echo "::error::CI còn đang chạy ($state). Chờ xong rồi chạy lại."; exit 1 ;;
+          esac
+
+      - name: Tạo và đẩy tag
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.version.outputs.tag }}" -m "V Assistant ${{ steps.version.outputs.tag }}"
+          git push origin "${{ steps.version.outputs.tag }}"
+          echo "✓ đã tạo ${{ steps.version.outputs.tag }}"
+
+      # Hai nhóm nền tảng, chạy tuần tự: nhóm `other` là nhóm publish bản phát
+      # hành, nên phải để nhóm `macos` xong trước, không thì bản phát hành công
+      # khai trong khi artefact macOS còn chưa tải lên.
+      - name: Dựng bản cài macOS
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          gh workflow run release.yml --ref "${{ steps.version.outputs.tag }}" -f targets=macos
+          sleep 15
+          run_id="$(gh run list --workflow release.yml --limit 1 --json databaseId --jq '.[0].databaseId')"
+          echo "▸ theo dõi run $run_id"
+          gh run watch "$run_id" --exit-status
+
+      - name: Dựng bản cài Windows/Linux rồi công khai bản phát hành
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          gh workflow run release.yml --ref "${{ steps.version.outputs.tag }}" -f targets=other
+          sleep 15
+          run_id="$(gh run list --workflow release.yml --limit 1 --json databaseId --jq '.[0].databaseId')"
+          echo "▸ theo dõi run $run_id"
+          gh run watch "$run_id" --exit-status
+
+      - name: Tóm tắt
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Phát hành ${{ steps.version.outputs.tag }}"
+            echo ""
+            echo "- Commit: \`$GITHUB_SHA\`"
+            echo "- Bản phát hành: https://github.com/${{ github.repository }}/releases/tag/${{ steps.version.outputs.tag }}"
+          } >> "$GITHUB_STEP_SUMMARY"
