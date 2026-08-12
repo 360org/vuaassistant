@@ -15,7 +15,7 @@ export function WorkspaceSettingsSection() {
     language,
   } = useApp();
 
-  const [dataPathInput, setDataPathInput] = useState(customDataPath || "~/vuaai-data");
+  const [dataPathInput, setDataPathInput] = useState(customDataPath || "~/vuaassistant");
   const [savedPathMsg, setSavedPathMsg] = useState<string | null>(null);
   const [copiedPath, setCopiedPath] = useState(false);
   const [backupMsg, setBackupMsg] = useState<string | null>(null);
@@ -23,11 +23,11 @@ export function WorkspaceSettingsSection() {
   const backupFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setDataPathInput(customDataPath || "~/vuaai-data");
+    setDataPathInput(customDataPath || "~/vuaassistant");
   }, [customDataPath]);
 
   const handleCopyDataPath = async () => {
-    const p = customDataPath || "~/vuaai-data";
+    const p = customDataPath || "~/vuaassistant";
     try {
       await navigator.clipboard.writeText(p);
       setCopiedPath(true);
@@ -67,7 +67,7 @@ export function WorkspaceSettingsSection() {
       const relPath = firstFile.webkitRelativePath || firstFile.name;
       const folderName = relPath.split("/")[0] || relPath.split("\\")[0];
       if (folderName) {
-        setDataPathInput(`~/vuaai-data/${folderName}`);
+        setDataPathInput(`~/vuaassistant/${folderName}`);
       }
     }
   };
@@ -94,9 +94,9 @@ export function WorkspaceSettingsSection() {
   const handleResetDefaultDataPath = async () => {
     try {
       const { invoke } = await import("@tauri-apps/api/core");
-      await invoke("set_workspace_path", { customDir: "~/vuaai-data" });
+      await invoke("set_workspace_path", { customDir: "~/vuaassistant" });
       setCustomDataPath("");
-      setDataPathInput("~/vuaai-data");
+      setDataPathInput("~/vuaassistant");
       setSavedPathMsg("✅ Đã đặt lại đường dẫn dữ liệu mặc định!");
     } catch {
       setSavedPathMsg("❌ Không thể đặt lại vị trí lưu trữ.");
@@ -115,7 +115,7 @@ export function WorkspaceSettingsSection() {
 
       if (typeof window !== "undefined" && "__TAURI_INTERNALS__" in window) {
         const { invoke } = await import("@tauri-apps/api/core");
-        const customDir = customDataPath || localStorage.getItem("vua:custom-data-path") || "~/vuaai-data";
+        const customDir = customDataPath || localStorage.getItem("vua:custom-data-path") || "~/vuaassistant";
         const savedPath = await invoke<string>("save_custom_data_text", {
           customDir,
           relativePath: `backup/${filename}`,
@@ -187,7 +187,7 @@ export function WorkspaceSettingsSection() {
             </div>
             <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-neutral-800 bg-neutral-950/80 px-3 py-2">
               <code className="flex-1 truncate font-mono text-xs text-gold-300">
-                {customDataPath || "~/vuaai-data"}
+                {customDataPath || "~/vuaassistant"}
               </code>
               <button
                 onClick={handleCopyDataPath}

@@ -186,9 +186,9 @@ fn grant_agent_read_path(state: tauri::State<Runtime>, path: String) -> Result<S
 fn resolve_data_dir(custom_dir: &str) -> std::path::PathBuf {
     use std::path::PathBuf;
     let trimmed = custom_dir.trim();
-    if trimmed.is_empty() || trimmed == "~/vuaai-data" {
+    if trimmed.is_empty() || trimmed == "~/vuaassistant" {
         if let Ok(home) = std::env::var("HOME") {
-            return PathBuf::from(home).join("vuaai-data");
+            return PathBuf::from(home).join("vuaassistant");
         }
     }
     if trimmed.starts_with("~/") {
@@ -276,7 +276,7 @@ fn save_custom_data_text(custom_dir: String, relative_path: String, content: Str
 }
 
 /// Load chat sessions from disk as fallback when localStorage is empty.
-/// Reads `chats/sessions.json` from the custom data dir (or ~/vuaai-data).
+/// Reads `chats/sessions.json` from the custom data dir (or ~/vuaassistant).
 /// Returns the raw JSON string; empty-string on any error so the UI can
 /// fall through to its own defaults without throwing.
 #[tauri::command]

@@ -239,7 +239,7 @@ const scheduleMessage: BuiltinTool = {
 
     if (!name || !prompt || !schedule) throw new Error('name, prompt and schedule are required');
 
-    const dataDir = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '', 'vuaai-data');
+    const dataDir = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '', 'vuaassistant');
     fs.mkdirSync(dataDir, { recursive: true });
     const tasksFile = path.join(dataDir, 'scheduled_tasks.json');
 
@@ -280,7 +280,7 @@ const listScheduled: BuiltinTool = {
     },
   },
   async execute(): Promise<string> {
-    const dataDir = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '', 'vuaai-data');
+    const dataDir = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '', 'vuaassistant');
     const tasksFile = path.join(dataDir, 'scheduled_tasks.json');
     if (!fs.existsSync(tasksFile)) return 'No scheduled tasks found.';
 
@@ -316,7 +316,7 @@ const cancelScheduled: BuiltinTool = {
     const name = typeof args.name === 'string' ? args.name.trim() : undefined;
     if (!id && !name) throw new Error('Either id or name is required to cancel a task');
 
-    const dataDir = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '', 'vuaai-data');
+    const dataDir = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '', 'vuaassistant');
     const tasksFile = path.join(dataDir, 'scheduled_tasks.json');
     if (!fs.existsSync(tasksFile)) return 'No scheduled tasks found.';
 

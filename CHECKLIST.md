@@ -120,7 +120,7 @@
 - [x] Kết nối vừa lưu là chat được ngay: model không đòi smoke test phải xong
       trước (`Pending test` vẫn phục vụ, chỉ `Failed` bị ẩn) — #19/#16
 - [x] Lỗi nhà cung cấp hiển thị câu người dùng hiểu, không đổ JSON thô — #13
-- [x] Thư mục dữ liệu thống nhất `~/vuaai-data` ở cả vỏ desktop lẫn Agent Runner
+- [x] Thư mục dữ liệu thống nhất `~/vuaassistant` ở cả vỏ desktop lẫn Agent Runner
       (trước đây runner mặc định `~/.v-vuaai` nên ghi lệch chỗ) — #15
 - [ ] Theme / Language settings
 - [ ] Data export / import

@@ -64,7 +64,7 @@ export async function getRuntimeStatus(): Promise<{ engine_running: boolean; ai_
 /**
  * The runtime directory the Host Process actually uses (`VUA_DATA_DIR`). Files
  * shared with the runner — the scheduled-task list above all — must be written
- * here; guessing `~/vuaai-data` puts them where nothing reads them.
+ * here; guessing `~/vuaassistant` puts them where nothing reads them.
  */
 export async function runtimeDir(): Promise<string | null> {
   if (!inDesktopShell()) return null;

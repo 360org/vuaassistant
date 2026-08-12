@@ -629,7 +629,7 @@ const scheduleTaskTool: NativeTool = {
       return 'Error: each task needs name, prompt and schedule. Nothing was scheduled.';
     }
 
-    const dataDir = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '', 'vuaai-data');
+    const dataDir = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '', 'vuaassistant');
     fs.mkdirSync(dataDir, { recursive: true });
     const tasksFile = path.join(dataDir, 'scheduled_tasks.json');
 

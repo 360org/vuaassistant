@@ -483,7 +483,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (state.chatSessions.length > 1) return; // đã có sessions — không cần
     if (state.chatSessions[0]?.messages.length) return; // session có tin nhắn — không cần
     if (typeof window === "undefined" || !("__TAURI_INTERNALS__" in window)) return;
-    const dataDir = state.customDataPath || localStorage.getItem("vua:custom-data-path") || "~/vuaai-data";
+    const dataDir = state.customDataPath || localStorage.getItem("vua:custom-data-path") || "~/vuaassistant";
     import("@tauri-apps/api/core").then(({ invoke }) =>
       invoke<string>("load_sessions_from_disk", { customDir: dataDir })
         .then((raw) => {
@@ -673,7 +673,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           localStorage.setItem("vuaassistant-last-active-user-key", currentKey);
         }
 
-        const dataDir = state.customDataPath || localStorage.getItem("vua:custom-data-path") || "~/vuaai-data";
+        const dataDir = state.customDataPath || localStorage.getItem("vua:custom-data-path") || "~/vuaassistant";
         if (state.customDataPath) {
           localStorage.setItem("vua:custom-data-path", state.customDataPath);
         } else {

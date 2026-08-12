@@ -49,7 +49,7 @@ function log(msg: string): void {
  * a task created from chat and one created in the UI are the same task.
  */
 function tasksFile(): string {
-  const dataDir = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '', 'vuaai-data');
+  const dataDir = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '', 'vuaassistant');
   return path.join(dataDir, 'scheduled_tasks.json');
 }
 

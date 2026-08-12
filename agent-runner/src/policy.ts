@@ -44,7 +44,7 @@ export const DEFAULT_POLICY: Policy = {
 };
 
 function policyFile(): string {
-  const dataDir = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '', 'vuaai-data');
+  const dataDir = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '', 'vuaassistant');
   return path.join(dataDir, 'policy.json');
 }
 

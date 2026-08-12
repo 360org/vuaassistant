@@ -14,7 +14,7 @@
 | Nợ kỹ thuật cũ từ Audit 26/07? | 🟢 **Đã giải quyết 100%**. 4 hệ con sai tầng, god-file, và framer-motion đều đã xử lý xong. |
 | Các tính năng đột phá mới? | 🟢 **Computer Use**, **Delegate Task**, **Kanban 4 cột**, **Sổ chi tiêu Token theo ngày**, **Cơ chế Phanh chống lặp liveness**, **maker/checker Verifier**. |
 | Sức khoẻ build & test? | 🟢 Hoàn toàn sạch. Chạy các contract check tự động đạt kết quả tuyệt đối. |
-| Rebranding Vua AI? | 🟢 **Đã hoàn thành**. Đồng bộ cổng `36360`, thư mục nổi `~/vuaai-data`, và cấu hình code sign/notarize cho macOS. |
+| Rebranding Vua AI? | 🟢 **Đã hoàn thành**. Đồng bộ cổng `36360`, thư mục nổi `~/vuaassistant`, và cấu hình code sign/notarize cho macOS. |
 
 ---
 
@@ -66,15 +66,15 @@ Chúng tôi ghi nhận sự xuất hiện của các tính năng kiến trúc ca
 
 ---
 
-## ⚡ PHẦN 3 — Đồng bộ Rebranding Vua AI (`~/vuaai-data` & Port `36360`)
+## ⚡ PHẦN 3 — Đồng bộ Rebranding Vua AI (`~/vuaassistant` & Port `36360`)
 
 Chúng tôi đã quét và đồng bộ lại toàn bộ codebase theo định hướng thương hiệu Vua AI mới của phiên bản `v1.1.59`:
 
 1. **Cổng AI Router `36360`:**
    * Cổng mặc định của sidecar đã chuyển từ `20128` sang `36360` để tránh xung đột với phiên bản cũ hoặc 9router cũ chạy ngầm.
    * Đã sửa đồng bộ trong `docker-compose.dev.yml`, `scripts/desktop-oauth-check.mjs`, `skills/v-assistant-dev-guidelines/SKILL.md` và `.agents/skills/v-assistant-dev-guidelines/SKILL.md`.
-2. **Thư mục dữ liệu `~/vuaai-data`:**
-   * Đã chuyển đổi thư mục dữ liệu mặc định từ thư mục ẩn `.v-assistant` sang thư mục nổi `~/vuaai-data` giúp người dùng dễ quản lý file tải lên, custom skills, cấu hình.
+2. **Thư mục dữ liệu `~/vuaassistant`:**
+   * Đã chuyển đổi thư mục dữ liệu mặc định từ thư mục ẩn `.v-assistant` sang thư mục nổi `~/vuaassistant` giúp người dùng dễ quản lý file tải lên, custom skills, cấu hình.
    * Đã đồng bộ cấu hình trong Rust backend (`src-tauri/src/lib.rs`), Agent Runner config (`agent-runner/src/config.ts`), database connection (`agent-runner/src/db/connection.ts`), native tools (`agent-runner/src/native-tools/index.ts`), mcp core (`agent-runner/src/mcp-tools/core.ts`) và phần cài đặt UI (`WorkspaceSettingsSection.tsx`).
 
 ---
@@ -82,7 +82,7 @@ Chúng tôi đã quét và đồng bộ lại toàn bộ codebase theo định h
 ## 📚 PHẦN 4 — Sửa chữa tài liệu & checklist
 
 * **Checklist Đồng bộ:** Bảng tổng kết số liệu ở cuối `CHECKLIST.md` trước đó bị lệch lớn so với số tick thật. Đã đếm thủ công từng phần và cập nhật bảng tổng kết khớp chính xác: **270 tính năng đã xong**, **6 cần cập nhật**, **88 chưa triển khai**.
-* **Cập nhật ARCH.md & SPEC.md:** Các tham chiếu cũ tới port `20128` và đường dẫn `.v-assistant` trong các tài liệu kiến trúc và đặc tả đã được cập nhật hoàn toàn sang `36360` và `vuaai-data`.
+* **Cập nhật ARCH.md & SPEC.md:** Các tham chiếu cũ tới port `20128` và đường dẫn `.v-assistant` trong các tài liệu kiến trúc và đặc tả đã được cập nhật hoàn toàn sang `36360` và `vuaassistant`.
 
 ---
 

@@ -34,7 +34,7 @@ const fromLines = (text: string) =>
 
 export function PolicySettingsSection() {
   const { customDataPath } = useApp();
-  const dataDir = customDataPath || "~/vuaai-data";
+  const dataDir = customDataPath || "~/vuaassistant";
   const policyPath = `${dataDir.replace(/\/+$/, "")}/policy.json`;
 
   const [deniedPaths, setDeniedPaths] = useState(toLines(DEFAULT_POLICY.deniedPaths));
