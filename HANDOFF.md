@@ -12,7 +12,7 @@
 |---|---|
 | Git tag | `backup-pre-hostprocess-20260727-0945` |
 | Git branch | `backup/pre-hostprocess-20260727-0945` |
-| File | `~/v-assistant-backup-20260727-0945.tar.gz` (2.6M) |
+| File | `~/vuaassistant-backup-20260727-0945.tar.gz` (2.6M) |
 
 ---
 
@@ -90,10 +90,10 @@ Runner báo `[telegram] Connected — listening for messages`. Cần PO nhắn t
 - **`runner.pid`**: app giết runner mồ côi trước khi spawn cái mới. Runner giờ ôm
   scheduler + Telegram, để sót 2 tiến trình là trả lời trùng.
 - **File chia sẻ với runner phải nằm ở `runtime_status().dir`**, không phải
-  `~/.v-assistant/data`. Hai chỗ này khác nhau.
+  `~/.vuaassistant/data`. Hai chỗ này khác nhau.
 - **`knowledge.db`**: app ghi (nó giữ File + pdfjs để trích text), runner mở
   read-only để truy xuất. Cùng mô hình sở hữu với `inbound.db`.
 - **Chỉ ghi đè file dữ liệu sống sau khi đã đọc nó ít nhất một lần** —
   `tasksLoadedRef` trong `store.tsx` là mẫu tham chiếu.
 - Quy trình test: **không Docker**. `npm run tauri dev`, rồi thao tác thật trên UI.
-- Đọc `skills/v-assistant-dev-guidelines/SKILL.md` trước khi sửa — **Luật số 1: bám idea.md**.
+- Đọc `skills/vuaassistant-dev-guidelines/SKILL.md` trước khi sửa — **Luật số 1: bám idea.md**.

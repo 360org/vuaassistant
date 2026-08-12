@@ -71,7 +71,7 @@ export function ProviderConnect({
       if (error) { setLoginError(url.searchParams.get("error_description") || error); return; }
       if (!code) { setLoginError("No authorization code found in URL."); return; }
       // Let signIn complete via exchangeCode — inject code via BroadcastChannel
-      const ch = new BroadcastChannel("v_assistant_oauth");
+      const ch = new BroadcastChannel("vuaassistant_oauth");
       ch.postMessage({
         code,
         state: new URL(manualCallbackUrl.trim()).searchParams.get("state"),
@@ -173,7 +173,7 @@ export function ProviderConnect({
                   <Check className="size-4 text-gold-400" /> Active Subscription
                 </div>
                 <p className="mt-1 text-neutral-400 leading-relaxed">
-                  V-Assistant has active central subscription. You can click <strong>Connect</strong> below to route this model through it, or sign in to this vendor.
+                  VuaAssistant has active central subscription. You can click <strong>Connect</strong> below to route this model through it, or sign in to this vendor.
                 </p>
               </div>
             )}
@@ -280,7 +280,7 @@ export function ProviderConnect({
                 <Check className="size-4 text-gold-400" /> Active Subscription
               </div>
               <p className="mt-1 text-neutral-400 leading-relaxed">
-                V-Assistant will automatically route your requests through the central subscription. No API key required.
+                VuaAssistant will automatically route your requests through the central subscription. No API key required.
               </p>
             </div>
 

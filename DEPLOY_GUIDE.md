@@ -1,6 +1,6 @@
 # DEPLOYMENT GUIDE: Hướng dẫn Đóng gói & Triển khai Đa nền tảng (Zero-Docker)
 
-Tài liệu này hướng dẫn cách đóng gói ứng dụng V-Assistant kèm theo động cơ Agentic nhúng NanoClaw (chế độ Host Process) hỗ trợ đầy đủ các hệ điều hành: macOS, Windows và Linux.
+Tài liệu này hướng dẫn cách đóng gói ứng dụng VuaAssistant kèm theo động cơ Agentic nhúng NanoClaw (chế độ Host Process) hỗ trợ đầy đủ các hệ điều hành: macOS, Windows và Linux.
 
 ---
 
@@ -56,7 +56,7 @@ npm run tauri build
 
 ## 4. Code Signing & Notarization (Ký & Chứng thực ứng dụng trên macOS)
 
-Để tránh cảnh báo **"V Assistant cannot be opened because it is from an unidentified developer"** trên macOS, ứng dụng cần phải được ký bằng chứng chỉ Apple Developer và gửi lên Apple Notarization Service để xác thực trước khi phân phối.
+Để tránh cảnh báo **"VuaAssistant cannot be opened because it is from an unidentified developer"** trên macOS, ứng dụng cần phải được ký bằng chứng chỉ Apple Developer và gửi lên Apple Notarization Service để xác thực trước khi phân phối.
 
 ### 4.1. Cách build & ký ứng dụng dưới máy Local
 Nếu bạn tự đóng gói trực tiếp trên máy Mac của mình và đã có tài khoản Apple Developer:

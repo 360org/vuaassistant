@@ -26,7 +26,7 @@ const LONG_POLL_SECONDS = 30;
 const RETRY_MS = 5_000;
 /** Yield after an empty poll, in case the far side returned without blocking. */
 const IDLE_MS = 1_000;
-const GREETING = 'Xin chào! Tôi là V-Assistant. Nhắn gì cũng được, tôi giúp ngay.';
+const GREETING = 'Xin chào! Tôi là VuaAssistant. Nhắn gì cũng được, tôi giúp ngay.';
 
 interface TelegramUpdate {
   updateId: number;

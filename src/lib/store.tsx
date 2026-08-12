@@ -278,7 +278,7 @@ export interface ActiveBackgroundTask {
   startedAt: number;
 }
 
-const STORAGE_KEY = "v-assistant-state-v1";
+const STORAGE_KEY = "vuaassistant-state-v1";
 
 const initialChatSession = newChatSession();
 
@@ -314,9 +314,9 @@ const knowledgeBucket = (agentId: string | null): string =>
   agentId ?? GENERAL_KNOWLEDGE;
 
 function getUserStorageKey(user: LocalUser | null): string {
-  if (!user) return "v-assistant-guest-state";
+  if (!user) return "vuaassistant-guest-state";
   const id = user.detail || user.name || "user";
-  return `v-assistant-user-${id.toLowerCase().replace(/[^a-z0-9]/g, "_")}`;
+  return `vuaassistant-user-${id.toLowerCase().replace(/[^a-z0-9]/g, "_")}`;
 }
 
 function loadStateForUser(key: string): PersistedState {
@@ -365,7 +365,7 @@ function loadStateForUser(key: string): PersistedState {
 }
 
 function loadState(): PersistedState {
-  const lastActiveKey = localStorage.getItem("v-assistant-last-active-user-key") || STORAGE_KEY;
+  const lastActiveKey = localStorage.getItem("vuaassistant-last-active-user-key") || STORAGE_KEY;
   return loadStateForUser(lastActiveKey);
 }
 
@@ -670,7 +670,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const currentKey = getUserStorageKey(state.user);
         localStorage.setItem(currentKey, JSON.stringify(safe));
         if (state.user) {
-          localStorage.setItem("v-assistant-last-active-user-key", currentKey);
+          localStorage.setItem("vuaassistant-last-active-user-key", currentKey);
         }
 
         const dataDir = state.customDataPath || localStorage.getItem("vua:custom-data-path") || "~/vuaai-data";
@@ -683,7 +683,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           void import("@tauri-apps/api/core").then(({ invoke }) => {
             void invoke("save_custom_data_text", {
               customDir: dataDir,
-              relativePath: "v_assistant_backup.json",
+              relativePath: "vuaassistant_backup.json",
               content: JSON.stringify(safe, null, 2),
             }).catch(() => {});
 
@@ -876,7 +876,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const clearLocalUser = useCallback(() => {
-    localStorage.removeItem("v-assistant-last-active-user-key");
+    localStorage.removeItem("vuaassistant-last-active-user-key");
     setState(initialState);
   }, []);
 
@@ -905,7 +905,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const connectProvider = useCallback(
     async (provider: ProviderId, config: ProviderConfig) => {
-      // Persist credentials only through V Assistant's App Vault boundary.
+      // Persist credentials only through VuaAssistant's App Vault boundary.
       if (config.apiKey) await vaultSet(vaultKey(provider), config.apiKey);
       if (config.refreshToken) await vaultSet(refreshVaultKey(provider), config.refreshToken);
       setState((s) => ({

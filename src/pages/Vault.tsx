@@ -146,7 +146,7 @@ export function Vault() {
       <div className="mt-3 flex items-center gap-1.5 text-xs text-neutral-500">
         <Lock className="size-3.5" />
         {vaultIsSecure()
-          ? "Stored in V Assistant's encrypted App Vault."
+          ? "Stored in VuaAssistant's encrypted App Vault."
           : "Development preview storage; desktop uses the encrypted App Vault."}
       </div>
 

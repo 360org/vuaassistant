@@ -2,7 +2,7 @@
 //! runaway guest is trapped by the fuel cap (the host survives), and a guest
 //! that asks for host access is denied. Run: `cargo run --example sandbox_check`.
 
-use v_assistant_lib::sandbox::run_capped;
+use vuaassistant_lib::sandbox::run_capped;
 
 fn main() {
     let mut ok = true;

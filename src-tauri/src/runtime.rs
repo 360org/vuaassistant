@@ -1,4 +1,4 @@
-//! AI Runtime Service — the desktop side of the V-Assistant Agent Runner.
+//! AI Runtime Service — the desktop side of the VuaAssistant Agent Runner.
 //!
 //! Handles SQLite IPC layer (inbound.db/outbound.db) matching the new schema:
 //!   inbound.db  — UI writes to messages_in; host uses even sequence numbers
@@ -34,7 +34,7 @@ pub struct Runtime {
 #[derive(Serialize)]
 pub struct RuntimeStatus {
     pub version: &'static str,
-    /// True when a V-Assistant Agent Runner process is attached and alive.
+    /// True when a VuaAssistant Agent Runner process is attached and alive.
     pub engine_running: bool,
     /// True when the native AI Router sidecar is attached and alive.
     pub ai_router_running: bool,
@@ -338,7 +338,7 @@ fn spawn_process(
 ///
 /// This used to `pkill -f sidecar.mjs` unconditionally, which killed *every*
 /// sidecar on the machine — including the one belonging to another running
-/// V Assistant instance (dev build vs installed app). That instance was then
+/// VuaAssistant instance (dev build vs installed app). That instance was then
 /// left with a dead router and no way to recover. Now the port is probed
 /// first, so a free port means nothing is killed, and the kill is announced.
 fn kill_stale_port_process(port: u16) {
@@ -922,7 +922,7 @@ impl Runtime {
         let config_path = self.dir.join("runner.json");
         let config_json = serde_json::json!({
             "provider": "ai-router",
-            "assistantName": "V-Assistant",
+            "assistantName": "VuaAssistant",
             "agentName": agent_name,
             "maxMessagesPerPrompt": 10,
             "mcpServers": mcp_servers,
@@ -1060,7 +1060,7 @@ mod tests {
 
     #[test]
     fn restores_saved_workspace_path() {
-        let root = std::env::temp_dir().join(format!("v-assistant-workspace-test-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!("vuaassistant-workspace-test-{}", std::process::id()));
         fs::create_dir_all(&root).expect("runtime directory must be created");
         let expected = root.join("custom/workspace/output-data");
         fs::write(
@@ -1076,7 +1076,7 @@ mod tests {
     #[test]
     fn resolves_tauri_parent_resource_layout() {
         let root = std::env::temp_dir().join(format!(
-            "v-assistant-resource-test-{}-{}",
+            "vuaassistant-resource-test-{}-{}",
             std::process::id(),
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)

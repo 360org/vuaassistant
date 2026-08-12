@@ -1,7 +1,7 @@
 {
-  "name": "@v-assistant/agent-runner",
+  "name": "@vuaassistant/agent-runner",
   "version": "0.1.0",
-  "description": "Universal Agent Runner — Host Process for V-Assistant",
+  "description": "Universal Agent Runner — Host Process for VuaAssistant",
   "type": "module",
   "main": "src/index.ts",
   "scripts": {

@@ -112,7 +112,7 @@ export function McpSettingsSection() {
             <Plus className="size-3.5" /> Thêm remote MCP bằng URL
           </Button>
           <div className="sm:col-span-2 rounded-lg border border-neutral-800 bg-neutral-950/70 p-3 text-[11px] leading-relaxed text-neutral-500">
-            Remote MCP dùng bridge <code>mcp-remote</code>. Nếu server yêu cầu OAuth, bridge tự mở trình duyệt và quản lý phiên riêng; V Assistant không đưa token hoặc secret vào prompt của agent.
+            Remote MCP dùng bridge <code>mcp-remote</code>. Nếu server yêu cầu OAuth, bridge tự mở trình duyệt và quản lý phiên riêng; VuaAssistant không đưa token hoặc secret vào prompt của agent.
           </div>
           <input
             value={command}

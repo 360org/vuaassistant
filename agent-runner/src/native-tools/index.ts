@@ -29,7 +29,7 @@ function realRoot(configured: string): string {
   }
 }
 
-const DATA_DIR = process.env.VUA_DATA_DIR || '/tmp/v-assistant';
+const DATA_DIR = process.env.VUA_DATA_DIR || '/tmp/vuaassistant';
 
 const WORKSPACE_ROOT = realRoot(
   process.env.VUA_AGENT_WORKSPACE || path.join(DATA_DIR, 'workspace'),
@@ -464,7 +464,7 @@ const webSearchTool: NativeTool = {
 
     try {
       const response = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`, {
-        headers: { 'User-Agent': 'V-Assistant/1.0 (+https://vuaai.net)' },
+        headers: { 'User-Agent': 'VuaAssistant/1.0 (+https://vuaai.net)' },
       });
       if (!response.ok) return `Web search failed (HTTP ${response.status}).`;
       const html = await response.text();
@@ -577,7 +577,7 @@ const scheduleTaskTool: NativeTool = {
   definition: {
     name: 'schedule_task',
     description:
-      'Register one or more recurring or dated tasks in V-Assistant "Lịch & Nhiệm vụ" (Scheduled Tasks). ' +
+      'Register one or more recurring or dated tasks in VuaAssistant "Lịch & Nhiệm vụ" (Scheduled Tasks). ' +
       'Pass the whole plan at once in `tasks`. You MUST call this whenever you plan, agree, or promise any ' +
       'schedule, posting plan, report, or reminder — a plan is not scheduled until this tool has returned. ' +
       'Never tell the user something is scheduled without calling it.',

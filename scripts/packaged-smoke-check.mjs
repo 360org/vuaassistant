@@ -42,12 +42,12 @@ function packagedBinary() {
     const bundles = path.join(release, "bundle/macos");
     if (existsSync(bundles)) {
       const app = readdirSync(bundles).find((name) => name.endsWith(".app"));
-      if (app) return path.join(bundles, app, "Contents/MacOS/v-assistant");
+      if (app) return path.join(bundles, app, "Contents/MacOS/vuaassistant");
     }
   }
   // Trên Windows và Linux, binary release đứng cạnh gói cài và mang đúng
   // resource đã đóng gói, nên chạy thẳng nó là đủ để kiểm khâu này.
-  const direct = path.join(release, isWindows ? "v-assistant.exe" : "v-assistant");
+  const direct = path.join(release, isWindows ? "vuaassistant.exe" : "vuaassistant");
   return direct;
 }
 

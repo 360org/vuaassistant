@@ -1,6 +1,6 @@
 {
-  "name": "@v-assistant/ai-router-provider-core",
+  "name": "@vuaassistant/ai-router-provider-core",
   "private": true,
-  "version": "0.5.30-vassistant",
+  "version": "0.5.30-vuaassistant",
   "type": "module"
 }

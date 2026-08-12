@@ -1,5 +1,5 @@
 /**
- * Memory scaffold manager for V-Assistant.
+ * Memory scaffold manager for VuaAssistant.
  *
  * Automatically creates the memory directory structure for the current agent
  * at startup.

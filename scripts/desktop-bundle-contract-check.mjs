@@ -72,7 +72,7 @@ const assertions = [
     "macOS release workflow must verify the packaged Agent Runner runtime",
   ],
   [
-    workflow.includes('v-assistant.exe')
+    workflow.includes('vuaassistant.exe')
       && workflow.includes('sidecar.mjs')
       && workflow.includes('node.exe')
       && workflow.includes('packaged AI Router, Agent Runner, or node.exe resource is missing'),

@@ -170,7 +170,7 @@ const deliveryPromiseStart = runTelegramDeliveryLoop(config, deliveryControllerS
 await new Promise((r) => setTimeout(r, 100));
 deliveryControllerStart.abort();
 await deliveryPromiseStart;
-check('/start greets the user', /V-Assistant/.test(sent[sent.length - 1].text));
+check('/start greets the user', /VuaAssistant/.test(sent[sent.length - 1].text));
 
 // --- the backlog is skipped on start -----------------------------------------
 sent.length = 0;

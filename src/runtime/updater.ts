@@ -1,6 +1,6 @@
 import type { DownloadEvent, Update } from "@tauri-apps/plugin-updater";
 
-const REPO = "360org/v-assistant";
+const REPO = "360org/vuaassistant";
 const API_URL = `https://api.github.com/repos/${REPO}/releases/latest`;
 const RELEASES_URL = `https://github.com/${REPO}/releases`;
 const LATEST_RELEASE_URL = `https://github.com/${REPO}/releases/latest`;
@@ -72,7 +72,7 @@ async function checkNativeUpdate(): Promise<AppUpdateInfo | null> {
       hasUpdate: true,
       currentVersion: update.currentVersion || currentAppVersion(),
       latestVersion: update.version,
-      releaseTitle: `V Assistant v${update.version}`,
+      releaseTitle: `VuaAssistant v${update.version}`,
       releaseNotes: update.body || "",
       releaseUrl: LATEST_RELEASE_URL,
       downloadUrl: null,
@@ -103,7 +103,7 @@ async function checkGitHubRelease(): Promise<AppUpdateInfo> {
       hasUpdate: Boolean(latestVersion) && isNewerVersion(currentVersion, latestVersion),
       currentVersion,
       latestVersion: latestVersion || currentVersion,
-      releaseTitle: data.name || tag || "V Assistant Release",
+      releaseTitle: data.name || tag || "VuaAssistant Release",
       releaseNotes: data.body || "",
       releaseUrl: data.html_url || LATEST_RELEASE_URL,
       downloadUrl: data.html_url || LATEST_RELEASE_URL,

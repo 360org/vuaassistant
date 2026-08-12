@@ -33,10 +33,10 @@ type HmacSha1 = Hmac<Sha1>;
 
 /// Landing page shown in the browser after the redirect.
 const DONE_PAGE: &str = "<!doctype html><html><head><meta charset=\"utf-8\">\
-<title>V Assistant</title></head>\
+<title>VuaAssistant</title></head>\
 <body style=\"font-family:system-ui;background:#0a0a0a;color:#eaeaea;\
 text-align:center;padding-top:22vh\">\
-<h2>V Assistant</h2><p>Signed in successfully. You can close this tab and \
+<h2>VuaAssistant</h2><p>Signed in successfully. You can close this tab and \
 return to the app.</p></body></html>";
 
 /// Start the loopback listener and return its port. Accepts exactly one

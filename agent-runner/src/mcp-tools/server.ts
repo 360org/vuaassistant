@@ -1,5 +1,5 @@
 /**
- * Zero-dependency MCP stdio server for V Assistant built-in tools.
+ * Zero-dependency MCP stdio server for VuaAssistant built-in tools.
  * It intentionally mirrors the subset of MCP used by the existing external
  * MCP client so the runner can expose the same tool contract without an SDK.
  */
@@ -20,7 +20,7 @@ export function startBuiltinMcpServer(): void {
     try { request = JSON.parse(line) as JsonRpcRequest; } catch { return; }
     try {
       if (request.method === 'initialize') {
-        reply(request.id, { protocolVersion: '2024-11-05', capabilities: { tools: {} }, serverInfo: { name: 'v-assistant', version: '0.1.0' } });
+        reply(request.id, { protocolVersion: '2024-11-05', capabilities: { tools: {} }, serverInfo: { name: 'vuaassistant', version: '0.1.0' } });
       } else if (request.method === 'tools/list') {
         reply(request.id, { tools: CORE_TOOLS.map((tool) => tool.definition) });
       } else if (request.method === 'tools/call') {

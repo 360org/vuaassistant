@@ -234,7 +234,7 @@ export function Onboarding() {
           {step === "welcome" && (
             <div className="text-center">
               <Logo className="mx-auto size-20" />
-              <h1 className="mt-6 text-3xl font-bold">V Assistant</h1>
+              <h1 className="mt-6 text-3xl font-bold">VuaAssistant</h1>
               <p className="mt-2 text-neutral-400">
                 AI for everyone. Set up in under 2 minutes — no configuration,
                 no API keys, no technical knowledge.

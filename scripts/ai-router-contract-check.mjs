@@ -32,7 +32,7 @@ assert(sidecarSource.includes('url.pathname === "/health"') && sidecarSource.inc
 assert(sidecarSource.includes('url.pathname === "/v1/providers"'), "AI Router connection catalog is not exposed");
 assert(sidecarSource.includes("mode: \"native-core\""), "AI Router is still delegating to an upstream service");
 assert(sidecarSource.includes('url.pathname === "/v1/models"'), "AI Router model filtering is missing");
-assert(sidecarSource.includes("startCodexCallbackRelay"), "V-Assistant Codex callback compatibility relay is missing");
+assert(sidecarSource.includes("startCodexCallbackRelay"), "VuaAssistant Codex callback compatibility relay is missing");
 assert(sidecarSource.includes('redirectUri = "http://localhost:1455/auth/callback"'), "Codex callback URI changed unexpectedly");
 assert(sidecarSource.includes("startCodexCallbackRelay(redirectUri)"), "Codex callback relay does not preserve the requesting UI origin");
 assert(sidecarSource.includes('redirectUri = "http://localhost:443/callback"'), "Claude fixed callback URI is missing");
@@ -40,7 +40,7 @@ assert(sidecarSource.includes("startLoopbackCallbackRelay"), "xAI loopback callb
 assert(sidecarSource.includes('redirectUri = `http://127.0.0.1:${listenPort}${callbackPath}`'), "xAI must authorize with its registered loopback callback");
 assert(sidecarSource.includes('["127.0.0.1", "localhost"].includes(candidate.hostname)'), "AI Router CORS does not support both loopback UI origins");
 assert(!sidecarSource.includes('"access-control-allow-origin": "*"'), "AI Router must not expose Vault-backed requests to every browser origin");
-assert(!sidecarSource.includes("startCodexProxy"), "V-Assistant must not modify or embed the Core callback server");
+assert(!sidecarSource.includes("startCodexProxy"), "VuaAssistant must not modify or embed the Core callback server");
 const settingsSource = fs.readFileSync(settingsPage, "utf8");
 const onboardingSource = fs.readFileSync(path.join(root, "src", "pages", "Onboarding.tsx"), "utf8");
 const chatSource = fs.readFileSync(chatPage, "utf8");

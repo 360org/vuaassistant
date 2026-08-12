@@ -1,8 +1,8 @@
 /**
- * V Assistant compatibility adapter for the vendored 9router Provider Core.
+ * VuaAssistant compatibility adapter for the vendored 9router Provider Core.
  *
  * The upstream core records request telemetry through its dashboard database.
- * V Assistant has no dashboard database: connection secrets belong in Vault
+ * VuaAssistant has no dashboard database: connection secrets belong in Vault
  * and the host owns operational logs. Keep the upstream call contract intact
  * while retaining only bounded, non-secret in-process telemetry.
  */

@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import logo from "@/assets/logo.png";
 
-/** The V Assistant brand mark. */
+/** The VuaAssistant brand mark. */
 export function Logo({ className }: { className?: string }) {
   return (
     <img

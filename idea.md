@@ -1,4 +1,4 @@
-# V-Assistant — Ý tưởng sản phẩm & Thiết kế Kiến trúc (Kế thừa NanoClaw & Đa nhà cung cấp)
+# VuaAssistant — Ý tưởng sản phẩm & Thiết kế Kiến trúc (Kế thừa NanoClaw & Đa nhà cung cấp)
 
 > **Mục tiêu chốt chặn:** Xây dựng ứng dụng trợ lý cá nhân dạng Desktop Agentic cực nhẹ, hỗ trợ MacOS/Windows/Linux, kế thừa toàn bộ cấu trúc & tính năng agentic của NanoClaw (đọc/ghi file, thực thi lệnh Terminal, MCP tools) nhưng **loại bỏ sự lệ thuộc vào Anthropic Claude SDK** và **hỗ trợ Đa nhà cung cấp (ChatGPT, Claude, Gemini, OpenRouter, LocalAI)**.
 
@@ -28,7 +28,7 @@ Tài liệu này đặc tả ý tưởng sản phẩm cuối cùng và làm cơ 
 
 ```text
 +--------------------------------------------------------------+
-|            Tauri App (V-Assistant UI & Desktop Shell)        |
+|            Tauri App (VuaAssistant UI & Desktop Shell)        |
 |  +------------------+                   +------------------+ |
 |  |     React UI     |                   | Telegram Bot     | |
 |  +--------+---------+                   +--------+---------+ |
@@ -39,7 +39,7 @@ Tài liệu này đặc tả ý tưởng sản phẩm cuối cùng và làm cơ 
 |      |          |                                |           |
 |      |          | (Local Encrypted DB)           |           |
 |      |     +----v--------------------+           |           |
-|      |     |  V-Assistant Vault      |           |           |
+|      |     |  VuaAssistant Vault      |           |           |
 |      |     +-------------------------+           |           |
 |      | (SQLite IPC)                              |           |
 |  +---v-------------------------------------------v--------+  |
@@ -116,7 +116,7 @@ Tài liệu này đặc tả ý tưởng sản phẩm cuối cùng và làm cơ 
 
 ### F. Kho bảo mật Vault & Tích hợp (Integrations & Connectors)
 *   **[ ] Vault - Kho lưu trữ bảo mật mặc định:**
-    * Là tính năng cốt lõi của V-Assistant (không phải lấy từ OS/keychain của macOS hay Windows). Đây là một cơ sở lưu trữ dữ liệu an toàn được mã hóa và quản lý trực tiếp bởi V-Assistant, chứa toàn bộ API Keys, tài khoản, Tokens và cấu hình tích hợp của người dùng.
+    * Là tính năng cốt lõi của VuaAssistant (không phải lấy từ OS/keychain của macOS hay Windows). Đây là một cơ sở lưu trữ dữ liệu an toàn được mã hóa và quản lý trực tiếp bởi VuaAssistant, chứa toàn bộ API Keys, tài khoản, Tokens và cấu hình tích hợp của người dùng.
 *   **[ ] Tích hợp & Liên kết (Integrations & Connectors) kết nối vào Vault:**
     * Định nghĩa sẵn các cổng kết nối dịch vụ bên ngoài (GitHub, Notion, Slack, Discord, Telegram).
     * Agent chỉ query danh sách `credential_ref` và tên biến. Trusted Connector Gateway trong AI Router mới được đọc Vault, resolve credential trong memory, bind request vào origin đã lưu và redaction response trước khi trả về Agent.
@@ -131,7 +131,7 @@ Tài liệu này đặc tả ý tưởng sản phẩm cuối cùng và làm cơ 
 > (MIT). Repo đó dành cho **agent lập trình** chạy không người trông trong CI.
 > Ta **không bê nguyên** hệ sinh thái npm, điểm "Loop Ready", hay các pattern
 > gắn chặt GitHub (PR Babysitter, CI Sweeper) — chúng giải bài toán khác. Cái
-> đáng lấy là **cơ chế điều khiển vòng lặp**, vì V Assistant cũng chạy vòng lặp
+> đáng lấy là **cơ chế điều khiển vòng lặp**, vì VuaAssistant cũng chạy vòng lặp
 > agentic không người trông (scheduler, kênh Telegram) trên **tiền thật của
 > người dùng** — mỗi vòng lặp vô ích là tiền token của Sếp và của khách.
 
@@ -176,7 +176,7 @@ Ba trạng thái ra: `tiếp tục` · `chỉ báo cáo` (không side effect) ·
 dùng`. Điểm mấu chốt: **hoàn toàn tất định, không cần gọi model** để quyết
 định — nên rẻ tới mức chạy được ở mọi vòng lặp.
 
-Với V Assistant, "escalate" không phải mở issue mà là **nhắn thẳng cho người
+Với VuaAssistant, "escalate" không phải mở issue mà là **nhắn thẳng cho người
 dùng**: "Em thử 3 lần đều lỗi *X*, dừng lại để khỏi tốn thêm. Sếp muốn em thử
 cách khác không?" — đúng tinh thần lỗi phải ra câu người hiểu (#13).
 
@@ -191,7 +191,7 @@ breaker ở mục A, vừa cho phép cắt tỉa **không cần model**:
 - cắt stack trace còn vài dòng đầu.
 
 Lợi ích kép: rẻ hơn **và** chính xác hơn, vì model không còn phải bơi trong
-rác. Đây là thứ hợp với V Assistant nhất vì ta chạy trên máy người dùng, cắt
+rác. Đây là thứ hợp với VuaAssistant nhất vì ta chạy trên máy người dùng, cắt
 được token nào là tiền thật của họ.
 
 **C. Vai trò kiểm tra (maker/checker)**
@@ -213,7 +213,7 @@ Học từ `loop-constraints.md` + `gate.yaml`. Hiện luật của ta nằm **t
 muốn đổi luật thì phải sửa mã và phát hành lại. Repo kia tách làm hai tầng:
 văn bản cho người đọc, YAML cho máy thi hành.
 
-Với V Assistant nên là **một màn hình trong Settings** ghi xuống một tệp
+Với VuaAssistant nên là **một màn hình trong Settings** ghi xuống một tệp
 chính sách, thay vì bắt người dùng viết YAML:
 
 - không được gửi ra ngoài quá N tin/giờ;

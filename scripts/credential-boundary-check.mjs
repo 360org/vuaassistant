@@ -18,7 +18,7 @@ assert(!tauriRuntime.includes('"apiKey"'), "runner.json must not contain an API-
 assert(!tauriRuntime.includes("VUA_VAULT_MANIFEST"), "Runner must query Vault metadata instead of reading a cache file");
 assert(vault.includes("Aes256"), "App Vault must encrypt its SQLite values with AES-256");
 assert(vault.includes("HmacSha256"), "App Vault ciphertext must be authenticated");
-assert(!vault.includes("keyring::Entry"), "Connection data must stay in the V Assistant Vault, not an OS keychain");
+assert(!vault.includes("keyring::Entry"), "Connection data must stay in the VuaAssistant Vault, not an OS keychain");
 assert(!vault.includes("vault-manifest.json"), "App Vault must remain the single source of connection metadata");
 assert(router.includes("AI_ROUTER_VAULT_BROKER_URL"), "AI Router must support the desktop Vault broker");
 assert(router.includes("AI_ROUTER_VAULT_BROKER_TOKEN"), "AI Router broker access must require a capability token");

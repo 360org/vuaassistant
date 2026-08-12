@@ -187,7 +187,7 @@ jobs:
       - name: Verify packaged AI Router runtime
         shell: bash
         run: |
-          app_path="$(find "src-tauri/target/${{ matrix.target }}/release/bundle/macos" -name 'V Assistant.app' -type d -print -quit)"
+          app_path="$(find "src-tauri/target/${{ matrix.target }}/release/bundle/macos" -name 'VuaAssistant.app' -type d -print -quit)"
           test -n "$app_path"
           test -f "$app_path/Contents/Resources/_up_/ai-router/src/sidecar.mjs"
           test -f "$app_path/Contents/Resources/_up_/ai-router/node_modules/undici/package.json"
@@ -220,8 +220,8 @@ jobs:
           }
           if ! retry gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
             retry gh release create "$TAG" --repo "${{ github.repository }}" \
-              --draft --title "V Assistant $TAG" \
-              --notes "Download the installer for your platform below, then open it to install V Assistant." || \
+              --draft --title "VuaAssistant $TAG" \
+              --notes "Download the installer for your platform below, then open it to install VuaAssistant." || \
               retry gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null
           fi
           mkdir -p .release-assets
@@ -232,7 +232,7 @@ jobs:
             cp "$signature" ".release-assets/$name.sig"
           done < <(find "src-tauri/target/${{ matrix.target }}/release/bundle" -type f -name '*.sig' -print0)
           retry gh release upload "$TAG" --repo "${{ github.repository }}" --clobber \
-            "src-tauri/target/${{ matrix.target }}/release/bundle/dmg/V Assistant_${{ needs.version.outputs.version }}_${{ matrix.dmg_arch }}.dmg" \
+            "src-tauri/target/${{ matrix.target }}/release/bundle/dmg/VuaAssistant_${{ needs.version.outputs.version }}_${{ matrix.dmg_arch }}.dmg" \
             .release-assets/*
 
 
@@ -337,11 +337,11 @@ jobs:
         if: matrix.platform == 'windows-latest'
         shell: pwsh
         run: |
-          $nsisInstaller = "src-tauri/target/release/bundle/nsis/V Assistant_${{ needs.version.outputs.version }}_x64-setup.exe"
+          $nsisInstaller = "src-tauri/target/release/bundle/nsis/VuaAssistant_${{ needs.version.outputs.version }}_x64-setup.exe"
           # Get absolute path for MSI to avoid 1619 error in msiexec
-          $msiInstaller = Resolve-Path "src-tauri/target/release/bundle/msi/V Assistant_${{ needs.version.outputs.version }}_x64_en-US.msi"
-          $nsisInstallPath = "$env:LOCALAPPDATA\Programs\V Assistant\v-assistant.exe"
-          $msiInstallPath = "C:\Program Files\V Assistant\v-assistant.exe"
+          $msiInstaller = Resolve-Path "src-tauri/target/release/bundle/msi/VuaAssistant_${{ needs.version.outputs.version }}_x64_en-US.msi"
+          $nsisInstallPath = "$env:LOCALAPPDATA\Programs\VuaAssistant\vuaassistant.exe"
+          $msiInstallPath = "C:\Program Files\VuaAssistant\vuaassistant.exe"
           $installPath = $null
 
           # Helper to wait for file
@@ -355,12 +355,12 @@ jobs:
 
           Write-Host "Attempting silent installation via NSIS..."
           # Pass /D without quotes as NSIS requires, using Start-Process
-          $process = Start-Process -FilePath $nsisInstaller -ArgumentList "/S", "/D=$env:LOCALAPPDATA\Programs\V Assistant" -Wait -PassThru -NoNewWindow
+          $process = Start-Process -FilePath $nsisInstaller -ArgumentList "/S", "/D=$env:LOCALAPPDATA\Programs\VuaAssistant" -Wait -PassThru -NoNewWindow
           Write-Host "NSIS Installer ExitCode: $($process.ExitCode)"
 
           if (Wait-For-File $nsisInstallPath 15) {
             $installPath = $nsisInstallPath
-            Write-Host "Verification Success: V Assistant installed successfully via NSIS!"
+            Write-Host "Verification Success: VuaAssistant installed successfully via NSIS!"
           }
 
           if ($null -eq $installPath) {
@@ -369,7 +369,7 @@ jobs:
             Write-Host "MSI Installer ExitCode: $($msiProcess.ExitCode)"
             if (Wait-For-File $msiInstallPath 15) {
               $installPath = $msiInstallPath
-              Write-Host "Verification Success: V Assistant installed successfully via MSI!"
+              Write-Host "Verification Success: VuaAssistant installed successfully via MSI!"
             }
           }
 
@@ -378,13 +378,13 @@ jobs:
               Write-Host "MSI Install Log Content:"
               Get-Content "msi_install.log" -Tail 50
             }
-            Write-Host "Searching for v-assistant.exe under User Profile..."
-            $foundFiles = Get-ChildItem -Path $env:USERPROFILE -Filter "v-assistant.exe" -Recurse -ErrorAction SilentlyContinue
+            Write-Host "Searching for vuaassistant.exe under User Profile..."
+            $foundFiles = Get-ChildItem -Path $env:USERPROFILE -Filter "vuaassistant.exe" -Recurse -ErrorAction SilentlyContinue
             if ($foundFiles) { $installPath = $foundFiles[0].FullName }
           }
 
           if ($null -eq $installPath) {
-            throw "Verification Failed: Neither NSIS nor MSI installer produced v-assistant.exe."
+            throw "Verification Failed: Neither NSIS nor MSI installer produced vuaassistant.exe."
           }
 
           $installRoot = Split-Path $installPath
@@ -397,7 +397,7 @@ jobs:
             throw "Verification Failed: packaged AI Router, Agent Runner, or node.exe resource is missing."
           }
           Write-Host "Packaged runtime resources verified under $installRoot"
-          Stop-Process -Name "v-assistant" -Force -ErrorAction SilentlyContinue
+          Stop-Process -Name "vuaassistant" -Force -ErrorAction SilentlyContinue
 
 
 
@@ -418,8 +418,8 @@ jobs:
           }
           if ! retry gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
             retry gh release create "$TAG" --repo "${{ github.repository }}" \
-              --draft --title "V Assistant $TAG" \
-              --notes "Download the installer for your platform below, then open it to install V Assistant." || \
+              --draft --title "VuaAssistant $TAG" \
+              --notes "Download the installer for your platform below, then open it to install VuaAssistant." || \
               retry gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null
           fi
           mkdir -p .release-assets
@@ -431,13 +431,13 @@ jobs:
           done < <(find src-tauri/target/release/bundle -type f -name '*.sig' -print0)
           if [[ "${{ matrix.platform }}" == "windows-latest" ]]; then
             retry gh release upload "$TAG" --repo "${{ github.repository }}" --clobber \
-              "src-tauri/target/release/bundle/msi/V Assistant_${{ needs.version.outputs.version }}_x64_en-US.msi" \
-              "src-tauri/target/release/bundle/nsis/V Assistant_${{ needs.version.outputs.version }}_x64-setup.exe"
+              "src-tauri/target/release/bundle/msi/VuaAssistant_${{ needs.version.outputs.version }}_x64_en-US.msi" \
+              "src-tauri/target/release/bundle/nsis/VuaAssistant_${{ needs.version.outputs.version }}_x64-setup.exe"
           else
             retry gh release upload "$TAG" --repo "${{ github.repository }}" --clobber \
-              "src-tauri/target/release/bundle/deb/V Assistant_${{ needs.version.outputs.version }}_amd64.deb" \
-              "src-tauri/target/release/bundle/rpm/V Assistant-${{ needs.version.outputs.version }}-1.x86_64.rpm" \
-              "src-tauri/target/release/bundle/appimage/V Assistant_${{ needs.version.outputs.version }}_amd64.AppImage"
+              "src-tauri/target/release/bundle/deb/VuaAssistant_${{ needs.version.outputs.version }}_amd64.deb" \
+              "src-tauri/target/release/bundle/rpm/VuaAssistant-${{ needs.version.outputs.version }}-1.x86_64.rpm" \
+              "src-tauri/target/release/bundle/appimage/VuaAssistant_${{ needs.version.outputs.version }}_amd64.AppImage"
           fi
           retry gh release upload "$TAG" --repo "${{ github.repository }}" --clobber .release-assets/*
 

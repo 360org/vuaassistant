@@ -2,8 +2,8 @@ import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
 
-const sourceApp = "/Volumes/DATA/DEV/v-assistant/src-tauri/target/release/bundle/macos/V Assistant.app";
-const targetApp = "/Applications/V Assistant.app";
+const sourceApp = "/Volumes/DATA/DEV/vuaassistant/src-tauri/target/release/bundle/macos/VuaAssistant.app";
+const targetApp = "/Applications/VuaAssistant.app";
 
 if (!fs.existsSync(sourceApp)) {
   console.error(`❌ Source app not found at: ${sourceApp}`);
@@ -15,7 +15,7 @@ console.log(`📦 Copying local build to Applications: ${sourceApp} → ${target
 try {
   // Kill running instance if open
   try {
-    execSync('pkill -f "V Assistant"', { stdio: "ignore" });
+    execSync('pkill -f "VuaAssistant"', { stdio: "ignore" });
   } catch {
     // Ignore error if app is not currently running
   }

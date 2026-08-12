@@ -1,7 +1,7 @@
 /**
  * Agent tools — the real capabilities agents run inside the app.
  *
- * This is what makes V Assistant "just work" after install: no external
+ * This is what makes VuaAssistant "just work" after install: no external
  * engine, no Docker. The agent loop (see `providers.ts`) calls these tools
  * directly. Two abilities cover the core promise "store a login once, the
  * agent uses it to act":
@@ -164,7 +164,7 @@ const connectorRequestTool: AgentTool = {
   },
   async run(args) {
     if (!(typeof window !== "undefined" && "__TAURI_INTERNALS__" in window)) {
-      return "Connector gateway is available only in V Assistant Desktop.";
+      return "Connector gateway is available only in VuaAssistant Desktop.";
     }
     const { invoke } = await import("@tauri-apps/api/core");
     const payload = JSON.stringify({
@@ -187,7 +187,7 @@ const createScheduleTool: AgentTool = {
     function: {
       name: "create_schedule",
       description:
-        "Tạo mới một tác vụ lập lịch chạy tự động/định kỳ (Scheduled Task) trong ứng dụng V Assistant. Sử dụng công cụ này khi người dùng yêu cầu đặt lịch, lập lịch đăng bài, nhắc nhở hoặc báo cáo tự động.",
+        "Tạo mới một tác vụ lập lịch chạy tự động/định kỳ (Scheduled Task) trong ứng dụng VuaAssistant. Sử dụng công cụ này khi người dùng yêu cầu đặt lịch, lập lịch đăng bài, nhắc nhở hoặc báo cáo tự động.",
       parameters: {
         type: "object",
         properties: {
@@ -293,7 +293,7 @@ const fileReadTool: AgentTool = {
         const { invoke } = await import("@tauri-apps/api/core");
         return await invoke<string>("agent_read_file", { path });
       }
-      return "Lỗi: Đọc tệp hệ thống chỉ hỗ trợ trên ứng dụng V Assistant Desktop.";
+      return "Lỗi: Đọc tệp hệ thống chỉ hỗ trợ trên ứng dụng VuaAssistant Desktop.";
     } catch (e) {
       return `Lỗi đọc file: ${e instanceof Error ? e.message : String(e)}`;
     }
@@ -325,7 +325,7 @@ const fileWriteTool: AgentTool = {
         const { invoke } = await import("@tauri-apps/api/core");
         return await invoke<string>("agent_write_file", { path, content });
       }
-      return "Lỗi: Ghi tệp hệ thống chỉ hỗ trợ trên ứng dụng V Assistant Desktop.";
+      return "Lỗi: Ghi tệp hệ thống chỉ hỗ trợ trên ứng dụng VuaAssistant Desktop.";
     } catch (e) {
       return `Lỗi ghi file: ${e instanceof Error ? e.message : String(e)}`;
     }
@@ -356,7 +356,7 @@ const fileListTool: AgentTool = {
         const list = await invoke<string[]>("agent_list_dir", { path });
         return `Danh sách tệp/thư mục tại "${path}":\n` + list.map((item) => `- ${item}`).join("\n");
       }
-      return "Lỗi: Liệt kê thư mục hệ thống chỉ hỗ trợ trên ứng dụng V Assistant Desktop.";
+      return "Lỗi: Liệt kê thư mục hệ thống chỉ hỗ trợ trên ứng dụng VuaAssistant Desktop.";
     } catch (e) {
       return `Lỗi xem thư mục: ${e instanceof Error ? e.message : String(e)}`;
     }

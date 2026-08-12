@@ -1,4 +1,4 @@
-# CHANGELOGS: Nhật ký Phát triển V-Assistant (Zero-Docker / Đa nền tảng)
+# CHANGELOGS: Nhật ký Phát triển VuaAssistant (Zero-Docker / Đa nền tảng)
 
 Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu trúc hệ thống.
 
@@ -28,7 +28,7 @@ Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu tr
 
 ### Tính năng Reply, Retry & Tối ưu hóa Lưu trữ
 *   **Hành động Reply & Retry trực quan:** Bổ sung hai nút "Trả lời" (trích dẫn tin nhắn dạng blockquote) và "Thử lại" (gửi lại yêu cầu trước đó) trực tiếp bên dưới các bong bóng chat của AI.
-*   **Thư mục dữ liệu thương hiệu `~/vuaai-data`:** Chuyển đổi toàn bộ thư mục lưu trữ dữ liệu mặc định từ tệp ẩn `.v-assistant/data` sang thư mục nổi `~/vuaai-data` để tăng tính nhận diện thương hiệu và giúp người dùng dễ quản lý.
+*   **Thư mục dữ liệu thương hiệu `~/vuaai-data`:** Chuyển đổi toàn bộ thư mục lưu trữ dữ liệu mặc định từ tệp ẩn `.vuaassistant/data` sang thư mục nổi `~/vuaai-data` để tăng tính nhận diện thương hiệu và giúp người dùng dễ quản lý.
 *   **Tự động Code Sign & Notarize:** Cấu hình tự động ký và chứng thực bảo mật với Apple trên GitHub Actions khi phát hành, khắc phục triệt để lỗi "unidentified developer" trên macOS.
 *   **Khắc phục lỗi cổng AI Router:** Chuyển cổng mặc định trong sidecar sang `36360` đồng bộ hoàn toàn với hệ thống, sửa lỗi AI Router bị tắt sau khi mở.
 
@@ -40,8 +40,8 @@ Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu tr
     Carriage Return và Line Feed (`\r\n`) chuẩn trong HTTP request gửi qua `TcpStream` của Rust backend.
     Sửa lỗi AI Router nhận request không hợp lệ (malformed) trả về `400 Bad Request` dẫn đến việc app
     tưởng AI Router chưa sẵn sàng và tự động kill tiến trình con ngay sau khi spawn.
-*   **Sửa lỗi phân giải binary name trong Smoke Test:** Đổi tên file tìm kiếm từ `V Assistant.exe`
-    thành `v-assistant.exe` trong workflow kiểm thử cài đặt tự động trên GitHub Actions để test khói chạy đúng.
+*   **Sửa lỗi phân giải binary name trong Smoke Test:** Đổi tên file tìm kiếm từ `VuaAssistant.exe`
+    thành `vuaassistant.exe` trong workflow kiểm thử cài đặt tự động trên GitHub Actions để test khói chạy đúng.
 
 ## [1.1.49] — 2026-08-04
 
@@ -53,7 +53,7 @@ Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu tr
     tránh kẹt ở bước đăng nhập AI account.
 *   Không kill bừa process ngoài khi port `20128` bị chiếm; chỉ dừng đúng process
     AI Router có `sidecar.mjs`.
-*   Windows release smoke test bắt buộc kiểm tra `v-assistant.exe`, `sidecar.mjs`,
+*   Windows release smoke test bắt buộc kiểm tra `vuaassistant.exe`, `sidecar.mjs`,
     Agent Runner `index.js` và `node.exe` sau cài đặt.
 
 ### Kiểm chứng
@@ -67,16 +67,16 @@ Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu tr
 
 *   **Sửa lỗi phân giải thư mục tài nguyên (Issue #7 & #8):** Cập nhật hàm `resolve_project_dir` trong
     Rust backend để phát hiện và tìm đúng thư mục tài nguyên `_up_` giải nén cùng cấp với file thực thi chính
-    (`v-assistant.exe`) trên Windows. Sửa lỗi AI Router và Agent Runner không thể khởi động được (Đang dừng)
+    (`vuaassistant.exe`) trên Windows. Sửa lỗi AI Router và Agent Runner không thể khởi động được (Đang dừng)
     sau khi cài đặt app thực tế trên Windows 11.
-*   **Sửa lỗi typo Smoke Test:** Đổi tên file tìm kiếm từ `V Assistant.exe` thành `v-assistant.exe` trong
+*   **Sửa lỗi typo Smoke Test:** Đổi tên file tìm kiếm từ `VuaAssistant.exe` thành `vuaassistant.exe` trong
     workflow kiểm thử cài đặt tự động trên GitHub Actions để test khói chạy đúng.
 
 ## [1.1.47] — 2026-08-04
 
 ### Desktop menu, updater và checklist
 
-*   Bổ sung cấu trúc native menu cho macOS gồm V Assistant, File, Edit, View,
+*   Bổ sung cấu trúc native menu cho macOS gồm VuaAssistant, File, Edit, View,
     Window và Help để chuẩn hóa trải nghiệm desktop.
 *   Cho phép cấp quyền đọc từ file hoặc thư mục được chọn trong native picker;
     path được canonicalize trước khi lưu vào approved-read-paths.
@@ -134,7 +134,7 @@ Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu tr
 
 ### Giao diện Sidebar
 
-*   Hiển thị phiên bản hiện tại cạnh tên V Assistant trên Sidebar.
+*   Hiển thị phiên bản hiện tại cạnh tên VuaAssistant trên Sidebar.
 *   Giữ thông báo có bản cập nhật tại khu vực Cài đặt, tránh hiển thị cùng một
     thông tin ở hai vị trí.
 
@@ -161,7 +161,7 @@ Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu tr
     số lượng Skills/MCP/Knowledge/Scheduled và copy gói hỗ trợ đã che API key, token,
     password, credential để debug local runtime an toàn.
 *   **Kiểm chứng:** thêm `agent-runner/scripts/capability-rail-check.mjs` và nối vào
-    `agent-runner` test/check; root build V Assistant đã pass sau thay đổi.
+    `agent-runner` test/check; root build VuaAssistant đã pass sau thay đổi.
 
 ## [1.1.41] — 2026-08-02
 
@@ -191,13 +191,13 @@ Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu tr
 
 ## [1.1.40] — 2026-08-01
 
-### Tài liệu khớp lại thực tế (audit theo `v-assistant-dev-guidelines`)
+### Tài liệu khớp lại thực tế (audit theo `vuaassistant-dev-guidelines`)
 
 *   `CHECKLIST.md`: tick lại mục "Move Telegram, scheduled jobs, and RAG
     execution behind the host/Runner" — đã xong từ trước (`agent-runner/src/index.ts`
     gọi `startScheduler()`/`startTelegramChannel()`, RAG đọc thẳng `knowledge.db`
     trong `agent-runner/src/knowledge/index.ts`), checklist ghi `[ ]` là lỗi thời.
-*   `skills/v-assistant-dev-guidelines/SKILL.md` §0.45: sửa dòng liệt kê
+*   `skills/vuaassistant-dev-guidelines/SKILL.md` §0.45: sửa dòng liệt kê
     "Còn lại: selfImprove, Knowledge/RAG" — cả hai đã di trú xong vào
     `agent-runner/`, không còn dở dang.
 *   **MCP cấu hình được từ Settings:** người dùng tự khai báo server đã tin cậy
@@ -206,7 +206,7 @@ Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu tr
     lại host shell cho model.
 *   **Bản app native tự đủ runtime:** `build:local` tự nạp Node 24 theo kiến trúc
     macOS trước khi bundle. Native smoke ngày 2026-07-29 xác nhận AI Router và
-    Agent Runner chạy từ `V Assistant.app/Contents/Resources/_up_/runtime/node/node`,
+    Agent Runner chạy từ `VuaAssistant.app/Contents/Resources/_up_/runtime/node/node`,
     không còn dùng Node cài trên iMac. CI cũng bỏ kiểm tra `better-sqlite3` lỗi thời
     vì Runner đã dùng `node:sqlite`.
 *   **Lịch & Nhiệm vụ chuyển Kanban:** thay danh sách dài bằng ba cột Đang chạy,
@@ -338,7 +338,7 @@ Webview chỉ còn hiển thị. Đã xoá `src/runtime/{telegram,scheduler,sche
     trả lời Telegram nhảy vào ô chat như thể là câu trả lời của người dùng.
 *   **Khôi phục Grok Web session capture** bị mất khi tách god file.
 *   **File chia sẻ với runner** phải nằm ở `runtime_status().dir`, không phải
-    `~/.v-assistant/data` — hai đường dẫn này khác nhau.
+    `~/.vuaassistant/data` — hai đường dẫn này khác nhau.
 
 ### Kiểm chứng
 
@@ -348,10 +348,10 @@ runner tăng lên 5 nhóm test (scheduler, Telegram, self-improve, knowledge, na
 ---
 
 ## [1.1.2] và trước đó
-*   **Bỏ Docker khỏi quy trình test (`skills/v-assistant-dev-guidelines/SKILL.md` §5)**:
-    - Từ 2026-07-27, **không dùng Docker/Colima** để test nữa. Quy trình chuẩn: `npm run tauri dev` cho vòng lặp sửa nhanh, `npm run build:local` cho bản cài thật vào `/Applications/V Assistant.app`, rồi **thao tác thật trên UI**.
+*   **Bỏ Docker khỏi quy trình test (`skills/vuaassistant-dev-guidelines/SKILL.md` §5)**:
+    - Từ 2026-07-27, **không dùng Docker/Colima** để test nữa. Quy trình chuẩn: `npm run tauri dev` cho vòng lặp sửa nhanh, `npm run build:local` cho bản cài thật vào `/Applications/VuaAssistant.app`, rồi **thao tác thật trên UI**.
     - Docker/Colima profile cũ đã được xoá; dev/test chỉ dùng app Tauri native.
-*   **Xiết quy chuẩn phát triển (`skills/v-assistant-dev-guidelines/SKILL.md`)**:
+*   **Xiết quy chuẩn phát triển (`skills/vuaassistant-dev-guidelines/SKILL.md`)**:
     - Thêm **Luật số 1 — Bám idea gốc**: bắt buộc đọc `idea.md` trước khi đề xuất thay đổi về luồng người dùng/kiến trúc/xác thực; mâu thuẫn với idea thì DỪNG và hỏi PO thay vì tự quyết.
     - Chốt **định danh**: `AI Router` là tên chính thức của tầng chung chuyển (local `127.0.0.1:20128`); `9router` chỉ là công nghệ nền; `OpenRouter` chỉ là một provider ngang hàng — **không phải** hạ tầng chung chuyển. Phần kết nối hiện tại đang đúng, cấm refactor/làm lại.
     - Chốt **thứ tự ưu tiên kết nối**: Subscription (OAuth 1-click) trước → API key sau (Advanced Options).
@@ -370,7 +370,7 @@ runner tăng lên 5 nhóm test (scheduler, Telegram, self-improve, knowledge, na
       - Thêm cơ chế **Hard Timeout 6 giây** cho hàm `indexKnowledgeFile`: Đảm bảo mọi tệp tin tải lên đều hoàn tất xử lý và chuyển sang trạng thái **"Ready"** trong tối đa vài giây, tuyệt đối không bị treo.
       - Thêm cơ chế `FileReader` timeout 2.5s khi nạp ảnh base64.
 *   **Backup Timestamp & Success Banner (`WorkspaceSettingsSection.tsx`)**:
-    - Mỗi khi nhấn **Xuất dữ liệu Sao lưu (.json)**, ứng dụng sẽ tự động sinh tệp tin kèm timestamp đầy đủ dạng `v-assistant-backup-YYYY-MM-DD_HHmmss.json`.
+    - Mỗi khi nhấn **Xuất dữ liệu Sao lưu (.json)**, ứng dụng sẽ tự động sinh tệp tin kèm timestamp đầy đủ dạng `vuaassistant-backup-YYYY-MM-DD_HHmmss.json`.
     - Hiển thị thông báo `Backup success` trực quan kèm thời gian xuất dữ liệu chính xác dạng `HH:mm:ss ngày DD/MM/YYYY`.
 *   **Run on Startup Option (`GeneralSettings.tsx`, `src-tauri/src/lib.rs`)**:
     - Thêm công tắc **Tự động chạy cùng hệ thống (Run on Startup)** trong Cài đặt hệ thống.
@@ -380,7 +380,7 @@ runner tăng lên 5 nhóm test (scheduler, Telegram, self-improve, knowledge, na
 *   **Renamed Sidebar Menu & i18n (`i18n.ts`, `Scheduled.tsx`)**:
     - Đổi tên nhãn menu hiển thị ở Sidebar từ "Lịch đăng bài & Tác vụ" thành **"Lịch & Nhiệm vụ"** theo đúng yêu cầu người dùng.
 *   **Native Tool `schedule_task` & Automatic UI Sync (`agent-runner`, `store.tsx`)**:
-    - Trang bị công cụ native `schedule_task` cho Agent Runner: Khi người dùng yêu cầu "đặt lịch đăng bài", "lên lịch tự động", "nhắc nhở"... Agent tự động gọi `schedule_task` để tạo tác vụ lên lịch trực tiếp trong mục **Lịch & Nhiệm vụ** của ứng dụng V-Assistant thay vì thao tác sai trên website đích.
+    - Trang bị công cụ native `schedule_task` cho Agent Runner: Khi người dùng yêu cầu "đặt lịch đăng bài", "lên lịch tự động", "nhắc nhở"... Agent tự động gọi `schedule_task` để tạo tác vụ lên lịch trực tiếp trong mục **Lịch & Nhiệm vụ** của ứng dụng VuaAssistant thay vì thao tác sai trên website đích.
     - Tự động đồng bộ các tác vụ đặt lịch từ `scheduled_tasks.json` lên màn hình **Lịch & Nhiệm vụ (Scheduled Tasks)** của giao diện 2 giây/lần.
     - Bổ sung quy định bắt buộc `MANDATORY SCHEDULING RULE` vào System Prompt để Agent không còn nhầm lẫn địa điểm lên lịch.
 *   **Mandatory Workspace File Storage Rule (`agent-runner/src/index.ts`)**:
@@ -408,7 +408,7 @@ runner tăng lên 5 nhóm test (scheduler, Telegram, self-improve, knowledge, na
     - Giải quyết triệt để cảnh báo `Could not Fast Refresh ("useApp" export is incompatible)`, giúp tính năng HMR của Vite hoạt động cực kỳ mượt mà.
 *   **Audit & Live Test Pass 100%**:
     - Vượt qua toàn bộ 15 kịch bản test contract tích hợp (`npm run check`), typecheck (`npx tsc`) và backend Rust check (`cargo check`).
-    - Đóng gói và cài đặt thành công bản build local trực tiếp vào `/Applications/V Assistant.app`.
+    - Đóng gói và cài đặt thành công bản build local trực tiếp vào `/Applications/VuaAssistant.app`.
 
 ## [1.1.0] - 2026-07-25
 ### Comprehensive System Hardening, Multimodal Vision & Production Release
@@ -421,7 +421,7 @@ runner tăng lên 5 nhóm test (scheduler, Telegram, self-improve, knowledge, na
     - Xử lý giải phóng cổng AI Router Sidecar (`kill_stale_port_process`) triệt tiêu lỗi `EADDRINUSE 20128`.
 *   **Agent Runner Hardening & Audit Logging**:
     - Ngắt vòng lặp restart lặp vô hạn của Agent Runner (`consecutive_failures >= 5`), tích hợp đọc log stderr thực tế từ `runner.log`.
-    - Ghi vết truy vết cấu trúc JSON cho toàn bộ Native Tools vào `~/.v-assistant/data/workspace/<agent_id>/.audit/tool_calls.log`.
+    - Ghi vết truy vết cấu trúc JSON cho toàn bộ Native Tools vào `~/.vuaassistant/data/workspace/<agent_id>/.audit/tool_calls.log`.
 *   **OAuth Security & Custom Data Directory Sync**:
     - Tự động lưu trữ `refresh_token` và `expiresAt` cho Claude OAuth vào Vault mã hóa; tự động refresh token bằng `refreshClaudeToken()`.
     - Đồng bộ khóa `vua:custom-data-path` trong `localStorage` và Vault, giúp các module đính kèm (`knowledge.ts`, `tools.ts`) lưu chính xác vào thư mục tùy chỉnh của người dùng.
@@ -441,7 +441,7 @@ runner tăng lên 5 nhóm test (scheduler, Telegram, self-improve, knowledge, na
 
 ## [1.0.73] - 2026-07-24
 ### Unified Physical Disk Data Storage Architecture
-*   **Tự động lưu tệp vật lý vào data directory (`uploads/`)**: Toàn bộ tệp tải lên (hình ảnh, tài liệu, tệp đính kèm trò chuyện, Media Vault, Knowledge Base) đều được lưu trữ trực tiếp thành tệp vật lý trong thư mục `uploads/` của Data Directory (cho cả vị trí mặc định `~/.v-assistant/data` và vị trí mount tùy chỉnh).
+*   **Tự động lưu tệp vật lý vào data directory (`uploads/`)**: Toàn bộ tệp tải lên (hình ảnh, tài liệu, tệp đính kèm trò chuyện, Media Vault, Knowledge Base) đều được lưu trữ trực tiếp thành tệp vật lý trong thư mục `uploads/` của Data Directory (cho cả vị trí mặc định `~/.vuaassistant/data` và vị trí mount tùy chỉnh).
 *   **Automatic Backup & Sync**: Tự động giải quyết đường dẫn hệ thống (`resolve_data_dir`) hỗ trợ dấu `~/` trên macOS/Linux, tự động xả và đồng bộ tất cả tệp dữ liệu đã tải lên từ trước vào thư mục `uploads/` thực tế trên đĩa cứng ngay khi khởi động ứng dụng.
 
 ## [1.0.72] - 2026-07-24
@@ -584,7 +584,7 @@ runner tăng lên 5 nhóm test (scheduler, Telegram, self-improve, knowledge, na
 
 ## [1.0.45] - 2026-07-24
 ### Added GitHub Auto-Updater, Drag & Drop Folders/Files & Smart Task Status Widget
-*   **GitHub Releases Auto-Updater**: Thêm cơ chế tự động kiểm tra phiên bản mới từ GitHub Releases (`360org/v-assistant`). Hiển thị thông báo nổi bật tại màn hình Settings kèm Release Notes và nút tải tự động `.dmg` 1-click.
+*   **GitHub Releases Auto-Updater**: Thêm cơ chế tự động kiểm tra phiên bản mới từ GitHub Releases (`360org/vuaassistant`). Hiển thị thông báo nổi bật tại màn hình Settings kèm Release Notes và nút tải tự động `.dmg` 1-click.
 *   **Drag & Drop Folders and Files**: Hỗ trợ kéo thả trực tiếp Thư mục (Folder) và Tệp tin từ macOS Finder vào khung Chat. Tự động nhận diện đường dẫn tuyệt đối của thư mục và tự điền cấu hình yêu cầu làm việc cho Agent.
 *   **Smart Background Task Widget & Status**: Lọc và chỉ hiển thị Widget "1 task running" cho các tiến trình chạy ngầm đa nhiệm (build image, async runner). Khắc phục triệt để lỗi bong bóng chat bị rỗng khi task chưa thực thi.
 
@@ -614,7 +614,7 @@ runner tăng lên 5 nhóm test (scheduler, Telegram, self-improve, knowledge, na
 ## [1.0.39] - 2026-07-23
 ### Added & Configurable Host Data Storage Location
 *   Bổ sung tính năng **Cấu hình Nơi lưu trữ dữ liệu trên máy Host (Data Storage Location)** trong trang **Settings**:
-    - Hiển thị công khai đường dẫn lưu trữ dữ liệu hiện tại trên hệ thống (ví dụ: `~/.v-assistant/data` hoặc thư mục tùy chỉnh).
+    - Hiển thị công khai đường dẫn lưu trữ dữ liệu hiện tại trên hệ thống (ví dụ: `~/.vuaassistant/data` hoặc thư mục tùy chỉnh).
     - Cung cấp nút **`📂 Chọn thư mục`** (kích hoạt trình chọn thư mục hệ thống), nút **`✏️ Nhập đường dẫn thủ công`**, nút **`💾 Lưu vị trí`** và nút **`🔄 Đặt lại mặc định`**.
     - Cho phép người dùng linh hoạt đổi nơi lưu toàn bộ cơ sở dữ liệu chat, file kiến thức, IndexedDB sang các vị trí mong muốn như ổ cứng SSD rời, USB hoặc các thư mục đám mây (iCloud Drive, Google Drive, OneDrive) để tự động backup dữ liệu an toàn.
 

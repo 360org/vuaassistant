@@ -280,7 +280,7 @@ const check = (name, cond) => {
 
 // 1. Sign-in return: pending verifier for "Continue with OpenRouter" → key.
 globalThis.mockStorageStore.set(
-  "v-assistant-oauth-pending",
+  "vuaassistant-oauth-pending",
   JSON.stringify({ provider: "openrouter", verifier: "VERIFIER_XYZ", context: "onboarding" }),
 );
 const result = await mod.completeOAuthReturn();
@@ -385,8 +385,8 @@ const refreshedGemRun = await drainLogin("gemini", "ya29.EXPIRED", {
 });
 check("Gemini subscription → refreshes an expired access token",
   refreshedGemRun.headers.Authorization === "Bearer ya29.REFRESHED");
-globalThis.mockStorageStore.delete("v-assistant-vault:provider:gemini");
-globalThis.mockStorageStore.delete("v-assistant-vault:provider:gemini:refresh");
+globalThis.mockStorageStore.delete("vuaassistant-vault:provider:gemini");
+globalThis.mockStorageStore.delete("vuaassistant-vault:provider:gemini:refresh");
 
 const openAICallsBeforeRateLimit = openAIChatCalls;
 openAIRateLimitResponses = 1;

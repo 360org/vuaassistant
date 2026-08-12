@@ -1,7 +1,7 @@
 /**
  * AI Runtime Service — the only place the UI talks to when it needs a model.
  *
- *   V Assistant Desktop  →  AI Runtime (this module)  →  Engine
+ *   VuaAssistant Desktop  →  AI Runtime (this module)  →  Engine
  *
  * The engine behind this interface is an implementation detail and is never
  * surfaced in the UI. Today it ships with a local demo engine so the app is
@@ -82,7 +82,7 @@ const demoEngine: Engine = {
     const persona = agentName ? ` as your ${agentName}` : "";
     const reply =
       `You said: “${lastUser?.content ?? ""}”.\n\n` +
-      `I'm V Assistant, running${persona} on ${providerName}. ` +
+      `I'm VuaAssistant, running${persona} on ${providerName}. ` +
       `This is a preview response — once your ${providerName} account is ` +
       `connected, real answers will stream here. Everything else already ` +
       `works: switch providers in one click, install agents from the store, ` +
@@ -100,7 +100,7 @@ const demoEngine: Engine = {
 /** The persona sent to real providers as the system prompt. */
 export function buildSystemPrompt(options: ChatOptions): string {
   let prompt =
-    "You are V Assistant, a highly autonomous personal AI assistant for everyday work. " +
+    "You are VuaAssistant, a highly autonomous personal AI assistant for everyday work. " +
     "Be concise, concrete, and act with a clear engineering mindset. Always answer in the user's language.\n\n" +
     "=== CORE BEHAVIOR & PROCESS AUTONOMY ===\n" +
     "1. PLANNING: When given a complex request (anything requiring more than 2 steps or multiple tool calls), you MUST formulate a brief, structured Plan in Markdown (with checkable boxes) in your initial response. Explain the task breakdown, specify clear completion criteria (Done criteria), and keep track of these steps. Update your progress as you complete them so the user always knows what has been completed, what is in progress, and what remains.\n" +

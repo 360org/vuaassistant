@@ -61,7 +61,7 @@ export function Sidebar({
         <Logo />
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-1.5 text-sm font-semibold leading-tight">
-            <span className="min-w-0 truncate">V Assistant</span>
+            <span className="min-w-0 truncate">VuaAssistant</span>
             {appUpdate?.hasUpdate && (
               <button
                 onClick={goUpdate}
@@ -129,7 +129,7 @@ export function Sidebar({
           <span className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-1">
               <span className="truncate text-xs font-medium text-neutral-200">
-                {user?.name ?? "V Assistant"}
+                {user?.name ?? "VuaAssistant"}
               </span>
             </div>
             <span className="mt-0.5 block truncate text-[11px] text-neutral-500">

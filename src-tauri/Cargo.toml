@@ -1,13 +1,13 @@
 [package]
-name = "v-assistant"
-version = "1.1.58"
-description = "V Assistant — AI for everyone"
+name = "vuaassistant"
+version = "1.1.59"
+description = "VuaAssistant — AI for everyone"
 authors = ["360org <support@vuaai.net>"]
 homepage = "https://vuaai.net"
 edition = "2021"
 
 [lib]
-name = "v_assistant_lib"
+name = "vuaassistant_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
@@ -20,7 +20,7 @@ serde_json = "1"
 rusqlite = { version = "0.32", features = ["bundled"] }
 chrono = "0.4"
 uuid = { version = "1", features = ["v4"] }
-# V Assistant-owned encrypted SQLite Vault.
+# VuaAssistant-owned encrypted SQLite Vault.
 aes = "0.8"
 cbc = { version = "0.1", features = ["alloc", "block-padding"] }
 hmac = "0.12"

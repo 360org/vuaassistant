@@ -32,7 +32,7 @@ export function VaultSettings() {
           Bảo mật Credential & Token API
         </div>
         <p className="text-xs text-neutral-400 leading-relaxed">
-          Tất cả OAuth tokens, API Keys và mật khẩu truy cập của bạn được mã hóa an toàn ở cấp độ hệ thống thông qua Vault bảo mật của V-Assistant.
+          Tất cả OAuth tokens, API Keys và mật khẩu truy cập của bạn được mã hóa an toàn ở cấp độ hệ thống thông qua Vault bảo mật của VuaAssistant.
         </p>
         <div className="flex items-center gap-2 pt-2 border-t border-neutral-800/80 text-xs text-emerald-400">
           <ShieldCheck className="size-4" />

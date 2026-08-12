@@ -1,4 +1,4 @@
-# 📋 Báo cáo Audit Toàn diện — V-Assistant
+# 📋 Báo cáo Audit Toàn diện — VuaAssistant
 
 > **Ngày:** 2026-07-26 · **Nhánh:** `dev` (sạch, khớp `origin/dev`)
 > **Đối chiếu:** [idea.md](./idea.md) — bản cập nhật 17/07

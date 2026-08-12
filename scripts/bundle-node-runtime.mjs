@@ -16,7 +16,7 @@ if (process.platform !== "darwin") {
 }
 
 const archive = `node-v${VERSION}-darwin-${arch}`;
-const temp = await mkdtemp(join(tmpdir(), "v-assistant-node-"));
+const temp = await mkdtemp(join(tmpdir(), "vuaassistant-node-"));
 try {
   const download = join(temp, "node.tar.gz");
   execFileSync("curl", ["--fail", "--location", "--retry", "3", `https://nodejs.org/dist/v${VERSION}/${archive}.tar.gz`, "-o", download], { stdio: "inherit" });

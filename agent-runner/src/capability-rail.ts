@@ -15,7 +15,7 @@ export interface Capability {
 export const CAPABILITY_TOOL_DEFINITIONS: ToolDefinition[] = [
   {
     name: 'search_capabilities',
-    description: 'Tìm capability đang có trong V Assistant runtime. Dùng trước khi chọn tool hoặc integration.',
+    description: 'Tìm capability đang có trong VuaAssistant runtime. Dùng trước khi chọn tool hoặc integration.',
     input_schema: {
       type: 'object',
       properties: {

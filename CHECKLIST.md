@@ -1,4 +1,4 @@
-# V-Assistant — Checklist Tính năng Tổng thể
+# VuaAssistant — Checklist Tính năng Tổng thể
 
 > **Nguồn tham chiếu chéo:**
 > - [NanoClaw](file:///Volumes/DATA/DEV/NanoClaw) — Agent Runner, Poll Loop, SQLite IPC, MCP Tools, Channels, Provider Registry
@@ -90,7 +90,7 @@
 ### 2.7 Trang Vault
 - [x] CRUD credential (tạo/đọc/sửa/xóa)
 - [x] Field động: chọn kiểu dữ liệu (text/password/number/url/email/date/datetime) + icon
-- [x] V-Assistant Vault nội bộ: SQLite mã hóa AES-256-CBC + HMAC-SHA256;
+- [x] VuaAssistant Vault nội bộ: SQLite mã hóa AES-256-CBC + HMAC-SHA256;
   không dùng OS Keychain
 
 ### 2.8 Trang Scheduled
@@ -226,7 +226,7 @@
   smoke theo từng subscription trước khi đánh dấu vendor Connected.
 - [x] Codex OAuth callback compatibility: authorize dùng URI đã đăng ký
   `http://localhost:1455/auth/callback`, relay giữ nguyên origin khởi tạo của
-  V Assistant (`localhost` hoặc `127.0.0.1`) để callback thực sự cập nhật UI.
+  VuaAssistant (`localhost` hoặc `127.0.0.1`) để callback thực sự cập nhật UI.
 - [x] AI Router CORS cho phép đúng hai UI loopback origin `localhost:1420` và
   `127.0.0.1:1420`; không dùng wildcard vì Router có quyền dùng Vault credential.
 - [x] Bản dev dùng một App Vault duy nhất: UI dev broker và AI Router cùng
@@ -435,10 +435,10 @@
 
 ## 7. Vault — Kho bảo mật Cốt lõi
 
-> **Vault là tính năng chính của V-Assistant, KHÔNG lấy từ OS Keychain**
+> **Vault là tính năng chính của VuaAssistant, KHÔNG lấy từ OS Keychain**
 
 - [x] CRUD credential cơ bản (hoàn toàn dùng local SQLite `vault.db`)
-- [x] Chuyển sang V-Assistant Vault nội bộ (SQLite mã hóa hoặc encrypted file)
+- [x] Chuyển sang VuaAssistant Vault nội bộ (SQLite mã hóa hoặc encrypted file)
 - [x] Mã hóa AES-256-CBC + HMAC-SHA256; tự migrate format XOR legacy sang v2
 - [ ] Master password hoặc device-bound key để unlock Vault
 - [x] UI Vault API: `vault_set`, `vault_get`, `vault_delete`; Agent Runner
@@ -630,7 +630,7 @@
 
 - [x] Automated `inbound.db -> poll loop -> provider/tool loop -> outbound.db`
       tests pass locally, including session isolation and restart persistence.
-- [~] Real Tauri host-process smoke: 2026-07-29 native `/Applications/V Assistant.app`
+- [~] Real Tauri host-process smoke: 2026-07-29 native `/Applications/VuaAssistant.app`
       confirmed bundled AI Router + Agent Runner launch and remain alive; `runner.log`
       confirmed poll loop, scheduler and Telegram channel start. A manual native chat
       + outbound delivery turn remains required; web preview cannot prove it.
@@ -644,7 +644,7 @@
 - [x] Bundle the Agent Runner and Node runtime in Tauri resources; production
       does not depend on the checkout, `npx`, or a developer-installed Node
       runtime. Native smoke on 2026-07-29 confirmed AI Router and Runner launch
-      from `V Assistant.app/Contents/Resources/_up_/runtime/node/node`.
+      from `VuaAssistant.app/Contents/Resources/_up_/runtime/node/node`.
 - [x] Move Telegram, scheduled jobs, and RAG execution behind the host/Runner
       IPC path; keep the webview engine as a fallback only.
       `agent-runner/src/index.ts` calls `startScheduler()` and
@@ -807,7 +807,7 @@
 
 ### 13.1 Native Computer Use & OS Control
 - [x] **Desktop App Execution**: Chạy ứng dụng desktop native bằng Tauri 2 (Rust) + React UI
-- [x] **Auto Launch (Run on Startup)**: Khởi động ngầm V-Assistant cùng hệ thống macOS/Windows (`set_autostart`)
+- [x] **Auto Launch (Run on Startup)**: Khởi động ngầm VuaAssistant cùng hệ thống macOS/Windows (`set_autostart`)
 - [ ] **Mouse & Keyboard Control (`computer_action`)**: Cho phép Agent thực hiện di chuyển chuột, click, double click, gõ phím, drag & drop trực tiếp trên màn hình host OS
 - [ ] **Screen Capture & Visual Inspection (`screen_capture`)**: Chụp ảnh màn hình toàn cảnh hoặc theo cửa sổ ứng dụng để Agent phân tích hình ảnh UI bằng Vision Model
 - [ ] **App Focus & Window Management**: Tự động mở, chuyển đổi focus giữa các ứng dụng trên hệ thống (VS Code, Chrome, Terminal, Finder, Finder...)
@@ -823,7 +823,7 @@
 - [x] **Cơ chế Lập kế hoạch (Planning Mechanism):** Khi nhận nhiệm vụ trên 2 bước/tool call, Agent tự động phân rã tác vụ thành một Plan chi tiết (dạng Markdown checklist), xác định Done criteria để theo dõi và cập nhật tiến trình trong prompt hệ thống của `src/runtime/engine.ts`.
 - [x] **Tự sửa lỗi & Phục hồi (Self-Correction & Self-Healing):** Khi tool call trả về `is_error: true` hoặc lỗi hệ thống, Agent tự động phân tích nguyên nhân và thử các phương án tự sửa sai (quét thư mục, sửa cú pháp lệnh) thay vì dừng lại.
 - [x] **Chủ động hoàn tất tác vụ (Task Completion):** Tự động chuyển tiếp sang bước tiếp theo trong kế hoạch mà không cần người dùng ra lệnh cho từng bước nhỏ, luôn đánh giá Done criteria để chốt kết quả cuối cùng.
-- [ ] **Theo dõi trạng thái Task qua UI:** Tích hợp kế hoạch Markdown checklist của Agent hiển thị trực tiếp lên Task Workspace / Kanban view trên UI của V Assistant để người dùng theo dõi trực quan.
+- [ ] **Theo dõi trạng thái Task qua UI:** Tích hợp kế hoạch Markdown checklist của Agent hiển thị trực tiếp lên Task Workspace / Kanban view trên UI của VuaAssistant để người dùng theo dõi trực quan.
 - [ ] **Multi-task Scheduler & Task Tree:** Chuẩn hóa task cha/con với `parentTaskId`, `subtaskId`, trạng thái, timeout, retry và hiển thị cây task trong Task Workspace; giữ Scheduler hiện tại tương thích ngược.
 - [ ] **Multi-sub-agent Delegation:** Thêm capability `delegate_task` để Agent cha phân rã việc cho Agent con có role/instruction/memory riêng; Agent con trả kết quả về Agent cha qua IPC, không chia sẻ transcript hoặc credential ngoài boundary.
 - [ ] **Sub-agent Queue & Concurrency:** Xây queue riêng cho sub-agent, giới hạn số agent chạy đồng thời, backpressure, cancellation và graceful shutdown; không dùng `Promise.all()` không giới hạn trong `poll-loop.ts`.

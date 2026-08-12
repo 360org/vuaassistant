@@ -23,14 +23,14 @@ async function main(): Promise<void> {
   // If called with --mcp, start the built-in JSON-RPC stdio MCP server
   // (Task 4: Built-in MCP Server)
   if (process.argv.includes('--mcp')) {
-    log('Starting V-Assistant Built-in stdio MCP Server');
+    log('Starting VuaAssistant Built-in stdio MCP Server');
     startBuiltinMcpServer();
     return;
   }
 
   const providerName = config.provider.toLowerCase() as ProviderName;
 
-  log(`Starting V-Assistant Agent Runner v0.1.0`);
+  log(`Starting VuaAssistant Agent Runner v0.1.0`);
   log(`  Provider: ${providerName}`);
   log(`  Model: ${config.model || '(default)'}`);
   log(`  Agent: ${config.agentName}`);
@@ -106,7 +106,7 @@ function buildSystemPrompt(assistantName: string, agentName: string, agentDir: s
   parts.push('- http_request: Make unauthenticated HTTP requests');
   parts.push('- web_search: Search the public web, then use http_request to read a result');
   parts.push('- connector_request: Use an opaque connector reference through the trusted gateway');
-  parts.push('- schedule_task: Register one or many tasks in V-Assistant "Lịch & Nhiệm vụ" (Scheduled Tasks)');
+  parts.push('- schedule_task: Register one or many tasks in VuaAssistant "Lịch & Nhiệm vụ" (Scheduled Tasks)');
   parts.push('');
   parts.push('=== MANDATORY SCHEDULING RULE ===');
   parts.push('Whenever you plan, agree to, or promise anything that happens at a time — a posting plan, a recurring report, a reminder, a daily summary — you MUST call "schedule_task" before you say it is scheduled.');
@@ -115,7 +115,7 @@ function buildSystemPrompt(assistantName: string, agentName: string, agentDir: s
   parts.push('NEVER tell the user something is scheduled, will be posted automatically, or will run on time unless "schedule_task" returned successfully in this turn. If you did not call it, say plainly that nothing is scheduled yet.');
   parts.push('Each task\'s "prompt" must stand on its own — the scheduled run does not see this conversation.');
   parts.push('Schedule strings may be English or Vietnamese, recurring ("Hàng ngày lúc 09:30", "Every Monday at 08:00", "Weekdays at 08:30") or one-off ("27/07 08:30", "2026-07-27 08:30").');
-  parts.push('Schedule inside V-Assistant, not on external websites, unless the user explicitly asks otherwise.');
+  parts.push('Schedule inside VuaAssistant, not on external websites, unless the user explicitly asks otherwise.');
   parts.push('');
   parts.push('=== MANDATORY WORKSPACE & FILE STORAGE RULE ===');
   parts.push('- All created or generated files MUST be saved inside your active workspace directory.');

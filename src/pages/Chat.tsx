@@ -1099,7 +1099,7 @@ export function Chat() {
                   {!isUser && (
                     <div
                       className="size-7 rounded-full bg-neutral-850 border border-neutral-800 flex items-center justify-center text-sm shrink-0 mr-2.5 mt-0.5 shadow-md select-none"
-                      title={activeAgent?.name || "V Assistant"}
+                      title={activeAgent?.name || "VuaAssistant"}
                     >
                       {activeAgent?.emoji || "🤖"}
                     </div>
@@ -1555,7 +1555,7 @@ export function Chat() {
                   ? `Đang dùng Skill: ${activeSkill.name}…`
                   : activeAgent
                   ? `Ask your ${activeAgent.name} (gõ / chọn Skill)…`
-                  : "Message V Assistant (gõ / chọn Skill)…"
+                  : "Message VuaAssistant (gõ / chọn Skill)…"
               }
               onChange={(e) => {
                 const val = e.target.value;

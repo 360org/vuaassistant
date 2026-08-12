@@ -6,7 +6,7 @@
 
 use std::io::{BufRead, BufReader, Write};
 use std::net::{TcpListener, TcpStream};
-use v_assistant_lib::auth::{handle_connection, query_param};
+use vuaassistant_lib::auth::{handle_connection, query_param};
 
 fn main() {
     // --- Pure parsing, including percent-encoding ---

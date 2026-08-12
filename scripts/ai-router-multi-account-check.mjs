@@ -9,7 +9,7 @@ function assert(condition, message) {
 }
 
 const root = path.resolve(import.meta.dirname, "..");
-const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "v-assistant-multi-account-"));
+const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "vuaassistant-multi-account-"));
 const vaultPath = path.join(tempDir, "vault.json");
 const port = 22000 + Math.floor(Math.random() * 1000);
 const connections = [1, 2].map((number) => ({

@@ -48,7 +48,7 @@ export const translations = {
     // Workspace & Data Location
     workspace_title: "Vị trí Thư mục Dữ liệu & Lưu trữ (Data Workspace)",
     workspace_label: "Đường dẫn Thư mục Lưu trữ Dữ liệu Host",
-    workspace_desc: "Chỉ định thư mục trên máy tính của bạn để V-Assistant tự động lưu trữ tài liệu, lịch sử chat và bản sao lưu.",
+    workspace_desc: "Chỉ định thư mục trên máy tính của bạn để VuaAssistant tự động lưu trữ tài liệu, lịch sử chat và bản sao lưu.",
     choose_folder: "Chọn thư mục",
     save_location: "Lưu vị trí",
     set_default: "Đặt lại mặc định",
@@ -104,7 +104,7 @@ export const translations = {
 
     // Vault & Encryption
     vault_title: "Két mật mã Vault (Encrypted Vault & Credentials)",
-    vault_subtitle: "Tất cả OAuth tokens, API Keys và mật khẩu truy cập của bạn được mã hóa an toàn ở cấp độ hệ thống thông qua Vault bảo mật của V-Assistant.",
+    vault_subtitle: "Tất cả OAuth tokens, API Keys và mật khẩu truy cập của bạn được mã hóa an toàn ở cấp độ hệ thống thông qua Vault bảo mật của VuaAssistant.",
     aes_active: "Mã hóa AES-256 GCM + OS Keychain active.",
   },
   en: {
@@ -147,7 +147,7 @@ export const translations = {
     // Workspace & Data Location
     workspace_title: "Data Workspace & Storage Location",
     workspace_label: "Host Data Directory Path",
-    workspace_desc: "Specify a directory on your computer where V-Assistant automatically stores documents, chat logs, and backups.",
+    workspace_desc: "Specify a directory on your computer where VuaAssistant automatically stores documents, chat logs, and backups.",
     choose_folder: "Choose Folder",
     save_location: "Save Location",
     set_default: "Set Default",

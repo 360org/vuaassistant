@@ -12,7 +12,7 @@ metadata:
 
 # Skill Creator — Hướng dẫn Tạo Kỹ năng cho AI Agent
 
-Công cụ này giúp bạn thiết kế, viết hướng dẫn chỉ dẫn và tự động đóng gói một Kỹ năng (Skill) mới cho AI Agent trong V Assistant theo đúng quy chuẩn Agent Skills.
+Công cụ này giúp bạn thiết kế, viết hướng dẫn chỉ dẫn và tự động đóng gói một Kỹ năng (Skill) mới cho AI Agent trong VuaAssistant theo đúng quy chuẩn Agent Skills.
 
 ## Trình tự tạo Skill:
 1. **Phân tích Yêu cầu**: Xác định tên skill (dạng `kebab-case`), mục đích sử dụng và các bước xử lý logic.

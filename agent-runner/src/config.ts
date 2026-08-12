@@ -57,7 +57,7 @@ export function loadConfig(): RunnerConfig {
 
   _config = {
     provider: (raw.provider as string) || process.env.VUA_PROVIDER || 'ai-router',
-    assistantName: (raw.assistantName as string) || process.env.VUA_ASSISTANT_NAME || 'V-Assistant',
+    assistantName: (raw.assistantName as string) || process.env.VUA_ASSISTANT_NAME || 'VuaAssistant',
     agentName: (raw.agentName as string) || process.env.VUA_AGENT_NAME || 'default',
     maxMessagesPerPrompt: (raw.maxMessagesPerPrompt as number) || DEFAULT_MAX_MESSAGES,
     mcpServers: (raw.mcpServers as RunnerConfig['mcpServers']) || {},

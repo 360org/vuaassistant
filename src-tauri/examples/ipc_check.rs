@@ -5,7 +5,7 @@
 //!   VUA_ENGINE_DIR=../scripts/engine-stub.mjs cargo run --example ipc_check
 
 use std::time::{Duration, Instant};
-use v_assistant_lib::runtime::{AgentConfig, Runtime};
+use vuaassistant_lib::runtime::{AgentConfig, Runtime};
 
 fn main() {
     let dir = std::env::temp_dir().join("vua-ipc-check");
