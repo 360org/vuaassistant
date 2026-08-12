@@ -1,5 +1,5 @@
 // Folds the dist-demo Vite output into a single self-contained HTML file
-// (dist-demo/v-assistant-demo.html) suitable for hosting as a static demo.
+// (dist-demo/vuaassistant-demo.html) suitable for hosting as a static demo.
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -25,7 +25,7 @@ const single = `<!doctype html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>V Assistant — Demo</title>
+    <title>VuaAssistant — Demo</title>
     <style>${css}</style>
   </head>
   <body>
@@ -35,6 +35,6 @@ const single = `<!doctype html>
 </html>
 `;
 
-const out = join(DIST, "v-assistant-demo.html");
+const out = join(DIST, "vuaassistant-demo.html");
 writeFileSync(out, single);
 console.log(`wrote ${out} (${(single.length / 1024).toFixed(0)} KB)`);

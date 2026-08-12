@@ -1,13 +1,13 @@
 ---
 name: verify
-description: Builds, launches and drives the V Assistant app to verify changes end-to-end at the UI surface. Use when verifying a diff, checking that a feature works in the running app, or before committing nontrivial changes to this repository.
+description: Builds, launches and drives the VuaAssistant app to verify changes end-to-end at the UI surface. Use when verifying a diff, checking that a feature works in the running app, or before committing nontrivial changes to this repository.
 license: MIT
 compatibility: Requires Node.js 20+ and Playwright with Chromium; the Rust shell check additionally needs pkg-config, libgtk-3-dev and libwebkit2gtk-4.1-dev on Linux.
 metadata:
   vua-author: 360org
 ---
 
-# Verifying V Assistant
+# Verifying VuaAssistant
 
 ## Build
 
@@ -82,5 +82,5 @@ Tauri) chat must silently fall back to the preview engine.
   `exact: true` on `getByRole` name matches.
 - User message text is echoed inside the assistant reply, so `getByText` on
   the sent message resolves to 2 nodes — scope or use `.first()`.
-- State lives in localStorage key `v-assistant-state-v1`; clear it (or
+- State lives in localStorage key `vuaassistant-state-v1`; clear it (or
   Settings → Reset) to re-run onboarding.

@@ -1,4 +1,4 @@
-//! V Assistant desktop shell.
+//! VuaAssistant desktop shell.
 //!
 //! The window hosts the React UI; the `runtime` module is the AI Runtime
 //! Service boundary: it speaks the NanoClaw engine's channel contract
@@ -155,7 +155,7 @@ fn runtime_connector_request(
 #[tauri::command]
 fn pick_directory() -> Option<String> {
     rfd::FileDialog::new()
-        .set_title("Chọn thư mục lưu trữ dữ liệu V Assistant")
+        .set_title("Chọn thư mục lưu trữ dữ liệu VuaAssistant")
         .pick_folder()
         .map(|path| path.to_string_lossy().to_string())
 }
@@ -383,7 +383,7 @@ fn agent_list_dir(state: tauri::State<Runtime>, path: String) -> Result<Vec<Stri
 #[tauri::command]
 fn set_autostart(enable: bool) -> Result<bool, String> {
     if let Ok(home) = std::env::var("HOME") {
-        let plist_path = std::path::PathBuf::from(home).join("Library/LaunchAgents/net.vuaai.v-assistant.plist");
+        let plist_path = std::path::PathBuf::from(home).join("Library/LaunchAgents/net.vuaai.vuaassistant.plist");
         if enable {
             if let Ok(exe_path) = std::env::current_exe() {
                 let plist_content = format!(
@@ -392,7 +392,7 @@ fn set_autostart(enable: bool) -> Result<bool, String> {
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>net.vuaai.v-assistant</string>
+    <string>net.vuaai.vuaassistant</string>
     <key>ProgramArguments</key>
     <array>
         <string>{}</string>
@@ -462,7 +462,7 @@ pub fn run() {
             // đúng tổ hợp đó — tuyệt đối không để app không mở được vì nó.
             for accelerator in GLOBAL_SHORTCUTS {
                 if let Err(err) = app.global_shortcut().register(accelerator) {
-                    eprintln!("[v-assistant] bỏ qua phím tắt {accelerator}: {err}");
+                    eprintln!("[vuaassistant] bỏ qua phím tắt {accelerator}: {err}");
                 }
             }
 
@@ -470,20 +470,20 @@ pub fn run() {
             {
                 use tauri::menu::{Menu, Submenu, PredefinedMenuItem, MenuItem};
 
-                // App Menu (V Assistant) - must be first submenu to become the macOS app menu
-                let app_menu = Submenu::new(app, "V Assistant", true)?;
+                // App Menu (VuaAssistant) - must be first submenu to become the macOS app menu
+                let app_menu = Submenu::new(app, "VuaAssistant", true)?;
                 app_menu.append_items(&[
-                    &PredefinedMenuItem::about(app, Some("About V Assistant"), None)?,
+                    &PredefinedMenuItem::about(app, Some("About VuaAssistant"), None)?,
                     &PredefinedMenuItem::separator(app)?,
                     &MenuItem::new(app, "Settings...", true, Some("Cmd+,"))?,
                     &PredefinedMenuItem::separator(app)?,
                     &PredefinedMenuItem::services(app, None)?,
                     &PredefinedMenuItem::separator(app)?,
-                    &PredefinedMenuItem::hide(app, Some("Hide V Assistant"))?,
+                    &PredefinedMenuItem::hide(app, Some("Hide VuaAssistant"))?,
                     &PredefinedMenuItem::hide_others(app, Some("Hide Others"))?,
                     &PredefinedMenuItem::show_all(app, Some("Show All"))?,
                     &PredefinedMenuItem::separator(app)?,
-                    &PredefinedMenuItem::quit(app, Some("Quit V Assistant"))?,
+                    &PredefinedMenuItem::quit(app, Some("Quit VuaAssistant"))?,
                 ])?;
 
                 // File Menu
@@ -542,7 +542,7 @@ pub fn run() {
                     &MenuItem::new(app, "Documentation", true, None::<&str>)?,
                     &MenuItem::new(app, "Report Issue...", true, None::<&str>)?,
                     &PredefinedMenuItem::separator(app)?,
-                    &PredefinedMenuItem::about(app, Some("About V Assistant"), None)?,
+                    &PredefinedMenuItem::about(app, Some("About VuaAssistant"), None)?,
                 ])?;
 
                 let menu = Menu::new(app)?;
@@ -647,7 +647,7 @@ pub fn run() {
             computer_action::computer_list_displays
         ])
         .build(tauri::generate_context!())
-        .expect("error while building V Assistant")
+        .expect("error while building VuaAssistant")
         .run(|app_handle, event| {
             if let tauri::RunEvent::Exit = event {
                 if let Some(runtime) = app_handle.try_state::<Runtime>() {

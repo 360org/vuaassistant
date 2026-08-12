@@ -32,7 +32,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const binary =
   process.env.VUA_DESKTOP_BINARY ||
-  path.join(repoRoot, "src-tauri/target/debug", isWindows ? "v-assistant.exe" : "v-assistant");
+  path.join(repoRoot, "src-tauri/target/debug", isWindows ? "vuaassistant.exe" : "vuaassistant");
 
 if (!existsSync(binary)) {
   console.log(`⊘ bỏ qua kiểm phím tắt: chưa có binary (${binary})`);

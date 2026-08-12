@@ -81,7 +81,7 @@ export function WorkspaceSettingsSection() {
       await invoke("save_custom_data_text", {
         customDir: cleanPath,
         relativePath: "README.txt",
-        content: "Thư mục lưu trữ dữ liệu Vua AI Assistant.\nCác tệp tải lên (uploads/), nhật ký trò chuyện (chats/) và bản sao lưu tự động (v_assistant_backup.json) được lưu trữ tại đây.",
+        content: "Thư mục lưu trữ dữ liệu Vua AI Assistant.\nCác tệp tải lên (uploads/), nhật ký trò chuyện (chats/) và bản sao lưu tự động (vuaassistant_backup.json) được lưu trữ tại đây.",
       });
       setCustomDataPath(cleanPath);
       setSavedPathMsg("✅ Đã lưu vị trí & workspace/output-data đã được áp dụng!");
@@ -110,7 +110,7 @@ export function WorkspaceSettingsSection() {
       const now = new Date();
       const pad = (n: number) => n.toString().padStart(2, "0");
       const dateStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-      const filename = `v-assistant-backup-${dateStr}.json`;
+      const filename = `vuaassistant-backup-${dateStr}.json`;
       const timeFormatted = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} ngày ${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
 
       if (typeof window !== "undefined" && "__TAURI_INTERNALS__" in window) {
@@ -218,7 +218,7 @@ export function WorkspaceSettingsSection() {
                 type="text"
                 value={dataPathInput}
                 onChange={(e) => setDataPathInput(e.target.value)}
-                placeholder={language === "en" ? "Example: /Volumes/DATA/v-assistant-storage or D:\\V-Assistant-Data" : "Ví dụ: /Volumes/DATA/v-assistant-storage hoặc D:\\V-Assistant-Data"}
+                placeholder={language === "en" ? "Example: /Volumes/DATA/vuaassistant-storage or D:\\VuaAssistant-Data" : "Ví dụ: /Volumes/DATA/vuaassistant-storage hoặc D:\\VuaAssistant-Data"}
                 className="flex-1 rounded-xl border border-neutral-800 bg-neutral-950 px-3 py-2 font-mono text-xs text-neutral-200 focus:border-gold-500/50 focus:outline-hidden"
               />
               <input

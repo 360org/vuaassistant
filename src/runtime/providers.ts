@@ -696,7 +696,7 @@ async function* streamGemini(
     `${model}:streamGenerateContent?alt=sse`,
   );
   // Gemini Developer API uses an API key. Subscription OAuth needs an OAuth
-  // client registered to V Assistant's own Google Cloud project, which this
+  // client registered to VuaAssistant's own Google Cloud project, which this
   // app does not ship yet.
   const isOAuth = oauth || apiKey.startsWith("ya29.");
   const headers: Record<string, string> = {

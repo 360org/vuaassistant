@@ -27,7 +27,7 @@ export function OAuthCallbackPage() {
 
   // Method 2: BroadcastChannel (same-origin tabs/iframes)
   try {
-    const ch = new BroadcastChannel("v_assistant_oauth");
+    const ch = new BroadcastChannel("vuaassistant_oauth");
     ch.postMessage(callbackData);
     ch.close();
   } catch (e) {
@@ -37,7 +37,7 @@ export function OAuthCallbackPage() {
   // Method 3: localStorage event (extra fallback)
   try {
     localStorage.setItem(
-      "v_assistant_oauth_callback",
+      "vuaassistant_oauth_callback",
       JSON.stringify({ ...callbackData, timestamp: Date.now() }),
     );
   } catch {
@@ -78,7 +78,7 @@ export function OAuthCallbackPage() {
             <p style={{ color: "#a3a3a3", fontSize: 14 }}>
               {window.opener
                 ? "This window will close automatically…"
-                : "Đăng nhập thành công! Bạn có thể đóng tab này và quay lại ứng dụng V Assistant."}
+                : "Đăng nhập thành công! Bạn có thể đóng tab này và quay lại ứng dụng VuaAssistant."}
             </p>
           </>
         ) : (

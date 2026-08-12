@@ -319,7 +319,7 @@ registerProvider('local', (options) => {
   return { ...provider, name: 'local' };
 });
 /**
- * AI Router is V-Assistant's local, OpenAI-compatible gateway. It owns
+ * AI Router is VuaAssistant's local, OpenAI-compatible gateway. It owns
  * provider routing; the Runner never needs a vendor-specific adapter.
  */
 registerProvider('ai-router', (options) => {

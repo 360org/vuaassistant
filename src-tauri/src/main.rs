@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    v_assistant_lib::run()
+    vuaassistant_lib::run()
 }

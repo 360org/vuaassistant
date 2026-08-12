@@ -29,7 +29,7 @@ const DEFAULT_BANNER: BannerData = {
 
 // Endpoints on vuaai.net to attempt fetching dynamic banner configs
 const BANNER_ENDPOINTS = [
-  "https://vuaai.net/api/v-assistant-banner",
+  "https://vuaai.net/api/vuaassistant-banner",
   "https://vuaai.net/api/banner",
   "https://vuaai.net/banner.json",
 ];

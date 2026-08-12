@@ -7,11 +7,11 @@ import type { ToolDefinition } from '../providers/types.js';
 import { getBuiltinToolContext } from './context.js';
 
 const WORKSPACE_ROOT = path.resolve(
-  process.env.VUA_AGENT_WORKSPACE || path.join(process.env.VUA_DATA_DIR || '/tmp/v-assistant', 'workspace'),
+  process.env.VUA_AGENT_WORKSPACE || path.join(process.env.VUA_DATA_DIR || '/tmp/vuaassistant', 'workspace'),
 );
 const OUTBOX_ROOT = process.env.VUA_AGENT_WORKSPACE
   ? path.resolve(process.env.VUA_AGENT_WORKSPACE, '..', 'outbox')
-  : path.resolve(process.env.VUA_DATA_DIR || '/tmp/v-assistant', 'outbox');
+  : path.resolve(process.env.VUA_DATA_DIR || '/tmp/vuaassistant', 'outbox');
 
 export interface BuiltinTool {
   definition: ToolDefinition;

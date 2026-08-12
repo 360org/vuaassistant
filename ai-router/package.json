@@ -1,8 +1,8 @@
 {
-  "name": "@v-assistant/ai-router",
+  "name": "@vuaassistant/ai-router",
   "private": true,
   "version": "0.1.0",
-  "description": "V-Assistant local AI Router sidecar",
+  "description": "VuaAssistant local AI Router sidecar",
   "type": "module",
   "scripts": {
     "dev": "node src/sidecar.mjs",

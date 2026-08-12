@@ -1,10 +1,10 @@
-# V Assistant
+# VuaAssistant
 
 **AI cho mọi người — cài trong 2 phút, dùng được ngay.**
 
 > Tải → Cài → Đăng nhập → Kết nối → Bắt đầu
 
-V Assistant là trợ lý AI để bàn cho người dùng phổ thông. Không cấu hình, không
+VuaAssistant là trợ lý AI để bàn cho người dùng phổ thông. Không cấu hình, không
 terminal, không Docker, không API key (khi provider hỗ trợ OAuth). Người dùng chỉ
 thấy: **Chat, Agents, Knowledge, Integrations** — mọi thứ khác chạy ẩn phía sau.
 
@@ -39,7 +39,7 @@ thấy: **Chat, Agents, Knowledge, Integrations** — mọi thứ khác chạy �
 
 ```
 +-----------------------------------------------+
-|              V Assistant Desktop              |
+|              VuaAssistant Desktop              |
 |-----------------------------------------------|
 | React UI  ──  Engine nhúng (src/runtime/*)    |  chạy tức thì, không Docker
 | Vỏ Tauri (Rust)                               |

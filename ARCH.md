@@ -1,6 +1,6 @@
-# ARCHITECTURE GUIDE: Kiến trúc V-Assistant (Universal Agent Runner — Zero-Docker)
+# ARCHITECTURE GUIDE: Kiến trúc VuaAssistant (Universal Agent Runner — Zero-Docker)
 
-Tài liệu này mô tả chi tiết sơ đồ thiết kế kiến trúc, cấu trúc các thành phần và cách thức hoạt động của hệ thống trợ lý cá nhân V-Assistant chạy trực tiếp trên MacOS, Windows và Linux.
+Tài liệu này mô tả chi tiết sơ đồ thiết kế kiến trúc, cấu trúc các thành phần và cách thức hoạt động của hệ thống trợ lý cá nhân VuaAssistant chạy trực tiếp trên MacOS, Windows và Linux.
 
 ---
 
@@ -19,7 +19,7 @@ Tài liệu này mô tả chi tiết sơ đồ thiết kế kiến trúc, cấu 
 |      |          |                               |            |
 |      |          | (Secure Storage)              |            |
 |      |    +-----v---------------+               |            |
-|      |    | V-Assistant Vault   |               |            |
+|      |    | VuaAssistant Vault   |               |            |
 |      |    | (Built-in Encrypted)|               |            |
 |      |    +---------------------+               |            |
 |      | (SQLite IPC)                             |            |
@@ -132,7 +132,7 @@ Tất cả adapters đều hỗ trợ **streaming** và **tool calling / functio
 
 ### 2.5. Vault bảo mật (Tính năng cốt lõi)
 
-**Vault là tính năng cốt lõi của V-Assistant**, chạy mặc định và tích hợp trực thuộc hệ thống (không phải connector, không phụ thuộc OS Keychain).
+**Vault là tính năng cốt lõi của VuaAssistant**, chạy mặc định và tích hợp trực thuộc hệ thống (không phải connector, không phụ thuộc OS Keychain).
 
 *   Mã hóa AES-256-CBC, xác thực ciphertext bằng HMAC-SHA256.
 *   Lưu trữ: API Keys, Access Tokens, tài khoản liên kết, cấu hình tích hợp.
@@ -161,7 +161,7 @@ Kế thừa kiến trúc NanoClaw, hỗ trợ đa kênh:
 ## 3. Cấu trúc Thư mục Dự án
 
 ```text
-v-assistant/
+vuaassistant/
 ├── src/                        # React UI (frontend)
 │   ├── pages/                  # 10 trang: Home, Chat, Agents, Skills...
 │   ├── components/             # Shared UI components

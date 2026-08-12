@@ -19,8 +19,8 @@
 import type { ProviderId } from "@/lib/catalog";
 import { devUrl, inDesktopShell } from "./proxy";
 
-const PENDING_KEY = "v-assistant-oauth-pending";
-const CALLBACK_KEY = "v_assistant_oauth_callback";
+const PENDING_KEY = "vuaassistant-oauth-pending";
+const CALLBACK_KEY = "vuaassistant_oauth_callback";
 
 /**
  * Demo build: the artifact/preview can't complete a real OAuth round-trip.
@@ -135,7 +135,7 @@ function randomBase64url(bytes = PKCE_BYTES): string {
 // Subscription sign-in with the vendor's OAuth client (Claude Code and
 // Antigravity). Gemini uses Antigravity's Code Assist endpoint, not the
 // Gemini Developer API used by raw API keys.
-// ponytail: client không phải do vendor cấp cho V-Assistant — vendor có thể
+// ponytail: client không phải do vendor cấp cho VuaAssistant — vendor có thể
 // thu hồi/chặn bất kỳ lúc nào; hướng nâng cấp là chuyển OAuth về 9router
 // server-side (CHECKLIST §4.2).
 export const OAUTH_CONFIGS = {
@@ -511,7 +511,7 @@ export function waitForPopupCallback(
     const TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
     let settled = false;
 
-    const popup = window.open(authUrl, "v_assistant_oauth_popup", "width=600,height=700");
+    const popup = window.open(authUrl, "vuaassistant_oauth_popup", "width=600,height=700");
 
     function settle(value: CallbackPayload | Error) {
       if (settled) return;
@@ -548,7 +548,7 @@ export function waitForPopupCallback(
     // Method 2: BroadcastChannel
     let channel: BroadcastChannel | undefined;
     try {
-      channel = new BroadcastChannel("v_assistant_oauth");
+      channel = new BroadcastChannel("vuaassistant_oauth");
       channel.onmessage = (e) => handleData(e.data as CallbackPayload);
     } catch { /* not supported */ }
 

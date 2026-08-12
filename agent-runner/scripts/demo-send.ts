@@ -137,7 +137,7 @@ function sleep(ms: number): Promise<void> {
 
 // --- Main ---
 async function main(): Promise<void> {
-  log('🚀 V-Assistant Agent Runner — Demo Sender');
+  log('🚀 VuaAssistant Agent Runner — Demo Sender');
   log(`   IPC dir: ${IPC_DIR}`);
   log('');
 

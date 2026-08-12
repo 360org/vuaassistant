@@ -482,7 +482,7 @@ function TaskStatus({ columns }: { columns: { id: string; title: string; descrip
 
 function TaskCharts({ logs }: { logs: TaskRunLog[] }) {
   const completed = logs.filter((log) => log.status === "success" || log.status === "error");
-  if (!completed.length) return <Card className="mt-6 flex flex-col items-center gap-2 py-16 text-center"><BarChart3 className="size-8 text-neutral-600" /><h2 className="text-sm font-semibold text-neutral-200">Chưa có dữ liệu chạy thực tế</h2><p className="max-w-sm text-xs text-neutral-500">Biểu đồ chỉ xuất hiện khi Scheduler ghi nhận lịch sử chạy thật; V-Assistant không tạo số liệu mẫu.</p></Card>;
+  if (!completed.length) return <Card className="mt-6 flex flex-col items-center gap-2 py-16 text-center"><BarChart3 className="size-8 text-neutral-600" /><h2 className="text-sm font-semibold text-neutral-200">Chưa có dữ liệu chạy thực tế</h2><p className="max-w-sm text-xs text-neutral-500">Biểu đồ chỉ xuất hiện khi Scheduler ghi nhận lịch sử chạy thật; VuaAssistant không tạo số liệu mẫu.</p></Card>;
   const success = completed.filter((log) => log.status === "success").length;
   const failures = completed.length - success;
   const averageDuration = Math.round(completed.reduce((total, log) => total + log.duration, 0) / completed.length);

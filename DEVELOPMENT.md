@@ -22,7 +22,7 @@ tuyến qua model của OpenRouter. Ở đây credential nằm trong trình duy�
 npm run tauri dev
 ```
 
-Mở đúng cửa sổ V Assistant thật. Cần Rust toolchain và thư viện webview của OS
+Mở đúng cửa sổ VuaAssistant thật. Cần Rust toolchain và thư viện webview của OS
 (WebKitGTK trên Linux, WebView2 trên Windows, có sẵn trên macOS). Credential nằm
 trong OS keychain (Vault). (Cửa sổ desktop là GUI native nên không chạy trong
 Docker được — dùng trực tiếp trên máy.)

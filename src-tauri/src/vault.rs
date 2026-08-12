@@ -1,4 +1,4 @@
-//! V Assistant application Vault.
+//! VuaAssistant application Vault.
 //!
 //! Secrets live in the app's own SQLite database, encrypted with AES-256-CBC
 //! and authenticated with HMAC-SHA256. The master key is generated locally in
@@ -50,7 +50,7 @@ fn load_master_key(runtime_dir: &Path) -> Result<Vec<u8>, String> {
         if key.len() == 64 {
             return Ok(key);
         }
-        return Err("V Assistant Vault master key is invalid".to_string());
+        return Err("VuaAssistant Vault master key is invalid".to_string());
     }
     std::fs::create_dir_all(runtime_dir).map_err(|error| error.to_string())?;
     let mut key = vec![0u8; 64];
@@ -317,7 +317,7 @@ fn percent_decode(value: &str) -> Result<String, String> {
 }
 
 fn decrypt_legacy(input: &str) -> Result<String, String> {
-    let legacy_key = b"v-assistant-secure-vault-salt-key-360org";
+    let legacy_key = b"vuaassistant-secure-vault-salt-key-360org";
     let bytes = hex_decode(input)?;
     let output = bytes
         .iter()
@@ -332,7 +332,7 @@ fn hex_encode(bytes: &[u8]) -> String {
 }
 
 fn hex_decode(value: &str) -> Result<Vec<u8>, String> {
-    if value.len() % 2 != 0 {
+    if !value.len().is_multiple_of(2) {
         return Err("Invalid Vault hex value".to_string());
     }
     (0..value.len())

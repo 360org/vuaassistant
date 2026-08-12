@@ -2,7 +2,7 @@
 //
 // Đây là lớp lỗi "chạy từ mã nguồn thì tốt, cài xong thì chết". Khi chạy trong
 // repo, Node đi ngược lên thư mục cha và tìm thấy `undici` ở `node_modules`
-// gốc. Bản cài đặt `ai-router/` ở `/usr/lib/V Assistant/_up_/ai-router/` —
+// gốc. Bản cài đặt `ai-router/` ở `/usr/lib/VuaAssistant/_up_/ai-router/` —
 // không có thư mục cha nào như vậy — nên sidecar chết ngay khi khởi động và
 // người dùng thấy "không có model, không chat được".
 //

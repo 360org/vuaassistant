@@ -1,6 +1,6 @@
 # Nhật ký thay đổi (Changelog)
 
-Ghi lại mọi thay đổi đáng chú ý của V Assistant. Định dạng theo
+Ghi lại mọi thay đổi đáng chú ý của VuaAssistant. Định dạng theo
 [Keep a Changelog](https://keepachangelog.com/); phiên bản theo
 [SemVer](https://semver.org/).
 
@@ -17,7 +17,7 @@ Ghi lại mọi thay đổi đáng chú ý của V Assistant. Định dạng the
 
   ```
   Cannot find package 'undici' imported from
-    /usr/lib/V Assistant/_up_/ai-router/core/open-sse/translator/concerns/image.js
+    /usr/lib/VuaAssistant/_up_/ai-router/core/open-sse/translator/concerns/image.js
   ```
 
   Hệ quả với người dùng: cài xong, AI Router không bao giờ lên, không có model,
@@ -261,7 +261,7 @@ Ghi lại mọi thay đổi đáng chú ý của V Assistant. Định dạng the
 
 ### Tính năng mới & Trải nghiệm người dùng
 - **Hành động Reply & Retry**: Bổ sung hai nút bấm "Trả lời" (trích dẫn tin nhắn dạng blockquote) và "Thử lại" (gửi lại yêu cầu trước đó của user) trực tiếp dưới các bong bóng chat của AI.
-- **Thư mục dữ liệu mới `~/vuaai-data`**: Chuyển đổi toàn bộ đường dẫn lưu trữ mặc định của app từ tệp ẩn `.v-assistant/data` sang thư mục nổi `~/vuaai-data` giúp tăng nhận diện thương hiệu Vua AI và giúp người dùng dễ dàng quản lý tệp tin, custom skills, sao lưu.
+- **Thư mục dữ liệu mới `~/vuaai-data`**: Chuyển đổi toàn bộ đường dẫn lưu trữ mặc định của app từ tệp ẩn `.vuaassistant/data` sang thư mục nổi `~/vuaai-data` giúp tăng nhận diện thương hiệu Vua AI và giúp người dùng dễ dàng quản lý tệp tin, custom skills, sao lưu.
 - **Tự động Code Sign & Notarize**: Tích hợp các kho mật khẩu của Apple Developer lên GitHub Actions để tự động ký số ứng dụng và chứng thực bảo mật trực tiếp với Apple khi phát hành, gỡ bỏ lỗi cảnh báo "unidentified developer" trên macOS.
 - **Tự động lưu xuất tệp sao lưu**: Khi chạy trên bản Desktop, thao tác xuất sao lưu sẽ tự động ghi trực tiếp thành tệp tin vật lý trong thư mục `~/vuaai-data/backup/` thay vì kích hoạt tải xuống của trình duyệt.
 - **Khắc phục lỗi cổng AI Router**: Chuyển cổng mặc định của sidecar sang `36360` để đồng bộ với backend mới và sửa lỗi AI Router tự động dừng sau khi mở.
@@ -275,7 +275,7 @@ Ghi lại mọi thay đổi đáng chú ý của V Assistant. Định dạng the
 ### Sửa lỗi Windows/Desktop
 - **Đổi cổng AI Router sang 36360 (360 CORP)**: Tránh hoàn toàn xung đột cổng `20128` cố định cũ của 9router hoặc phiên bản cũ chạy ngầm.
 - **Sửa lỗi cú pháp healthcheck**: Sửa ký tự ngắt dòng `\r\n` chuẩn trong `TcpStream` của Rust backend, sửa lỗi HTTP 400 khiến app hiểu nhầm AI Router chưa chạy và tự động kill process.
-- **Tên binary trong Smoke Test**: Đồng bộ tên file tìm kiếm từ `V Assistant.exe` thành `v-assistant.exe` trong GitHub Actions.
+- **Tên binary trong Smoke Test**: Đồng bộ tên file tìm kiếm từ `VuaAssistant.exe` thành `vuaassistant.exe` trong GitHub Actions.
 
 ### Kiểm chứng
 - `npm run check` — pass toàn bộ.
@@ -287,7 +287,7 @@ Ghi lại mọi thay đổi đáng chú ý của V Assistant. Định dạng the
 - AI Router chờ endpoint `/health` sẵn sàng trước khi báo khởi động thành công; lỗi startup kèm log tail để chẩn đoán.
 - Onboarding polling health tối đa 10 giây sau restart thay vì chờ cứng 2,5 giây, tránh kẹt ở bước đăng nhập AI account.
 - Không kill bừa process ngoài khi port `20128` bị chiếm; chỉ dừng đúng process AI Router có `sidecar.mjs`.
-- Windows release smoke test bắt buộc kiểm tra `v-assistant.exe`, `sidecar.mjs`, Agent Runner `index.js` và `node.exe` sau cài đặt.
+- Windows release smoke test bắt buộc kiểm tra `vuaassistant.exe`, `sidecar.mjs`, Agent Runner `index.js` và `node.exe` sau cài đặt.
 
 ### Kiểm chứng
 - `npm run check` — pass toàn bộ.
@@ -299,7 +299,7 @@ Ghi lại mọi thay đổi đáng chú ý của V Assistant. Định dạng the
 - AI Router giờ chờ endpoint `/health` sẵn sàng trước khi báo khởi động thành công; lỗi startup kèm log tail để chẩn đoán.
 - Onboarding polling health tối đa 10 giây sau restart thay vì chờ cứng 2,5 giây, tránh kẹt ở bước đăng nhập AI account.
 - Không còn kill bừa process ngoài khi port `20128` bị chiếm; chỉ dừng đúng process AI Router có `sidecar.mjs`.
-- Windows release smoke test bắt buộc kiểm tra `v-assistant.exe`, `sidecar.mjs`, Agent Runner `index.js` và `node.exe` sau cài đặt.
+- Windows release smoke test bắt buộc kiểm tra `vuaassistant.exe`, `sidecar.mjs`, Agent Runner `index.js` và `node.exe` sau cài đặt.
 
 ### Kiểm chứng
 - `npm run check` — pass toàn bộ.
@@ -308,7 +308,7 @@ Ghi lại mọi thay đổi đáng chú ý của V Assistant. Định dạng the
 ## [1.1.47] - 2026-08-04
 
 ### Sửa lỗi Windows/Desktop
-- **Native menu desktop**: Bổ sung cấu trúc menu macOS gồm V Assistant, File, Edit, View, Window và Help.
+- **Native menu desktop**: Bổ sung cấu trúc menu macOS gồm VuaAssistant, File, Edit, View, Window và Help.
 - **Filesystem approval**: Cho phép chọn file hoặc thư mục để cấp quyền đọc cho Agent Runner; đường dẫn được chuẩn hóa trước khi lưu.
 - **Updater placement**: Đưa khu vực cập nhật phần mềm lên đầu trang Settings và hiển thị nút cập nhật rõ ràng trên Sidebar.
 - **Local build**: Tắt updater artifacts cho `build:local` để bản cài local không bị nhầm là release artifact.
@@ -321,7 +321,7 @@ Ghi lại mọi thay đổi đáng chú ý của V Assistant. Định dạng the
 ## [1.1.41] - 2026-08-02
 
 ### Sửa lỗi Windows/Desktop
-- **Native menu desktop**: Bổ sung cấu trúc menu macOS gồm V Assistant, File, Edit, View, Window và Help.
+- **Native menu desktop**: Bổ sung cấu trúc menu macOS gồm VuaAssistant, File, Edit, View, Window và Help.
 - **Filesystem approval**: Cho phép chọn file hoặc thư mục để cấp quyền đọc cho Agent Runner; đường dẫn được chuẩn hóa trước khi lưu.
 - **Updater placement**: Đưa khu vực cập nhật phần mềm lên đầu trang Settings và hiển thị nút cập nhật rõ ràng trên Sidebar.
 - **Local build**: Tắt updater artifacts cho `build:local` để bản cài local không bị nhầm là release artifact.
@@ -359,8 +359,8 @@ Ghi lại mọi thay đổi đáng chú ý của V Assistant. Định dạng the
 ## [1.1.1] - 2026-07-26
 
 - **Lịch & Nhiệm vụ Menu**: Đổi tên nhãn menu hiển thị ở Sidebar từ "Lịch đăng bài & Tác vụ" thành **"Lịch & Nhiệm vụ"**.
-- **Native Tool `schedule_task`**: Tích hợp công cụ native cho Agent Runner tự động đưa tác vụ lên lịch vào mục **Lịch & Nhiệm vụ** của ứng dụng V-Assistant.
-- **Backup Timestamp & Success Banner**: Xuất file backup kèm timestamp đầy đủ (`v-assistant-backup-YYYY-MM-DD_HHmmss.json`) và hiển thị thông báo thành công.
+- **Native Tool `schedule_task`**: Tích hợp công cụ native cho Agent Runner tự động đưa tác vụ lên lịch vào mục **Lịch & Nhiệm vụ** của ứng dụng VuaAssistant.
+- **Backup Timestamp & Success Banner**: Xuất file backup kèm timestamp đầy đủ (`vuaassistant-backup-YYYY-MM-DD_HHmmss.json`) và hiển thị thông báo thành công.
 - **Run on Startup Option**: Thêm công tắc tự động khởi động cùng hệ thống trong Cài đặt hệ thống (bật/tắt daemon `LaunchAgents` trên macOS).
 - **Fix File Upload Hanging**: Thêm cơ chế Hard Timeout 4s/6s chống kẹt trạng thái **Processing** khi nạp tệp PDF, DOCX, XLSX, hình ảnh.
 - **Claude Desktop Capabilities Roadmap**: Bổ sung Checklist mục 13 chi tiết các tính năng Computer Use & Advanced Capabilities.
@@ -407,7 +407,7 @@ Ghi lại mọi thay đổi đáng chú ý của V Assistant. Định dạng the
 ## [1.0.1] — 2026-07-19
 
 ### Thêm mới
-- **AI Router native.** Provider Core được đưa vào V Assistant để quản lý hơn
+- **AI Router native.** Provider Core được đưa vào VuaAssistant để quản lý hơn
   100 vendor tại chỗ, không kết nối runtime sang 9router. Kết nối có thể dùng
   subscription OAuth/device flow hoặc API key theo adapter của từng vendor.
 - **Vault-backed AI accounts.** Mỗi connection giữ một `credentialRef` opaque;

@@ -1,5 +1,5 @@
 /**
- * Inherited from NanoClaw's destination-map core, adapted to V Assistant's
+ * Inherited from NanoClaw's destination-map core, adapted to VuaAssistant's
  * inbound IPC schema. The host owns this map; the runner only reads it.
  */
 import { getInboundDb } from './db/connection.js';

@@ -1,6 +1,6 @@
-# SPECIFICATION: Trợ lý Cá nhân Agentic V-Assistant (Zero-Docker / Đa nền tảng)
+# SPECIFICATION: Trợ lý Cá nhân Agentic VuaAssistant (Zero-Docker / Đa nền tảng)
 
-Tài liệu này đặc tả kỹ thuật, quy trình cài đặt, cơ chế đăng nhập và cách thức vận hành hệ thống V-Assistant hỗ trợ đa nền tảng (macOS, Windows, Linux).
+Tài liệu này đặc tả kỹ thuật, quy trình cài đặt, cơ chế đăng nhập và cách thức vận hành hệ thống VuaAssistant hỗ trợ đa nền tảng (macOS, Windows, Linux).
 
 ---
 
@@ -57,8 +57,8 @@ Tất cả adapters đều hỗ trợ **streaming response** và **tool calling 
     *   Đặt biến môi trường:
         ```bash
         CONTAINER_RUNTIME_BIN=process
-        VUA_DATA_DIR=~/.v-assistant
-        VUA_IPC_DIR=~/.v-assistant/ipc
+        VUA_DATA_DIR=~/.vuaassistant
+        VUA_IPC_DIR=~/.vuaassistant/ipc
         ```
 2.  **Thao tác Hệ thống & File:**
     *   Agent Runner là Host Process nhưng model chỉ có capability giới hạn:
@@ -78,9 +78,9 @@ Tất cả adapters đều hỗ trợ **streaming response** và **tool calling 
 ## 5. Đặc tả Hệ thống Bảo mật Vault & Liên kết Dịch vụ (Integrations)
 
 *   **Vault là tính năng cốt lõi mặc định:** 
-    *   Là hệ thống lưu trữ bảo mật cốt lõi, chạy mặc định và tích hợp trực thuộc hệ thống V-Assistant (không phải là connector và không phụ thuộc vào Keychain của macOS/Windows).
+    *   Là hệ thống lưu trữ bảo mật cốt lõi, chạy mặc định và tích hợp trực thuộc hệ thống VuaAssistant (không phải là connector và không phụ thuộc vào Keychain của macOS/Windows).
     *   Tự động mã hóa AES-256 và quản lý dữ liệu nhạy cảm cục bộ (API Keys, Access Tokens của Slack, Notion, GitHub, tài khoản liên kết...).
-    *   Lưu trữ tại `~/.v-assistant/vault.db` (SQLite mã hóa) hoặc Tauri app data directory.
+    *   Lưu trữ tại `~/.vuaassistant/vault.db` (SQLite mã hóa) hoặc Tauri app data directory.
 *   **Liên kết không lộ thông tin (Connectors Auth):**
     *   App Vault là nguồn duy nhất cho cả connection metadata và secret; không tạo credential cache bên ngoài Vault.
     *   Model chỉ query sanitized manifest gồm opaque ref và tên biến, ví dụ `vault-entry:abc` + `{{credential:token}}`.

@@ -221,7 +221,7 @@ export function ModelSettings() {
   const captureGrokSession = async () => {
     if (!selectedProvider) return;
     setConnecting(true);
-    setConnectMessage("Đang mở Grok. Hãy đăng nhập ở đó, V-Assistant sẽ tự lấy phiên sso.");
+    setConnectMessage("Đang mở Grok. Hãy đăng nhập ở đó, VuaAssistant sẽ tự lấy phiên sso.");
     try {
       await saveGrokSession(await captureGrokWebSsoCookie());
       setConnectMessage("✅ Đã lấy phiên Grok Web, lưu vào Vault và xác thực xong.");
@@ -884,7 +884,7 @@ export function ModelSettings() {
                       <div className="text-xs font-semibold text-neutral-200">Kết nối gói đăng ký Grok Web</div>
                       <p className="text-xs text-neutral-500">
                         {selectedProvider.authHint ||
-                          "Đăng nhập Grok trên trình duyệt, V-Assistant sẽ lấy phiên sso và cất vào Vault."}
+                          "Đăng nhập Grok trên trình duyệt, VuaAssistant sẽ lấy phiên sso và cất vào Vault."}
                       </p>
                       <Button
                         size="sm"

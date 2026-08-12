@@ -1,4 +1,4 @@
-# V Assistant — Lịch sử phát triển
+# VuaAssistant — Lịch sử phát triển
 
 > Tổng hợp toàn bộ hành trình dự án, từ ý tưởng ban đầu đến hiện tại.
 > "AI cho mọi người — tải, cài, đăng nhập, kết nối, dùng." Cài trong 2 phút,
@@ -90,7 +90,7 @@ Rust (Tauri) ── Vỏ Desktop & Cầu nối Tiến trình
    ├─ main.rs          khởi tạo, quản lý vòng đời ứng dụng
    ├─ lib.rs           tauri command handlers (runtime_send/receive/restart_runner)
    ├─ runtime.rs       quản lý tiến trình Agent Runner & khởi tạo schema SQLite IPC
-   └─ vault.rs         V-Assistant local secure vault (mã hóa XOR, lưu vault.db)
+   └─ vault.rs         VuaAssistant local secure vault (mã hóa XOR, lưu vault.db)
 
 Agent Runner (Host) ── Bộ não độc lập (Node.js/TypeScript)
    ├─ index.ts         khởi chạy, nạp cấu hình, dựng system prompt
@@ -159,7 +159,7 @@ Chi tiết: [`DEVELOPMENT.md`](./DEVELOPMENT.md).
 
 - **v0.1.0** — bản cài đầu tiên cho macOS (Apple Silicon + Intel), Windows, Linux
   (`.dmg/.exe/.msi/.deb/.AppImage/.rpm`) qua GitHub Actions.
-- Nhánh phát triển hiện tại: `claude/v-assistant-desktop-abs2gw` (chưa merge main).
+- Nhánh phát triển hiện tại: `claude/vuaassistant-desktop-abs2gw` (chưa merge main).
 
 ---
 

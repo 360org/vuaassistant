@@ -1,11 +1,11 @@
 ---
-name: v-assistant-dev-guidelines
-description: Quy chuẩn phát triển V-Assistant — bám idea gốc, quy trình versioning, sidecar build, kiểm chứng thật. Load skill này TRƯỚC khi sửa bất cứ thứ gì trong repo v-assistant.
+name: vuaassistant-dev-guidelines
+description: Quy chuẩn phát triển VuaAssistant — bám idea gốc, quy trình versioning, sidecar build, kiểm chứng thật. Load skill này TRƯỚC khi sửa bất cứ thứ gì trong repo vuaassistant.
 ---
 
-# V-Assistant — Quy chuẩn Phát triển
+# VuaAssistant — Quy chuẩn Phát triển
 
-Quy chuẩn làm việc cho hệ thống V-Assistant (Zero-Docker / Tauri Desktop / AI Router + Agent Runner Sidecar).
+Quy chuẩn làm việc cho hệ thống VuaAssistant (Zero-Docker / Tauri Desktop / AI Router + Agent Runner Sidecar).
 
 ---
 
@@ -25,7 +25,7 @@ Trước khi đề xuất bất kỳ thay đổi nào về **luồng người d�
 |---|---|
 | **Đăng nhập bằng SUBSCRIPTION, không phải API key** | Agent từng đề xuất bỏ OAuth vendor để chuyển sang "dán API key" vì lo rủi ro kỹ thuật → **phá thẳng idea §A**. PO đã phản ứng gay gắt. API key CHỈ được nằm trong Advanced Options, sau khi đã login. |
 | **Không expose Bash/Terminal cho model** | idea §B ghi rõ. Đã gỡ, không được thêm lại. |
-| **Vault nội bộ, không phụ thuộc OS Keychain** | idea §F. Mã hoá AES-256 do V-Assistant quản lý. |
+| **Vault nội bộ, không phụ thuộc OS Keychain** | idea §F. Mã hoá AES-256 do VuaAssistant quản lý. |
 | **Agent không bao giờ đọc secret thô** | idea §F. Chỉ `credential_ref` + `{{credential:field}}`; Trusted Connector Gateway mới được resolve. |
 | **Zero-Docker cho người dùng cuối** | idea §1.3. Docker chỉ dành cho dev/server profile. |
 
@@ -71,7 +71,7 @@ không phải bản trùng cần dọn.
   có `channel_type` (`chat` / `telegram` / `scheduled`). Ghi `null` là lỗi: câu
   trả lời Telegram sẽ nhảy vào ô chat như thể là câu trả lời của người dùng.
 - **File chia sẻ giữa app và runner phải nằm ở `runtime_status().dir`**, KHÔNG
-  phải `~/.v-assistant/data`. Hai đường dẫn này khác nhau; đoán sai thì file ghi
+  phải `~/.vuaassistant/data`. Hai đường dẫn này khác nhau; đoán sai thì file ghi
   ra chỗ không ai đọc.
 - **Trước khi ghi đè file dữ liệu sống, phải đọc nó trước.** Đã có lần ghi `[]`
   đè lên `scheduled_tasks.json` lúc state chưa hydrate xong → xoá sạch 33 nhiệm
@@ -161,7 +161,7 @@ Trước khi "sửa" một phần đang hoạt động: **hỏi PO xem nó có �
 | Việc | Lệnh |
 |---|---|
 | Vòng lặp sửa nhanh (hot reload, cửa sổ native) | `npm run tauri dev` |
-| Bản cài thật vào `/Applications/V Assistant.app` | `npm run build:local` |
+| Bản cài thật vào `/Applications/VuaAssistant.app` | `npm run build:local` |
 | Chỉ biên dịch sidecar sau khi sửa `agent-runner/src` | `npm run build:runner` |
 
 * Docker/Colima profile cũ đã xoá khỏi repo; không dùng `./dev up|ui|all` nữa.

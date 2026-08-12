@@ -1,12 +1,12 @@
 /**
  * Credential Vault — front-end access to the secure secret store.
  *
- * On desktop, secrets live in V Assistant's encrypted SQLite Vault through
+ * On desktop, secrets live in VuaAssistant's encrypted SQLite Vault through
  * the Rust `vault_*` commands. Browser persistence is development-only and
  * is not the security boundary used by the shipped desktop app.
  */
 
-const WEB_PREFIX = "v-assistant-vault:";
+const WEB_PREFIX = "vuaassistant-vault:";
 
 function inDesktopShell(): boolean {
   return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;

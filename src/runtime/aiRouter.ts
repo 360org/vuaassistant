@@ -332,7 +332,7 @@ export async function signInWithAiRouterCore(
       || device.verificationUri;
     if (verificationUrl) {
       onManualAuthUrl?.(verificationUrl);
-      window.open(verificationUrl, "v_assistant_ai_router_device", "width=720,height=760");
+      window.open(verificationUrl, "vuaassistant_ai_router_device", "width=720,height=760");
     }
     const intervalMs = Math.max(2, Number(device.interval || 5)) * 1000;
     const expiresInMs = Math.max(60, Number(device.expires_in || device.expiresIn || 300)) * 1000;
@@ -433,8 +433,8 @@ export async function exchangeAiRouterOAuthCallbackUrl(
 
 export async function captureGrokWebSsoCookie(): Promise<string> {
   if (!inDesktopShell()) {
-    window.open("https://grok.com", "v_assistant_grok_web", "width=980,height=760");
-    throw new Error("Automatic Grok cookie capture requires the V Assistant desktop app. In this web preview, paste the sso cookie manually.");
+    window.open("https://grok.com", "vuaassistant_grok_web", "width=980,height=760");
+    throw new Error("Automatic Grok cookie capture requires the VuaAssistant desktop app. In this web preview, paste the sso cookie manually.");
   }
   const { invoke } = await import("@tauri-apps/api/core");
   return await invoke<string>("capture_grok_sso_cookie");

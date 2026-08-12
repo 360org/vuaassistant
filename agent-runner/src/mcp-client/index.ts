@@ -96,7 +96,7 @@ export class McpClientConnection {
     const result = await this.sendRequest('initialize', {
       protocolVersion: MCP_PROTOCOL_VERSION,
       capabilities: {},
-      clientInfo: { name: 'v-assistant-agent-runner', version: '0.1.0' },
+      clientInfo: { name: 'vuaassistant-agent-runner', version: '0.1.0' },
     }) as { protocolVersion?: string; capabilities?: Record<string, unknown> };
 
     if (!result.protocolVersion) {

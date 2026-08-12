@@ -1,5 +1,5 @@
 /**
- * V-Assistant AI Router. This is a first-party local service.
+ * VuaAssistant AI Router. This is a first-party local service.
  *
  * The inherited Provider Core is source code under `core/open-sse`; no
  * upstream 9router process, dashboard, cookie, database, or HTTP endpoint is
@@ -114,16 +114,16 @@ function validateLocalCallbackUri(value) {
     throw new Error("OAuth callback must use a local HTTP origin.");
   }
   if (callback.pathname !== "/callback") {
-    throw new Error("OAuth callback must use the V-Assistant /callback route.");
+    throw new Error("OAuth callback must use the VuaAssistant /callback route.");
   }
   return callback.toString();
 }
 
 /**
- * V-Assistant compatibility relay for the callback URI registered by the
+ * VuaAssistant compatibility relay for the callback URI registered by the
  * inherited Codex OAuth client. The provider Core still owns PKCE, authorize
  * parameters, and token exchange; this adapter only returns the browser to
- * V-Assistant's existing /callback page.
+ * VuaAssistant's existing /callback page.
  */
 function startCodexCallbackRelay(returnUri) {
   codexCallbackReturnUri = validateLocalCallbackUri(returnUri);
@@ -140,7 +140,7 @@ function startCodexCallbackRelay(returnUri) {
       // Return a useful response instead of crashing the native sidecar.
       if (!codexCallbackReturnUri) {
         response.writeHead(410, { "Content-Type": "text/plain; charset=utf-8" });
-        response.end("This V Assistant sign-in session has expired. Start sign-in again in the app.");
+        response.end("This VuaAssistant sign-in session has expired. Start sign-in again in the app.");
         return;
       }
       const destination = new URL(codexCallbackReturnUri);

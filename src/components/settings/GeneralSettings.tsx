@@ -17,12 +17,12 @@ export function GeneralSettings() {
   } = useApp();
 
   const [runOnStartup, setRunOnStartup] = useState<boolean>(() => {
-    return localStorage.getItem("v-assistant-autostart") === "true";
+    return localStorage.getItem("vuaassistant-autostart") === "true";
   });
 
   const handleToggleAutostart = async (enable: boolean) => {
     setRunOnStartup(enable);
-    localStorage.setItem("v-assistant-autostart", enable ? "true" : "false");
+    localStorage.setItem("vuaassistant-autostart", enable ? "true" : "false");
     try {
       if (typeof window !== "undefined" && "__TAURI_INTERNALS__" in window) {
         const { invoke } = await import("@tauri-apps/api/core");
@@ -47,8 +47,8 @@ export function GeneralSettings() {
             </div>
             <div className="text-xs text-neutral-400">
               {language === "en"
-                ? "Automatically launch V-Assistant when your computer starts up."
-                : "Khởi động V-Assistant chạy ngầm sẵn sàng phục vụ ngay khi bật máy tính."}
+                ? "Automatically launch VuaAssistant when your computer starts up."
+                : "Khởi động VuaAssistant chạy ngầm sẵn sàng phục vụ ngay khi bật máy tính."}
             </div>
           </div>
           <button

@@ -4,7 +4,7 @@
  *
  * Mỗi file là một persona chuyên gia: frontmatter (name/description/emoji/vibe)
  * + các mục ## (Mission, Rules, Workflow, Communication…). Ta ánh xạ thẳng sang
- * một Agent (vai trò) của V Assistant:
+ * một Agent (vai trò) của VuaAssistant:
  *   - name/description/emoji  → danh tính vai trò
  *   - vibe + Communication + Identity → Soul (tính cách)
  *   - Mission + Rules + Workflow + Deliverables + Advanced → Instructions

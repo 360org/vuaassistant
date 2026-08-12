@@ -47,7 +47,7 @@ phase('Quét & Phân loại')
 
 const FILTER = args || ''
 const scanPrompt = `
-Bạn đang ở repo v-assistant. Nhiệm vụ:
+Bạn đang ở repo vuaassistant. Nhiệm vụ:
 
 1. Chạy: git config --get remote.origin.url → xác nhận là GitHub repo.
 2. Lấy open issues:
@@ -117,7 +117,7 @@ const fixes = await pipeline(
   issue => {
     const slug = issue.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 30)
     const fixPrompt = `
-Bạn đang trong worktree cô lập của repo v-assistant. Nhiệm vụ: fix GitHub issue #${issue.number}.
+Bạn đang trong worktree cô lập của repo vuaassistant. Nhiệm vụ: fix GitHub issue #${issue.number}.
 
 ## Issue
 - Tiêu đề: ${issue.title}
@@ -194,7 +194,7 @@ const reviews = await pipeline(
   validFixes,
   fix => {
     const reviewPrompt = `
-Bạn là code reviewer cho repo v-assistant. Review fix cho issue #${fix.number}.
+Bạn là code reviewer cho repo vuaassistant. Review fix cho issue #${fix.number}.
 
 ## Thông tin fix
 - Branch: ${fix.branch}
@@ -239,7 +239,7 @@ for (const review of approved) {
   if (!fix) continue
 
   const mergePrompt = `
-Bạn đang ở repo v-assistant trên branch main. Nhiệm vụ: merge fix cho issue #${fix.number}.
+Bạn đang ở repo vuaassistant trên branch main. Nhiệm vụ: merge fix cho issue #${fix.number}.
 
 1. Kiểm tra branch tồn tại: git branch --list "${fix.branch}"
 2. Nếu tồn tại:

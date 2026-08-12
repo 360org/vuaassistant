@@ -43,8 +43,8 @@ function appDataDir() {
 function defaultBinary() {
   if (process.env.VUA_DESKTOP_BINARY) return process.env.VUA_DESKTOP_BINARY;
   const base = path.join(repoRoot, "src-tauri/target/debug");
-  if (isWindows) return path.join(base, "v-assistant.exe");
-  return path.join(base, "v-assistant");
+  if (isWindows) return path.join(base, "vuaassistant.exe");
+  return path.join(base, "vuaassistant");
 }
 
 function skip(reason) {

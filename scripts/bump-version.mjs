@@ -2,7 +2,7 @@
 // command. Usage: node scripts/bump-version.mjs 0.1.1
 //
 // Updates package.json, src-tauri/tauri.conf.json, src-tauri/Cargo.toml and
-// the v-assistant entry in src-tauri/Cargo.lock. After this, commit and tag
+// the vuaassistant entry in src-tauri/Cargo.lock. After this, commit and tag
 // `vX.Y.Z` — the Release workflow builds the installers.
 
 import { readFileSync, writeFileSync } from "node:fs";
@@ -35,10 +35,10 @@ const edits = [
   },
   {
     file: "src-tauri/Cargo.lock",
-    // The version line that follows `name = "v-assistant"`.
+    // The version line that follows `name = "vuaassistant"`.
     fn: (s) =>
       s.replace(
-        /(name = "v-assistant"\nversion = )"[^"]+"/,
+        /(name = "vuaassistant"\nversion = )"[^"]+"/,
         `$1"${version}"`,
       ),
   },

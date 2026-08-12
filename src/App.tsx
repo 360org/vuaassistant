@@ -75,7 +75,7 @@ export default function App() {
             <Menu className="size-5" />
           </button>
           <Logo className="size-7" />
-          <span className="text-sm font-semibold">V Assistant</span>
+          <span className="text-sm font-semibold">VuaAssistant</span>
         </header>
 
         {/* Desktop sidebar */}

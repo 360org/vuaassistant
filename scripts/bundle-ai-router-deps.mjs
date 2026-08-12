@@ -3,7 +3,7 @@
 // `tauri.conf.json` đóng gói `../ai-router/**/*`, nhưng `ai-router/` không có
 // `node_modules` riêng: khi chạy từ mã nguồn, Node đi ngược lên thư mục cha và
 // tìm thấy `undici` ở `node_modules` gốc của dự án. Bản cài thì không có thư
-// mục cha nào như vậy — `/usr/lib/V Assistant/_up_/ai-router/` đứng một mình —
+// mục cha nào như vậy — `/usr/lib/VuaAssistant/_up_/ai-router/` đứng một mình —
 // nên sidecar chết ngay khi khởi động:
 //
 //   Cannot find package 'undici' imported from

@@ -1,5 +1,5 @@
 /**
- * Two-DB connection layer for V-Assistant Agent Runner.
+ * Two-DB connection layer for VuaAssistant Agent Runner.
  *
  * Uses two SQLite files to eliminate write contention:
  *   inbound.db  — Tauri/UI writes new messages; Runner opens READ-ONLY
