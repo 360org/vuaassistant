@@ -6,3 +6,4 @@ export { getPendingMessages, markProcessing, markCompleted, setMaxMessagesPerPro
 export { writeMessageOut, getMessageIdBySeq, getRoutingBySeq, markOutboundDelivered, isOutboundDelivered, type MessageOutRow, type WriteMessageOut } from './messages-out.js';
 export { getSessionState, setSessionState, deleteSessionState, getContinuation, setContinuation, clearContinuation, getTranscript, setTranscript, clearTranscript, setCurrentInReplyTo, getCurrentInReplyTo, clearCurrentInReplyTo } from './session-state.js';
 export { sessionIdFor, getSessionRouting } from './session-routing.js';
+export { writeTaskRunLog, getTaskRunLogs, clearTaskRunLogs, type TaskRunLogRow } from './task-logs.js';

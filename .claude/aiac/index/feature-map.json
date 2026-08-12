@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "note": "Feature map dẫn xuất từ symbol/domain signal. Agent cập nhật thủ công sau thay đổi có ý nghĩa.",
+  "hotspots": [
+    {
+      "file": "src-tauri/src/lib.rs",
+      "signals": 54
+    },
+    {
+      "file": "ai-router/core/open-sse/utils/cursorProtobuf.js",
+      "signals": 52
+    },
+    {
+      "file": "ai-router/core/open-sse/shared/zedAuth.js",
+      "signals": 39
+    },
+    {
+      "file": "ai-router/core/open-sse/config/kiroConstants.js",
+      "signals": 38
+    },
+    {
+      "file": "ai-router/core/open-sse/services/tokenRefresh/providers.js",
+      "signals": 37
+    },
+    {
+      "file": "src/runtime/knowledge.ts",
+      "signals": 35
+    },
+    {
+      "file": "src-tauri/src/runtime.rs",
+      "signals": 34
+    },
+    {
+      "file": "src/runtime/oauth.ts",
+      "signals": 34
+    },
+    {
+      "file": "src/runtime/aiRouter.ts",
+      "signals": 30
+    },
+    {
+      "file": "ai-router/core/open-sse/services/accountFallback.js",
+      "signals": 28
+    },
+    {
+      "file": "src/runtime/vault.ts",
+      "signals": 28
+    },
+    {
+      "file": "ai-router/core/src/lib/oauth/utils/server.js",
+      "signals": 27
+    }
+  ]
+}

@@ -286,6 +286,16 @@ fn load_sessions_from_disk(custom_dir: String) -> String {
 }
 
 #[tauri::command]
+fn load_task_run_logs(state: tauri::State<Runtime>) -> Result<Vec<runtime::TaskRunLog>, String> {
+    state.get_task_run_logs()
+}
+
+#[tauri::command]
+fn clear_task_run_logs(state: tauri::State<Runtime>, task_id: Option<String>) -> Result<(), String> {
+    state.clear_task_run_logs(task_id)
+}
+
+#[tauri::command]
 fn read_host_file(path: String) -> Result<String, String> {
     use std::fs;
     use std::path::PathBuf;
@@ -628,6 +638,8 @@ pub fn run() {
             save_custom_data_file,
             save_custom_data_text,
             load_sessions_from_disk,
+            load_task_run_logs,
+            clear_task_run_logs,
             read_host_file,
             write_host_file,
             list_host_dir,

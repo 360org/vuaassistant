@@ -1,0 +1,337 @@
+{
+  "schemaVersion": 1,
+  "counts": {
+    "v-assistant": 47
+  },
+  "signals": [
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/auth.rs",
+      "line": 45
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/auth.rs",
+      "line": 134
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/auth.rs",
+      "line": 142
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 22
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 28
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 39
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 49
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 56
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 62
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 68
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 96
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 108
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 113
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 118
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 126
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 136
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 144
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 152
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 191
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 196
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 240
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 255
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 270
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 290
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 331
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 336
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 345
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/lib.rs",
+      "line": 350
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/vault.rs",
+      "line": 148
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/vault.rs",
+      "line": 153
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_command_marker",
+      "name": "next fn",
+      "file": "src-tauri/src/vault.rs",
+      "line": 158
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_invoke",
+      "name": "open_external",
+      "file": "src/components/MessageContent.tsx",
+      "line": 26
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_invoke",
+      "name": "runtime_restart_ai_router",
+      "file": "src/components/settings/DiagnosticsSection.tsx",
+      "line": 45
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_invoke",
+      "name": "set_autostart",
+      "file": "src/components/settings/GeneralSettings.tsx",
+      "line": 36
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_invoke",
+      "name": "runtime_restart_ai_router",
+      "file": "src/components/settings/ModelSettings.tsx",
+      "line": 83
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_invoke",
+      "name": "save_custom_data_text",
+      "file": "src/components/settings/WorkspaceSettingsSection.tsx",
+      "line": 80
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_invoke",
+      "name": "save_custom_data_text",
+      "file": "src/lib/store.tsx",
+      "line": 654
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_invoke",
+      "name": "save_custom_data_text",
+      "file": "src/lib/store.tsx",
+      "line": 660
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_invoke",
+      "name": "write_host_file",
+      "file": "src/lib/store.tsx",
+      "line": 675
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_invoke",
+      "name": "runtime_restart_ai_router",
+      "file": "src/pages/Onboarding.tsx",
+      "line": 101
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_invoke",
+      "name": "runtime_sync",
+      "file": "src/runtime/nanoclaw.ts",
+      "line": 165
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_invoke",
+      "name": "open_external",
+      "file": "src/runtime/oauth.ts",
+      "line": 642
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_invoke",
+      "name": "open_external",
+      "file": "src/runtime/oauth.ts",
+      "line": 722
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_invoke",
+      "name": "save_custom_data_text",
+      "file": "src/runtime/tools.ts",
+      "line": 428
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_invoke",
+      "name": "open_external",
+      "file": "src/runtime/updater.ts",
+      "line": 130
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_invoke",
+      "name": "vault_set",
+      "file": "src/runtime/vault.ts",
+      "line": 18
+    },
+    {
+      "domain": "v-assistant",
+      "kind": "tauri_invoke",
+      "name": "vault_delete",
+      "file": "src/runtime/vault.ts",
+      "line": 79
+    }
+  ]
+}

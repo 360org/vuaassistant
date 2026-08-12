@@ -16,7 +16,7 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { getSessionState, setSessionState, writeMessageOut } from '../db/index.js';
+import { getSessionState, setSessionState, writeMessageOut, writeTaskRunLog } from '../db/index.js';
 import { checkBudget, recordSpend, type BudgetStore } from '../daily-budget.js';
 import { executeAgentLoop, type PollLoopConfig } from '../poll-loop.js';
 import { notifyTelegram } from '../channels/telegram.js';
@@ -158,6 +158,17 @@ export async function runDueTasks(config: PollLoopConfig, now = new Date()): Pro
         config.systemContext,
       );
       recordSpend(budgetStore, result.tokensEstimate ?? 0, now);
+
+      const duration = Date.now() - startedAt;
+      writeTaskRunLog({
+        id: `log-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        taskId: task.id,
+        status: 'success',
+        runAt: now.getTime(),
+        duration,
+        output: result.text || '',
+      });
+
       if (result.text) {
         writeMessageOut({
           id: generateId(),
@@ -170,7 +181,7 @@ export async function runDueTasks(config: PollLoopConfig, now = new Date()): Pro
             scheduledTaskId: task.id,
             scheduledTaskName: task.name,
             status: 'success',
-            durationMs: Date.now() - startedAt,
+            durationMs: duration,
           }),
         });
         // The point of a schedule is that it reaches the user with the app
@@ -180,6 +191,17 @@ export async function runDueTasks(config: PollLoopConfig, now = new Date()): Pro
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       log(`Task "${task.name || task.id}" failed: ${message}`);
+      const duration = Date.now() - startedAt;
+
+      writeTaskRunLog({
+        id: `log-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        taskId: task.id,
+        status: 'error',
+        runAt: now.getTime(),
+        duration,
+        output: message,
+      });
+
       writeMessageOut({
         id: generateId(),
         kind: 'chat',
@@ -191,7 +213,7 @@ export async function runDueTasks(config: PollLoopConfig, now = new Date()): Pro
           scheduledTaskId: task.id,
           scheduledTaskName: task.name,
           status: 'error',
-          durationMs: Date.now() - startedAt,
+          durationMs: duration,
         }),
       });
     }

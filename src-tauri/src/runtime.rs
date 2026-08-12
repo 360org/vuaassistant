@@ -50,6 +50,18 @@ pub struct McpServerConfig {
     pub env: std::collections::HashMap<String, String>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct TaskRunLog {
+    pub id: String,
+    pub task_id: String,
+    pub task_name: String,
+    pub run_at: i64,
+    pub duration: i64,
+    pub status: String,
+    pub output: String,
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct OutboundMessage {
     pub id: i64,
@@ -898,6 +910,48 @@ impl Runtime {
         )
         .map_err(err)?;
         *self.workspace.lock().map_err(err)? = workspace;
+        Ok(())
+    }
+
+    pub fn get_task_run_logs(&self) -> Result<Vec<TaskRunLog>, String> {
+        let conn = Connection::open(self.outbound()).map_err(err)?;
+        let mut stmt = conn
+            .prepare("SELECT id, taskId, status, runAt, duration, output FROM task_run_logs ORDER BY runAt DESC")
+            .map_err(err)?;
+        let rows = stmt
+            .query_map([], |row| {
+                let id: String = row.get(0)?;
+                let task_id: String = row.get(1)?;
+                let status: String = row.get(2)?;
+                let run_at: i64 = row.get(3)?;
+                let duration: i64 = row.get(4)?;
+                let output: String = row.get(5)?;
+                Ok(TaskRunLog {
+                    id,
+                    task_id,
+                    task_name: "".to_string(),
+                    run_at,
+                    duration,
+                    status,
+                    output,
+                })
+            })
+            .map_err(err)?;
+
+        let mut results = Vec::new();
+        for r in rows {
+            results.push(r.map_err(err)?);
+        }
+        Ok(results)
+    }
+
+    pub fn clear_task_run_logs(&self, task_id: Option<String>) -> Result<(), String> {
+        let conn = Connection::open(self.outbound()).map_err(err)?;
+        if let Some(tid) = task_id {
+            conn.execute("DELETE FROM task_run_logs WHERE taskId = ?1", [&tid]).map_err(err)?;
+        } else {
+            conn.execute("DELETE FROM task_run_logs", []).map_err(err)?;
+        }
         Ok(())
     }
 

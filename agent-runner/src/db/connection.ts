@@ -131,6 +131,17 @@ export function getOutboundDb(): DatabaseHandle {
       );
     `);
 
+    _outbound.exec(`
+      CREATE TABLE IF NOT EXISTS task_run_logs (
+        id          TEXT PRIMARY KEY,
+        taskId      TEXT NOT NULL,
+        status      TEXT NOT NULL,
+        runAt       INTEGER NOT NULL,
+        duration    INTEGER NOT NULL,
+        output      TEXT
+      );
+    `);
+
     log('Outbound DB initialized');
   }
   return _outbound;

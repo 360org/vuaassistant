@@ -15,15 +15,15 @@ export interface BannerData {
 }
 
 const DEFAULT_BANNER: BannerData = {
-  badge: "VUA AI — 360 CORP",
-  title: "Thuê Nhân Sự AI 24/7",
-  subtitle: "Giải pháp bứt phá doanh số & tự động hóa vận hành toàn diện",
-  ctaText: "Khám phá 3 gói thuê ngay",
-  linkUrl: "https://vuaai.net/#pricing",
+  badge: "AGENTIC FOR BUSINESS GROWTH",
+  title: "Thuê Nhân sự AI Vận hành 24/7, không nghỉ phép.",
+  subtitle: "Kết hợp Vua AI Agentic + Vua Hệ Thống Cloud Enterprise — Giải pháp toàn diện, xoá 6 rào cản tăng trưởng",
+  ctaText: "Hẹn lịch demo miễn phí",
+  linkUrl: "https://vuahethong.net/r/F3I",
   features: [
-    "Xóa 6 rào cản tăng trưởng",
-    "Tích hợp Cloud ERP & 100+ App",
-    "Triển khai nhanh trong 7 ngày",
+    "Triển khai trong 7 ngày",
+    "Tiếng Việt tự nhiên",
+    "Tích hợp 100+ công cụ",
   ],
 };
 

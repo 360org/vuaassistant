@@ -940,21 +940,22 @@
 
 | Phân loại | ✅ Xong | 🔄 Update | ⬜ Chưa làm |
 |-----------|:---:|:---:|:---:|
-| Tài liệu | 9 | 0 | 2 |
-| Giao diện UI | 28 | 2 | 6 |
-| Authentication | 4 | 0 | 3 |
-| AI Providers & 9router | 6 | 0 | 5 |
-| **Agent Runner (Core)** | **51** | **2** | **5** |
-| Tauri Shell (Host-side) | 4 | 3 | 7 |
-| Vault | 1 | 1 | 8 |
-| Channels | 2 | 0 | 8 |
+| Tài liệu | 11 | 0 | 0 |
+| Giao diện UI | 55 | 0 | 5 |
+| Authentication | 6 | 2 | 3 |
+| AI Providers & AI Router | 24 | 2 | 9 |
+| **Agent Runner (Core)** | **51** | **0** | **3** |
+| Tauri Shell (Host-side) | 7 | 0 | 8 |
+| Vault | 23 | 0 | 1 |
+| Channels | 4 | 0 | 10 |
 | Integrations | 2 | 0 | 7 |
-| Skills & MCP | 5 | 0 | 8 |
-| Memory | 3 | 1 | 2 |
-| Scheduled | 4 | 0 | 4 |
-| Bảo mật | 3 | 0 | 10 |
-| Computer Use & Advanced | 6 | 0 | 9 |
-| Testing & CI/CD | 9 | 0 | 12 |
-| **TỔNG** | **87** | **7** | **125** |
+| Skills & MCP | 8 | 0 | 5 |
+| Memory | 4 | 0 | 2 |
+| Scheduled | 6 | 0 | 2 |
+| Bảo mật | 24 | 2 | 9 |
+| Computer Use & Advanced | 2 | 0 | 5 |
+| Testing & CI/CD | 30 | 0 | 5 |
+| Autonomy & Harness Loop | 13 | 0 | 14 |
+| **TỔNG** | **270** | **6** | **88** |
 
-> **87 tính năng đã hoàn thành**, **7 cần cập nhật**, **125 chưa triển khai**.
+> **270 tính năng đã hoàn thành**, **6 cần cập nhật**, **88 chưa triển khai**.
