@@ -2,7 +2,10 @@ import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
 
-const sourceApp = "/Volumes/DATA/DEV/vuaassistant/src-tauri/target/release/bundle/macos/VuaAssistant.app";
+const sourceApp = path.resolve(
+  import.meta.dirname,
+  "../src-tauri/target/release/bundle/macos/VuaAssistant.app"
+);
 const targetApp = "/Applications/VuaAssistant.app";
 
 if (!fs.existsSync(sourceApp)) {
