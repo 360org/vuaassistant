@@ -1,5 +1,11 @@
 /**
  * CRUD operations for task_run_logs table in outbound.db.
+ *
+ * Dùng đúng API của `node:sqlite` mà các tệp db khác đang dùng: `run()` để ghi,
+ * `all()` để đọc. Bản đầu viết theo lối con trỏ thấp (`step()`, `columnText()`,
+ * `finalize()`) — đó là API của `better-sqlite3`/`node-sqlite3-wasm`, không có
+ * trên `PreparedStatement` của `node:sqlite`, nên cả agent-runner không biên
+ * dịch được.
  */
 import { getOutboundDb } from './connection.js';
 
@@ -17,38 +23,34 @@ export interface TaskRunLogRow {
  */
 export function writeTaskRunLog(log: TaskRunLogRow): void {
   const db = getOutboundDb();
-  const stmt = db.prepare(`
+  db.prepare(`
     INSERT INTO task_run_logs (id, taskId, status, runAt, duration, output)
     VALUES (?, ?, ?, ?, ?, ?)
-  `);
-  stmt.run(log.id, log.taskId, log.status, log.runAt, log.duration, log.output);
-  stmt.finalize();
+  `).run(log.id, log.taskId, log.status, log.runAt, log.duration, log.output);
 }
 
 /**
- * Get all run logs for a specific task.
+ * Get all run logs for a specific task, newest first.
  */
 export function getTaskRunLogs(taskId: string): TaskRunLogRow[] {
   const db = getOutboundDb();
-  const stmt = db.prepare(`
+  const rows = db.prepare(`
     SELECT id, taskId, status, runAt, duration, output
     FROM task_run_logs
     WHERE taskId = ?
     ORDER BY runAt DESC
-  `);
-  const rows: TaskRunLogRow[] = [];
-  while (stmt.step()) {
-    rows.push({
-      id: stmt.columnText(0),
-      taskId: stmt.columnText(1),
-      status: stmt.columnText(2),
-      runAt: stmt.columnInt(3),
-      duration: stmt.columnInt(4),
-      output: stmt.columnText(5),
-    });
-  }
-  stmt.finalize();
-  return rows;
+  `).all(taskId) as Array<Record<string, unknown>>;
+
+  // `output` cho phép NULL trong schema, nên trả về chuỗi rỗng thay vì null —
+  // phía gọi luôn mong một chuỗi.
+  return rows.map((row) => ({
+    id: String(row.id),
+    taskId: String(row.taskId),
+    status: String(row.status),
+    runAt: Number(row.runAt),
+    duration: Number(row.duration),
+    output: row.output == null ? '' : String(row.output),
+  }));
 }
 
 /**
@@ -56,10 +58,8 @@ export function getTaskRunLogs(taskId: string): TaskRunLogRow[] {
  */
 export function clearTaskRunLogs(taskId: string): void {
   const db = getOutboundDb();
-  const stmt = db.prepare(`
+  db.prepare(`
     DELETE FROM task_run_logs
     WHERE taskId = ?
-  `);
-  stmt.run(taskId);
-  stmt.finalize();
+  `).run(taskId);
 }
