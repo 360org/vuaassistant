@@ -16,13 +16,18 @@
  * gói thì phải trượt, chứ không được bài test cứu.
  */
 import { spawn, spawnSync } from "node:child_process";
-import { existsSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import os from "node:os";
 import path from "node:path";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const IDENTIFIER = "com.vuaai.assistant";
+// Xem ghi chú ở `desktop-smoke-check.mjs`: identifier phải lấy từ nguồn duy
+// nhất là tauri.conf.json, vì thư mục dữ liệu của bản cài đi theo nó.
+const IDENTIFIER = JSON.parse(
+  readFileSync(path.join(repoRoot, "src-tauri/tauri.conf.json"), "utf8"),
+).identifier;
+if (!IDENTIFIER) throw new Error("tauri.conf.json thiếu `identifier`");
 const isWindows = process.platform === "win32";
 const isMac = process.platform === "darwin";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

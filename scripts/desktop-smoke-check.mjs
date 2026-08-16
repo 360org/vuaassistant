@@ -25,7 +25,14 @@ import os from "node:os";
 import path from "node:path";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const IDENTIFIER = "com.vuaai.assistant";
+// Đọc thẳng từ tauri.conf.json, KHÔNG chép tay. Tauri đặt thư mục dữ liệu theo
+// đúng `identifier` này; chép tay thì đổi tên app một lần là bài test đi tìm
+// nhầm chỗ — chính xác chuyện đã xảy ra khi đổi `com.vuaai.assistant` thành
+// `com.vuaai.vuaassistant` ở v1.1.59, làm CI đỏ trên cả ba nền tảng.
+const IDENTIFIER = JSON.parse(
+  readFileSync(path.join(repoRoot, "src-tauri/tauri.conf.json"), "utf8"),
+).identifier;
+if (!IDENTIFIER) throw new Error("tauri.conf.json thiếu `identifier`");
 const isWindows = process.platform === "win32";
 const isMac = process.platform === "darwin";
 
