@@ -2,7 +2,7 @@
 
 > **Ngày:** 2026-08-17 · **Nguồn tham chiếu:** [deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness) (MIT)
 > **Trạng thái:** đang làm — hướng đã chốt (lấy ý "everything is a plugin", KHÔNG lấy Cordis).
-> **Tiến độ:** 6/8 chặng xong · `main` @ `ee34459`
+> **Tiến độ:** 8/8 chặng xong phần trong runner · `main` @ `9c4dea1`
 
 ---
 
@@ -121,13 +121,13 @@ Mỗi chặng đẩy lên `main` riêng, và giữa hai lần đẩy app vẫn p
 | 04 | Boot thành composition plugin | ✅ `cceab54` | `compose.ts` dùng chung test + chạy thật |
 | 05 | Mốc `turn`/`step` thành sự kiện có kiểu | ✅ `0d4f39d` | quan sát trọn lượt từ ngoài |
 | 06 | Prompt lắp từ sổ đăng ký | ✅ `5df58e4` | hết lệch 9/21 tool |
-| 07 | Sổ phiên append-only + invariant | 🟡 một nửa `ee34459` | cơ chế invariant xong; luật "model thấy gì thì sổ phải có" **chưa** |
-| 08 | Lan ra ngoài runner | ○ chưa | `ai-router/`, `src-tauri/`, `src/` |
+| 07 | Invariant + "model thấy gì thì sổ có nấy" | ✅ `ee34459` `3702d37` | tri thức đi qua sổ ghi |
+| 08 | Provider thành seam trên kernel | ✅ `9c4dea1` | thêm nhà cung cấp = đăng ký adapter |
 
-**Chặng 07 mới xong một nửa — nói rõ để không tưởng nhầm là đã đủ.** Sổ invariant
-đã chạy và đã bắt được vi phạm thật, nhưng luật đắt nhất của dsh — *bất cứ gì đi vào
-request gửi model đều phải dựng lại được từ sổ phiên* — thì **chưa làm**. Knowledge,
-memory và cắt-tỉa-ngữ-cảnh vẫn tiêm thẳng vào prompt không để lại vết.
+**Phần chặng 08 CHƯA làm — nói rõ để không tưởng nhầm là đã xong hết:** vỏ Tauri
+(3.182 dòng Rust) và giao diện React (18.209 dòng) vẫn giữ bản sao trạng thái riêng
+thay vì đọc từ sổ phiên. Đó là việc cắt ngang hai phần lớn nhất của dự án, nên tách
+thành đợt riêng chứ không gộp vào đây.
 
 **Đã đổi hành vi ở chặng 03:** `computer_use` nay hỏi trước khi điều khiển chuột và bàn
 phím; `http_request` và `delegate_task` tính là có tác dụng phụ.
