@@ -2,7 +2,7 @@
 
 > **Ngày:** 2026-08-17 · **Nguồn tham chiếu:** [deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness) (MIT)
 > **Trạng thái:** đang làm — hướng đã chốt (lấy ý "everything is a plugin", KHÔNG lấy Cordis).
-> **Tiến độ:** 2/8 chặng xong · `main` @ `705a538`
+> **Tiến độ:** 6/8 chặng xong · `main` @ `ee34459`
 
 ---
 
@@ -113,23 +113,27 @@ của họ (registry là effect, đăng ký trả về disposer, không hardcode
 
 Mỗi chặng đẩy lên `main` riêng, và giữa hai lần đẩy app vẫn phải mở lên dùng được.
 
-| # | Chặng | Trạng thái | Đụng vào |
+| # | Chặng | Trạng thái | Kết quả |
 |---|---|---|---|
-| 01 | Kernel: plugin, effect, sự kiện có kiểu | ✅ `2dad0ff` | `src/kernel/` — 550 dòng |
-| 02 | 13 tool native tự khai tính chất | ✅ `705a538` | `native-tools/index.ts` |
-| 03 | `capability-rail` thành plugin trên `tools/pre-execute` | ▸ đang tới | `capability-rail.ts` 157 dòng |
-| 04 | Boot thành composition plugin | ○ chờ 03 | `index.ts`, `scheduler/`, `channels/` |
-| 05 | Tách `turn`/`step` thành điểm mở rộng | ○ chờ 04 | `poll-loop.ts` 563 dòng |
-| 06 | Prompt lắp từ tool đã đăng ký thật | ○ chờ 05 | `buildSystemPrompt` → `ctx.prompt` |
-| 07 | Sổ phiên append-only + invariant | ○ chờ 05 | `db/`, `context-prune.ts`, `knowledge/` |
-| 08 | Lan ra ngoài runner | ○ cuối | `ai-router/`, `src-tauri/`, `src/` |
+| 01 | Kernel: plugin, effect, sự kiện có kiểu | ✅ `2dad0ff` | `src/kernel/` |
+| 02 | 13 tool native tự khai tính chất | ✅ `705a538` | mã cũ xếp sai 3/13 |
+| 03 | Chính sách thành lớp bọc `tools/pre-execute` | ✅ `cceab54` | 0 chỗ còn đoán theo tên |
+| 04 | Boot thành composition plugin | ✅ `cceab54` | `compose.ts` dùng chung test + chạy thật |
+| 05 | Mốc `turn`/`step` thành sự kiện có kiểu | ✅ `0d4f39d` | quan sát trọn lượt từ ngoài |
+| 06 | Prompt lắp từ sổ đăng ký | ✅ `5df58e4` | hết lệch 9/21 tool |
+| 07 | Sổ phiên append-only + invariant | 🟡 một nửa `ee34459` | cơ chế invariant xong; luật "model thấy gì thì sổ phải có" **chưa** |
+| 08 | Lan ra ngoài runner | ○ chưa | `ai-router/`, `src-tauri/`, `src/` |
 
-**Chặng 03 là chặng đổi hành vi thật:** từ đó `computer_use` bắt đầu hỏi trước khi điều
-khiển chuột và bàn phím. Phải báo trước cho người dùng, không lặng lẽ đổi.
+**Chặng 07 mới xong một nửa — nói rõ để không tưởng nhầm là đã đủ.** Sổ invariant
+đã chạy và đã bắt được vi phạm thật, nhưng luật đắt nhất của dsh — *bất cứ gì đi vào
+request gửi model đều phải dựng lại được từ sổ phiên* — thì **chưa làm**. Knowledge,
+memory và cắt-tỉa-ngữ-cảnh vẫn tiêm thẳng vào prompt không để lại vết.
 
-**Chặng 06 vá một lỗi lệch đang có thật:** `buildSystemPrompt` liệt kê tool bằng văn xuôi
-viết tay — nói với model là có **9 tool** trong khi đăng ký **13**. Bốn tool `vault_list`,
-`search_memory`, `computer_use`, `delegate_task` model không được cho biết là có.
+**Đã đổi hành vi ở chặng 03:** `computer_use` nay hỏi trước khi điều khiển chuột và bàn
+phím; `http_request` và `delegate_task` tính là có tác dụng phụ.
+
+**Đã vá ở chặng 06:** prompt từng nói với model là có **9 tool** trong khi sổ đăng ký
+**21** (13 native + 8 built-in). Mười hai tool nằm đó không bao giờ được dùng.
 
 ---
 
