@@ -62,8 +62,6 @@ async function main(): Promise<void> {
     ensureMemoryScaffold(agentDir);
   }
 
-  // Build system prompt after the optional scaffold exists.
-  const instructions = buildSystemPrompt(config.assistantName, config.agentName, agentDir);
 
   log(`Provider created: ${provider.name}`);
 
@@ -72,6 +70,15 @@ async function main(): Promise<void> {
   const kernel = await composeRunner({ provider, log });
   log(`Plugin đã nạp: ${kernel.loaded.join(', ')}`);
   log(`Tool đã đăng ký: ${kernel.root.tools.list().length}`);
+
+  // Dựng prompt SAU khi cây plugin nạp xong: phần liệt kê tool đọc từ sổ đăng
+  // ký, nên dựng sớm là ra danh sách rỗng.
+  const instructions = buildSystemPrompt(
+    config.assistantName,
+    config.agentName,
+    agentDir,
+    kernel.root.prompt.build(),
+  );
 
   const loopConfig = {
     provider,
@@ -99,22 +106,21 @@ async function main(): Promise<void> {
 /**
  * Build the system prompt from agent config.
  */
-function buildSystemPrompt(assistantName: string, agentName: string, agentDir: string): string {
+function buildSystemPrompt(
+  assistantName: string,
+  agentName: string,
+  agentDir: string,
+  toolSection: string,
+): string {
   const parts: string[] = [];
 
   parts.push(`You are ${assistantName}, a personal AI assistant.`);
   parts.push(`Current role: ${agentName}`);
   parts.push('');
-  parts.push('You have access to the following tools to help the user:');
-  parts.push('- file_read: Read files');
-  parts.push('- file_write: Write/create files');
-  parts.push('- file_edit: Search and replace in files');
-  parts.push('- grep: Search file contents');
-  parts.push('- glob: List files by pattern');
-  parts.push('- http_request: Make unauthenticated HTTP requests');
-  parts.push('- web_search: Search the public web, then use http_request to read a result');
-  parts.push('- connector_request: Use an opaque connector reference through the trusted gateway');
-  parts.push('- schedule_task: Register one or many tasks in VuaAssistant "Lịch & Nhiệm vụ" (Scheduled Tasks)');
+  // Danh sách tool dựng từ sổ đăng ký, KHÔNG viết tay. Bản viết tay cũ nói với
+  // model là có 9 tool trong khi runner đăng ký 13 — bốn tool nằm đó không bao
+  // giờ được dùng vì model không biết chúng tồn tại.
+  if (toolSection) parts.push(toolSection);
   parts.push('');
   parts.push('=== MANDATORY SCHEDULING RULE ===');
   parts.push('Whenever you plan, agree to, or promise anything that happens at a time — a posting plan, a recurring report, a reminder, a daily summary — you MUST call "schedule_task" before you say it is scheduled.');
