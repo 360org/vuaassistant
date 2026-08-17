@@ -16,6 +16,7 @@ function log(msg: string): void {
 }
 
 import { startBuiltinMcpServer } from './mcp-tools/index.js';
+import { composeRunner } from './kernel/compose.js';
 
 async function main(): Promise<void> {
   const config = loadConfig();
@@ -66,12 +67,19 @@ async function main(): Promise<void> {
 
   log(`Provider created: ${provider.name}`);
 
+  // Cây plugin dựng ở một chỗ duy nhất (kernel/compose.ts) để bài test kiểm
+  // đúng thứ người dùng chạy, không phải một hình thù chỉ có trong test.
+  const kernel = await composeRunner({ provider, log });
+  log(`Plugin đã nạp: ${kernel.loaded.join(', ')}`);
+  log(`Tool đã đăng ký: ${kernel.root.tools.list().length}`);
+
   const loopConfig = {
     provider,
     providerName,
     agentId: config.agentName,
     agentDir,
     systemContext: { instructions },
+    tools: kernel.root.tools,
   };
 
   // Scheduled tasks live here, not in the webview: closing the app window must

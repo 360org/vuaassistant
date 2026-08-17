@@ -65,6 +65,12 @@ export interface ToolExecution {
   readonly args: Record<string, unknown>;
   /** Người dùng đã duyệt lượt chạy này chưa. */
   readonly approved: boolean;
+  /**
+   * Việc người dùng đang nhờ, để lớp can thiệp xét hành động trong đúng bối
+   * cảnh. Đi kèm từng lời gọi chứ không nhét sẵn vào plugin: plugin nạp một
+   * lần rồi sống mãi, còn mục tiêu thì đổi theo từng lượt.
+   */
+  readonly goal: string;
 }
 
 declare module './types.js' {
@@ -109,7 +115,7 @@ export interface ToolRegistry {
   execute(
     name: string,
     args: Record<string, unknown>,
-    options?: { approved?: boolean },
+    options?: { approved?: boolean; goal?: string },
   ): Promise<ToolResult>;
 }
 
@@ -175,6 +181,7 @@ export const toolsPlugin = {
           tool,
           args,
           approved: options?.approved === true,
+          goal: options?.goal ?? '',
         };
         return ctx.run<ToolExecution, ToolResult>('tools/pre-execute', payload, async () =>
           tool.execute(args),

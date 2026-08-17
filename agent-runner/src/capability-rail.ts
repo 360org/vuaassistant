@@ -1,5 +1,5 @@
 import type { ToolDefinition, ToolResult } from './providers/types.js';
-import { OutboundLimiter, pathDenied, readPolicy, requiresAsk, type Policy } from './policy.js';
+import type { ToolSpec } from './kernel/tools.js';
 
 export type CapabilityKind = 'native' | 'builtin' | 'mcp';
 
@@ -40,34 +40,25 @@ export const CAPABILITY_TOOL_DEFINITIONS: ToolDefinition[] = [
   },
 ];
 
-const SIDE_EFFECT_NAMES = new Set([
-  'file_write',
-  'file_edit',
-  'connector_request',
-  'schedule_task',
-  'send_message',
-  'send_file',
-  'edit_message',
-  'add_reaction',
-]);
-
-const APPROVAL_REQUIRED_NAMES = new Set([
-  'connector_request',
-  'send_message',
-  'send_file',
-  'edit_message',
-  'add_reaction',
-]);
-
-export function capabilityFromTool(tool: ToolDefinition, kind: CapabilityKind): Capability {
-  const sideEffect = SIDE_EFFECT_NAMES.has(tool.name) || /(^|__)send|write|edit|delete|create|update|post|publish|message/i.test(tool.name);
+/**
+ * Dựng mô tả capability từ bản khai của chính tool.
+ *
+ * Bản cũ ĐOÁN `side_effect` và `requires_approval` bằng hai regex khớp vào tên
+ * tool cộng hai danh sách cứng. Cách đó sai cả hai chiều và đã được đo: 3/13
+ * tool native bị xếp sai, nặng nhất là `computer_use` — điều khiển chuột và bàn
+ * phím thật của người dùng — bị coi là hoàn toàn vô hại.
+ *
+ * Nay hai giá trị đó đọc thẳng từ `ToolSpec`, tức là từ chỗ người viết tool khai
+ * ra. Không còn chỗ nào đoán nữa.
+ */
+export function capabilityFromSpec(spec: ToolSpec): Capability {
   return {
-    name: tool.name,
-    kind,
-    summary: tool.description || tool.name,
-    input_schema: tool.input_schema,
-    side_effect: sideEffect,
-    requires_approval: APPROVAL_REQUIRED_NAMES.has(tool.name) || /(^|__)send|delete|post|publish|message/i.test(tool.name),
+    name: spec.name,
+    kind: spec.origin,
+    summary: spec.description || spec.name,
+    input_schema: spec.input_schema,
+    side_effect: spec.sideEffect,
+    requires_approval: spec.requiresApproval,
   };
 }
 
@@ -94,64 +85,12 @@ export function searchCapabilities(capabilities: Capability[], query: string, li
   return scored.length ? JSON.stringify({ capabilities: scored }, null, 2) : 'Không tìm thấy capability phù hợp.';
 }
 
-/**
- * Chặn theo chính sách của người dùng, TRƯỚC khi capability được chạy.
+/*
+ * `policyDenied()` và `sideEffectDenied()` đã bị xoá khỏi đây.
  *
- * Đây là chỗ luật thật sự có hiệu lực. Nhét luật vào system prompt chỉ là gợi
- * ý — model có thể bỏ qua, và với việc tiêu tiền thật thì "có thể bỏ qua" là
- * không chấp nhận được. Mọi capability đều đi qua đây nên chặn ở đây là chặn
- * được thật.
- *
- * Ba luật: đường dẫn bị cấm, capability luôn phải hỏi, và hạn mức gửi ra ngoài
- * mỗi giờ. Ba luật đều đọc từ tệp chính sách; tệp hỏng thì quay về mặc định
- * chặt hơn chứ không lỏng hơn.
+ * Luật không còn là hai hàm mà mỗi chỗ gọi tool phải tự nhớ gọi theo đúng thứ
+ * tự — quên một chỗ là thủng một lỗ và không có gì bắt được cái quên đó. Nay
+ * luật là một lớp bọc ở thác nước `tools/pre-execute`
+ * (`kernel/policy-plugin.ts`), nên MỌI tool đi qua `ctx.tools.execute()` đều
+ * phải chui qua, kể cả tool do plugin viết sau này đăng ký.
  */
-export function policyDenied(
-  capability: Capability,
-  args: Record<string, unknown>,
-  approved: unknown,
-  policy: Policy = readPolicy(),
-  limiter?: OutboundLimiter,
-): ToolResult | null {
-  const deny = (content: string): ToolResult => ({ tool_call_id: '', is_error: true, content });
-
-  // 1. Đường dẫn bị cấm — kiểm mọi tham số trông như đường dẫn.
-  for (const [key, value] of Object.entries(args)) {
-    if (typeof value !== 'string') continue;
-    if (!/(path|file|dir|folder|duong_dan)/i.test(key)) continue;
-    const rule = pathDenied(value, policy);
-    if (rule) {
-      return deny(
-        `POLICY_DENIED: Sếp đã đặt luật không cho đụng tới "${rule}", nên em không mở ` +
-          `"${value}". Nếu Sếp thật sự cần, hãy bỏ luật đó trong phần Cài đặt trước.`,
-      );
-    }
-  }
-
-  // 2. Capability người dùng bắt luôn phải hỏi.
-  if (requiresAsk(capability.name, policy) && approved !== true) {
-    return deny(
-      `APPROVAL_REQUIRED: Sếp đã đặt luật luôn hỏi trước khi dùng ${capability.name}. ` +
-        `Hãy xin người dùng duyệt đúng hành động này, rồi gọi lại với approved=true.`,
-    );
-  }
-
-  // 3. Hạn mức gửi ra ngoài. Chỉ tính khi hành động THẬT SỰ sắp chạy, tức là
-  //    sau khi đã qua mọi cửa duyệt — nếu tính sớm thì một lần bị từ chối vẫn
-  //    ăn mất hạn mức của người dùng.
-  if (limiter && capability.side_effect) {
-    const refused = limiter.take();
-    if (refused) return deny(`POLICY_DENIED: ${refused}`);
-  }
-
-  return null;
-}
-
-export function sideEffectDenied(capability: Capability, approved: unknown): ToolResult | null {
-  if (!capability.requires_approval || approved === true) return null;
-  return {
-    tool_call_id: '',
-    is_error: true,
-    content: `APPROVAL_REQUIRED: ${capability.name} gửi dữ liệu ra ngoài hoặc dùng credential. Hãy xin người dùng duyệt đúng hành động này, rồi gọi lại execute_capability với approved=true.`,
-  };
-}

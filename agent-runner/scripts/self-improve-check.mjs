@@ -54,7 +54,7 @@ const stubProvider = {
   },
   isSessionInvalid: () => false,
 };
-const config = { provider: stubProvider, providerName: 'stub', agentId: 'default', agentDir, systemContext: { instructions: '' } };
+const config = { provider: stubProvider, providerName: 'stub', agentId: 'default', agentDir, systemContext: { instructions: '' }, tools: (await (await import('../src/kernel/compose.ts')).composeRunner()).root.tools };
 
 nextReply = '["Prefers Vietnamese", "Runs a coffee shop"]';
 let notes = await reflectAndLearn(config, { user: 'chào em', assistant: 'chào anh' }, []);

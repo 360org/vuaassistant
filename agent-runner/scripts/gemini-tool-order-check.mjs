@@ -38,8 +38,9 @@ const provider = {
 };
 
 try {
+const kernelTools = (await (await import('../src/kernel/compose.ts')).composeRunner()).root.tools;
   const result = await executeAgentLoop(
-    { provider, providerName: 'mock', systemContext: { instructions: 'test' } },
+    { provider, providerName: 'mock', systemContext: { instructions: 'test' }, tools: kernelTools },
     'Hãy kiểm tra workspace',
     undefined,
     { platformId: 'desktop', channelType: 'chat', threadId: 'test' },

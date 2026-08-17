@@ -37,10 +37,8 @@ import { retrieveKnowledge, formatExcerpts } from './knowledge/index.js';
 import { mcpManager } from './mcp-client/index.js';
 import {
   CAPABILITY_TOOL_DEFINITIONS,
-  capabilityFromTool,
+  capabilityFromSpec,
   searchCapabilities,
-  policyDenied,
-  sideEffectDenied,
   type Capability,
 } from './capability-rail.js';
 import { OutboundLimiter, readPolicy } from './policy.js';
@@ -49,6 +47,7 @@ import { clearBuiltinToolContext, executeBuiltinTool, getBuiltinToolDefinitions,
 import { DEFAULT_LIMITS, checkLoop, type Attempt, type GuardLimits } from './loop-guard.js';
 import { estimateTokens, pruneHistory } from './context-prune.js';
 import type { AgentProvider, ProviderEvent, ChatMessage, ToolCall, ToolResult } from './providers/types.js';
+import type { ToolRegistry } from './kernel/tools.js';
 
 const POLL_INTERVAL_MS = 1000;
 const ACTIVE_POLL_INTERVAL_MS = 500;
@@ -81,6 +80,11 @@ export interface PollLoopConfig {
   };
   /** Optional stop signal for testing */
   signal?: AbortSignal;
+  /**
+   * Sổ đăng ký tool đã nạp sẵn plugin native, built-in, chính sách và vai kiểm.
+   * Vòng lặp chỉ điều phối; luật nằm ở các lớp cắm vào `tools/pre-execute`.
+   */
+  tools: ToolRegistry;
 }
 
 /**
@@ -324,6 +328,7 @@ export async function executeAgentLoop(
   // with an assistant function call followed by its tool result. Gemini rejects
   // that orphaned function-call turn: it must immediately follow a user turn or
   // another function response.
+  const tools = config.tools;
   const conversationHistory: ChatMessage[] = [...priorTranscript, { role: 'user', content: prompt }];
   let currentPrompt = '';
   let finalText: string | null = null;
@@ -364,15 +369,29 @@ export async function executeAgentLoop(
       return { text: verdict.message, continuation: sessionContinuation, tokensEstimate };
     }
 
-    const nativeTools = getToolDefinitions();
-    const builtinTools = getBuiltinToolDefinitions();
-    const mcpTools = await mcpManager.listAllTools();
-    const capabilities: Capability[] = [
-      ...nativeTools.map((tool) => capabilityFromTool(tool, 'native')),
-      ...builtinTools.map((tool) => capabilityFromTool(tool, 'builtin')),
-      ...mcpTools.map((tool) => capabilityFromTool(tool, 'mcp')),
-    ];
-    const allTools = [...CAPABILITY_TOOL_DEFINITIONS, ...nativeTools, ...builtinTools, ...mcpTools];
+    // Tool native và built-in đã nằm sẵn trong sổ từ lúc nạp plugin. Tool MCP
+    // thì phát hiện lúc chạy, nên đồng bộ vào sổ ở đây — và đăng ký dưới dạng
+    // KHÔNG TIN CẬY: server lạ không tự khai được tính chất, nên mặc định coi
+    // là nguy hiểm nhất có thể thay vì an toàn nhất.
+    for (const tool of await mcpManager.listAllTools()) {
+      if (tools.get(tool.name)) continue;
+      tools.registerUntrusted(
+        {
+          name: tool.name,
+          description: tool.description,
+          input_schema: tool.input_schema,
+          execute: async (args: Record<string, unknown>) =>
+            (await mcpManager.executeTool(tool.name, args)) ?? {
+              tool_call_id: '',
+              content: `Error: MCP tool "${tool.name}" failed to execute or server not found`,
+              is_error: true,
+            },
+        },
+        'mcp',
+      );
+    }
+    const capabilities: Capability[] = tools.list().map(capabilityFromSpec);
+    const allTools = [...CAPABILITY_TOOL_DEFINITIONS, ...tools.definitions()];
 
     // Lịch sử được gửi lại NGUYÊN VẸN ở mỗi vòng, nên chi phí tăng theo bình
     // phương số vòng nếu không cắt bớt. Cắt tỉa ngay trước khi gửi: bản đầy đủ
@@ -442,11 +461,6 @@ export async function executeAgentLoop(
       log(`Tool call: ${tc.name}(${JSON.stringify(tc.arguments).slice(0, 200)})`);
       let result: ToolResult;
       
-      const directCapability = capabilities.find((item) => item.name === tc.name);
-      const directDenied = directCapability
-        ? policyDenied(directCapability, tc.arguments, tc.arguments.approved, policy, outboundLimiter)
-          ?? sideEffectDenied(directCapability, tc.arguments.approved)
-        : null;
       if (tc.name === 'search_capabilities') {
         result = {
           tool_call_id: tc.id,
@@ -456,55 +470,29 @@ export async function executeAgentLoop(
             Number(tc.arguments.limit ?? 8),
           ),
         };
-      } else if (tc.name !== 'execute_capability' && directDenied) {
-        result = directDenied;
       } else if (tc.name === 'execute_capability') {
-        const capabilityName = typeof tc.arguments.name === 'string' ? tc.arguments.name : '';
-        const capability = capabilities.find((item) => item.name === capabilityName);
-        const capabilityArgs = tc.arguments.arguments && typeof tc.arguments.arguments === 'object'
-          ? tc.arguments.arguments as Record<string, unknown>
-          : {};
-        let denied = capability
-          ? policyDenied(capability, capabilityArgs, tc.arguments.approved, policy, outboundLimiter)
-            ?? sideEffectDenied(capability, tc.arguments.approved)
-          : null;
-
-        // Vai kiểm độc lập, chạy TRƯỚC khi hành động chạy — trong phiên riêng
-        // và không cầm công cụ nào. Chỉ bật khi người dùng đã yêu cầu, vì nó
-        // tốn thêm một lượt gọi model cho mỗi hành động.
-        if (capability && !denied && policy.verifySideEffects && capability.side_effect) {
-          const action = {
-            name: capability.name,
-            summary: capability.summary,
-            args: capabilityArgs,
-            goal: prompt,
-          };
-          const decision = await verifyAction(config.provider, action);
-          if (decision.verdict !== 'DUYET') {
-            log(`Người kiểm không duyệt ${capability.name}: ${decision.reason}`);
-            denied = {
-              tool_call_id: tc.id,
-              is_error: true,
-              content: refusalMessage(action, decision),
-            };
-          }
-        }
-
-        if (!capability) {
-          result = { tool_call_id: tc.id, content: `Unknown capability: ${capabilityName}`, is_error: true };
-        } else if (denied) {
-          result = denied;
-        } else if (capability.kind === 'builtin') {
-          result = await executeBuiltinTool(capability.name, capabilityArgs);
-        } else if (capability.kind === 'mcp') {
-          result = await mcpManager.executeTool(capability.name, capabilityArgs) ?? {
-            tool_call_id: tc.id,
-            content: `Error: MCP tool "${capability.name}" failed to execute or server not found`,
-            is_error: true,
-          };
-        } else {
-          result = await executeTool(capability.name, capabilityArgs);
-        }
+        // `execute_capability` chỉ là lớp bọc: tên thật và tham số thật nằm bên
+        // trong, còn cửa chính sách thì vẫn là một cửa duy nhất bên dưới.
+        const inner = typeof tc.arguments.name === 'string' ? tc.arguments.name : '';
+        const innerArgs =
+          tc.arguments.arguments && typeof tc.arguments.arguments === 'object'
+            ? (tc.arguments.arguments as Record<string, unknown>)
+            : {};
+        result = tools.get(inner)
+          ? await tools.execute(inner, innerArgs, {
+              approved: tc.arguments.approved === true,
+              goal: prompt,
+            })
+          : { tool_call_id: tc.id, content: `Unknown capability: ${inner}`, is_error: true };
+      } else if (tools.get(tc.name)) {
+        // Gọi thẳng tên tool. Trước đây nhánh này rẽ theo `kind` rồi tự nhớ gọi
+        // hai hàm chính sách theo đúng thứ tự; quên một chỗ là thủng một lỗ.
+        // Nay mọi thứ đi chung một cửa `tools.execute`, kể cả tool do plugin
+        // chưa viết đăng ký sau này.
+        result = await tools.execute(tc.name, tc.arguments, {
+          approved: tc.arguments.approved === true,
+          goal: prompt,
+        });
       } else if (hasBuiltinTool(tc.name)) {
         result = await executeBuiltinTool(tc.name, tc.arguments);
       } else if (tc.name.includes('__')) {

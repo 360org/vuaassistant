@@ -100,7 +100,7 @@ const stubProvider = {
 };
 
 const fired = await runDueTasks(
-  { provider: stubProvider, providerName: 'stub', agentId: 'default', systemContext: { instructions: '' } },
+  { provider: stubProvider, providerName: 'stub', agentId: 'default', systemContext: { instructions: '' }, tools: (await (await import('../src/kernel/compose.ts')).composeRunner()).root.tools },
   at9,
 );
 check('the due task fired', fired.length === 1 && fired[0] === 'run1');

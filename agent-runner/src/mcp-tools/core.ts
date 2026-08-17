@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { getMessageIdBySeq, getRoutingBySeq, writeMessageOut } from '../db/index.js';
 import { findByName, getAllDestinations } from '../destinations.js';
+import type { ToolPolicy } from '../kernel/tools.js';
 import type { ToolDefinition } from '../providers/types.js';
 import { getBuiltinToolContext } from './context.js';
 
@@ -13,7 +14,7 @@ const OUTBOX_ROOT = process.env.VUA_AGENT_WORKSPACE
   ? path.resolve(process.env.VUA_AGENT_WORKSPACE, '..', 'outbox')
   : path.resolve(process.env.VUA_DATA_DIR || '/tmp/vuaassistant', 'outbox');
 
-export interface BuiltinTool {
+export interface BuiltinTool extends ToolPolicy {
   definition: ToolDefinition;
   execute(args: Record<string, unknown>): Promise<string>;
 }
@@ -66,6 +67,9 @@ function routingFor(args: Record<string, unknown>) {
 }
 
 const sendMessage: BuiltinTool = {
+  // Gửi tin ra kênh thật cho người khác đọc.
+  sideEffect: true,
+  requiresApproval: true,
   definition: {
     name: 'send_message',
     description: 'Send a chat message to the current conversation, or to an explicitly provided routing destination.',
@@ -96,6 +100,9 @@ const sendMessage: BuiltinTool = {
 };
 
 const sendFile: BuiltinTool = {
+  // Gửi tệp ra ngoài — không rút lại được.
+  sideEffect: true,
+  requiresApproval: true,
   definition: {
     name: 'send_file',
     description: 'Send a workspace file to the current conversation. Files outside the assigned workspace are never accessible.',
@@ -135,6 +142,9 @@ function messageRouting(seq: number) {
 }
 
 const editMessage: BuiltinTool = {
+  // Sửa tin đã gửi; người nhận có thể đã đọc bản cũ.
+  sideEffect: true,
+  requiresApproval: true,
   definition: {
     name: 'edit_message',
     description: 'Request an edit to an outbound message previously sent by this runner.',
@@ -156,6 +166,9 @@ const editMessage: BuiltinTool = {
 };
 
 const addReaction: BuiltinTool = {
+  // Hiện ra ở phía người nhận.
+  sideEffect: true,
+  requiresApproval: true,
   definition: {
     name: 'add_reaction',
     description: 'Add an emoji reaction to a previously sent or received message by sequence number.',
@@ -177,6 +190,9 @@ const addReaction: BuiltinTool = {
 };
 
 const askUserQuestion: BuiltinTool = {
+  // Có gửi tin ra kênh nên là tác dụng phụ, nhưng KHÔNG được bắt duyệt: chính nó là cửa để xin duyệt, bắt duyệt nữa thì khoá chết lẫn nhau.
+  sideEffect: true,
+  requiresApproval: false,
   definition: {
     name: 'ask_user_question',
     description: 'Ask the user a clarifying question during task execution and pause the runner until a response is received.',
@@ -217,6 +233,9 @@ const askUserQuestion: BuiltinTool = {
 };
 
 const scheduleMessage: BuiltinTool = {
+  // Hẹn giờ gửi ra ngoài — hậu quả y như gửi ngay, chỉ chậm hơn.
+  sideEffect: true,
+  requiresApproval: true,
   definition: {
     name: 'schedule_message',
     description: 'Schedule a message or task to run periodically or at a specific time.',
@@ -271,6 +290,9 @@ const scheduleMessage: BuiltinTool = {
 };
 
 const listScheduled: BuiltinTool = {
+  // Chỉ liệt kê lịch đã đặt.
+  sideEffect: false,
+  requiresApproval: false,
   definition: {
     name: 'list_scheduled',
     description: 'List all active and inactive scheduled tasks.',
@@ -300,6 +322,9 @@ const listScheduled: BuiltinTool = {
 };
 
 const cancelScheduled: BuiltinTool = {
+  // Huỷ lịch của chính mình; không gửi gì ra ngoài.
+  sideEffect: true,
+  requiresApproval: false,
   definition: {
     name: 'cancel_scheduled',
     description: 'Cancel (delete) a scheduled task by ID or name.',

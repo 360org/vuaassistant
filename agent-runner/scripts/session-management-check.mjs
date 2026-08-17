@@ -9,6 +9,9 @@ process.env.VUA_IPC_DIR = dir;
 
 const { runPollLoop } = await import('../src/poll-loop.ts');
 const { createInboundSchema, closeAll } = await import('../src/db/connection.ts');
+// Dựng sổ tool SAU khi VUA_IPC_DIR đã trỏ vào thư mục tạm — module tool đọc
+// biến môi trường ngay lúc nạp, nên nạp sớm là mở nhầm thư mục dữ liệu thật.
+const sharedTools = (await (await import('../src/kernel/compose.ts')).composeRunner()).root.tools;
 
 createInboundSchema();
 const inboundPath = path.join(dir, 'inbound.db');
@@ -58,6 +61,7 @@ async function startRunner() {
     providerName: 'mock-stateless',
     agentId: 'agent-a',
     systemContext: { instructions: 'test' },
+    tools: sharedTools,
     signal: controller.signal,
   });
   return async () => {

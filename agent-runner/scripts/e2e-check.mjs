@@ -63,6 +63,7 @@ const loop = runPollLoop({
   provider,
   providerName: 'mock',
   systemContext: { instructions: 'You are a test.' },
+  tools: (await (await import('../src/kernel/compose.ts')).composeRunner()).root.tools,
   signal: controller.signal,
 });
 

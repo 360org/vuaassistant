@@ -86,6 +86,7 @@ const config = {
   agentId: 'default',
   dataDir: dir,
   systemContext: { instructions: '' },
+  tools: (await (await import('../src/kernel/compose.ts')).composeRunner()).root.tools,
 };
 
 // Helper to manually run one runner turn (read inbound -> LLM -> write outbound)

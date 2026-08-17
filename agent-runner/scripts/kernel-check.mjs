@@ -264,6 +264,62 @@ console.log('\n── 6. Trường nội bộ không được lọt ra model ─
     dup !== null && dup.includes('file_write'));
 }
 
+// ===========================================================================
+console.log('\n── 7. Thứ tự bọc: lớp đắt tiền phải nằm TRONG lớp rẻ ──────────');
+// ===========================================================================
+{
+  // Vai kiểm tốn một lượt gọi model mỗi lần chạy; chính sách thì miễn phí. Nếu
+  // vai kiểm bọc ngoài chính sách thì một hành động chắc chắn bị chặn vẫn kịp
+  // tốn tiền người dùng. Kernel quy định "đăng ký sau bọc ngoài", nên vai kiểm
+  // phải nạp TRƯỚC chính sách — compose.ts dựa vào đúng luật này.
+  const kernel = createKernel();
+  await kernel.use(toolsPlugin);
+  let verifierCalled = 0;
+  await kernel.use({
+    name: 'vai-kiem-gia', dependencies: ['tools'],
+    setup(ctx) {
+      ctx.effect(ctx.intercept('tools/pre-execute', async (_p, next) => {
+        verifierCalled += 1; return next();
+      }));
+    },
+  });
+  await kernel.use({
+    name: 'chinh-sach-gia', dependencies: ['tools'],
+    setup(ctx) {
+      ctx.effect(ctx.intercept('tools/pre-execute', async () => ({
+        tool_call_id: '', content: 'chặn', is_error: true,
+      })));
+    },
+  });
+  kernel.root.tools.register(toolStub('gui_tien', { sideEffect: true }), 'native');
+  await kernel.root.tools.execute('gui_tien', {});
+  check('chính sách chặn trước ⇒ vai kiểm không tốn lượt gọi model nào', verifierCalled === 0);
+
+  // ĐẢO NGƯỢC: nạp ngược thứ tự thì vai kiểm bị gọi dù hành động sẽ bị chặn.
+  const wrong = createKernel();
+  await wrong.use(toolsPlugin);
+  let wrongCalled = 0;
+  await wrong.use({
+    name: 'chinh-sach-gia', dependencies: ['tools'],
+    setup(ctx) {
+      ctx.effect(ctx.intercept('tools/pre-execute', async () => ({
+        tool_call_id: '', content: 'chặn', is_error: true,
+      })));
+    },
+  });
+  await wrong.use({
+    name: 'vai-kiem-gia', dependencies: ['tools'],
+    setup(ctx) {
+      ctx.effect(ctx.intercept('tools/pre-execute', async (_p, next) => {
+        wrongCalled += 1; return next();
+      }));
+    },
+  });
+  wrong.root.tools.register(toolStub('gui_tien', { sideEffect: true }), 'native');
+  await wrong.root.tools.execute('gui_tien', {});
+  check('ĐẢO NGƯỢC: nạp sai thứ tự thì vai kiểm tốn tiền oan (đúng như dự đoán)', wrongCalled === 1);
+}
+
 console.log(
   pass
     ? '\n✓ lớp plugin đạt: effect gỡ sạch, dịch vụ dùng chung, thác nước chặn được, tool tự khai tính chất'
