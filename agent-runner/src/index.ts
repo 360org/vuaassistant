@@ -2,8 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import { loadConfig } from './config.js';
 import { ensureIpcDir, setMaxMessagesPerPrompt } from './db/index.js';
-// Import providers barrel — each adapter self-registers on import
-import './providers/index.js';
 import { createProvider, type ProviderName } from './providers/factory.js';
 import { runPollLoop } from './poll-loop.js';
 import { startScheduler } from './scheduler/index.js';
@@ -67,7 +65,7 @@ async function main(): Promise<void> {
 
   // Cây plugin dựng ở một chỗ duy nhất (kernel/compose.ts) để bài test kiểm
   // đúng thứ người dùng chạy, không phải một hình thù chỉ có trong test.
-  const kernel = await composeRunner({ provider, log });
+  const kernel = await composeRunner({ provider, providerName, log });
   log(`Plugin đã nạp: ${kernel.loaded.join(', ')}`);
   log(`Tool đã đăng ký: ${kernel.root.tools.list().length}`);
 

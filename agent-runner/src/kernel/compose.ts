@@ -14,6 +14,12 @@ import { toolsPlugin } from './tools.js';
 import { promptPlugin, toolListSectionPlugin } from './prompt.js';
 import { coreInvariantsPlugin, invariantsPlugin } from './invariants.js';
 import { modelVisibleInvariantPlugin, modelVisiblePlugin } from './model-visible.js';
+import { createProvidersPlugin } from './providers-plugin.js';
+// Nạp adapter model. Đây là import CÓ TÁC DỤNG PHỤ: mỗi adapter tự ghi tên vào
+// sổ khi module chạy. Để ở đây, cạnh chỗ dựng cây, chứ không nằm lẻ trong
+// index.ts — xoá nhầm một dòng import trông vô hại thì mất luôn một nhà cung
+// cấp. Invariant `providers` sẽ nổ ngay nếu dòng này biến mất.
+import '../providers/index.js';
 import { createPolicyPlugin } from './policy-plugin.js';
 import { createVerifierPlugin } from './verifier-plugin.js';
 import { nativeToolsPlugin } from '../native-tools/index.js';
@@ -26,6 +32,8 @@ export interface ComposeOptions {
   provider?: AgentProvider;
   /** Bỏ trống thì đọc từ tệp luật. */
   policy?: Policy;
+  /** Tên nhà cung cấp trong cấu hình, để invariant khẳng định nó có mặt thật. */
+  providerName?: string;
   log?: (message: string) => void;
 }
 
@@ -50,6 +58,7 @@ export async function composeRunner(options: ComposeOptions = {}): Promise<Kerne
   await kernel.use(invariantsPlugin);
   await kernel.use(coreInvariantsPlugin);
   await kernel.use(modelVisibleInvariantPlugin);
+  await kernel.use(createProvidersPlugin({ configured: options.providerName }));
 
   // Vai kiểm chỉ có nghĩa khi có provider để hỏi.
   if (options.provider) {
