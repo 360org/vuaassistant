@@ -12,6 +12,7 @@
 import { createKernel, type Kernel } from './runtime.js';
 import { toolsPlugin } from './tools.js';
 import { promptPlugin, toolListSectionPlugin } from './prompt.js';
+import { coreInvariantsPlugin, invariantsPlugin } from './invariants.js';
 import { createPolicyPlugin } from './policy-plugin.js';
 import { createVerifierPlugin } from './verifier-plugin.js';
 import { nativeToolsPlugin } from '../native-tools/index.js';
@@ -44,6 +45,8 @@ export async function composeRunner(options: ComposeOptions = {}): Promise<Kerne
   await kernel.use(builtinToolsPlugin);
   await kernel.use(promptPlugin);
   await kernel.use(toolListSectionPlugin);
+  await kernel.use(invariantsPlugin);
+  await kernel.use(coreInvariantsPlugin);
 
   // Vai kiểm chỉ có nghĩa khi có provider để hỏi.
   if (options.provider) {
@@ -58,5 +61,13 @@ export async function composeRunner(options: ComposeOptions = {}): Promise<Kerne
 
   await kernel.use(createPolicyPlugin({ policy, limiter: new OutboundLimiter(policy) }));
   await kernel.start();
+
+  // Kiểm ngay lúc dựng xong, trên chính cây plugin vừa lắp. Vi phạm thì nổ ở
+  // đây — chỗ dễ tìm nhất — thay vì lòi ra thành hành vi lạ sau này.
+  const ran = await kernel.root.invariants.verify();
+  if (ran === 0) {
+    throw new Error('sổ invariant rỗng: không có lời khẳng định nào chạy, nên "đạt" ở đây vô nghĩa');
+  }
+
   return kernel;
 }
