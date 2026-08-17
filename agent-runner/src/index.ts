@@ -87,6 +87,7 @@ async function main(): Promise<void> {
     agentDir,
     systemContext: { instructions },
     tools: kernel.root.tools,
+    ctx: kernel.root,
   };
 
   // Scheduled tasks live here, not in the webview: closing the app window must

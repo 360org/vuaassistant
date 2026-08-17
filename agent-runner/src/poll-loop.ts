@@ -48,6 +48,9 @@ import { DEFAULT_LIMITS, checkLoop, type Attempt, type GuardLimits } from './loo
 import { estimateTokens, pruneHistory } from './context-prune.js';
 import type { AgentProvider, ProviderEvent, ChatMessage, ToolCall, ToolResult } from './providers/types.js';
 import type { ToolRegistry } from './kernel/tools.js';
+import type { Context } from './kernel/types.js';
+import type { TurnOutcome } from './kernel/loop-events.js';
+import './kernel/loop-events.js';
 
 const POLL_INTERVAL_MS = 1000;
 const ACTIVE_POLL_INTERVAL_MS = 500;
@@ -85,6 +88,11 @@ export interface PollLoopConfig {
    * Vòng lặp chỉ điều phối; luật nằm ở các lớp cắm vào `tools/pre-execute`.
    */
   tools: ToolRegistry;
+  /**
+   * Ngữ cảnh kernel, để vòng lặp công bố các mốc `turn/*` và `step/*`. Bỏ
+   * trống thì không ai nghe — tiện cho bài test chỉ quan tâm phần khác.
+   */
+  ctx?: Context;
 }
 
 /**
@@ -359,13 +367,24 @@ export async function executeAgentLoop(
   const policy = readPolicy();
   const outboundLimiter = new OutboundLimiter(policy);
 
+  const events = config.ctx;
+  await events?.emit('turn/start', { agentId: config.agentId ?? 'default', goal: prompt });
+  // Lượt phải được đóng trên MỌI lối ra, kể cả lối bị phanh cắt ngang. Dùng
+  // `finally` chứ không rải lời gọi ở từng chỗ `return`: rải tay thì thêm một
+  // lối ra mới là quên một chỗ, và không có gì bắt được cái quên đó.
+  let outcome: TurnOutcome = 'max-steps';
+  let steps = 0;
+  try {
   for (let iteration = 0; iteration < MAX_TOOL_ITERATIONS; iteration++) {
+    steps = iteration + 1;
+    await events?.emit('step/start', { index: iteration });
     // Phanh chạy TRƯỚC mỗi vòng: trần số vòng không đủ để chặn cảnh agent gọi
     // một tool hỏng rồi lặp lại y hệt cho tới hết 25 vòng — người dùng trả tiền
     // 25 lượt gọi model để nhận về đúng một thông báo lỗi.
     const verdict = checkLoop(attempts, iteration, LOOP_LIMITS);
     if (verdict.action === 'stop') {
       log(`Dừng vòng lặp sớm (${verdict.reason}) sau ${attempts.length} lần gọi công cụ`);
+      outcome = 'loop-guard';
       return { text: verdict.message, continuation: sessionContinuation, tokensEstimate };
     }
 
@@ -446,6 +465,8 @@ export async function executeAgentLoop(
     // If no tool calls, this is the final answer
     if (toolCalls.length === 0) {
       finalText = resultText;
+      outcome = 'completed';
+      await events?.emit('step/end', { index: iteration, toolCalls: 0 });
       break;
     }
 
@@ -520,6 +541,7 @@ export async function executeAgentLoop(
       });
 
       log(`Tool result (${tc.name}): ${result.content.slice(0, 200)}...`);
+      await events?.emit('tool/result', { call: tc, result });
 
       // Ghi vào sổ để phanh vòng lặp có căn cứ ở vòng sau. `is_error` là tín
       // hiệu chính; một số tool báo hỏng ngay trong nội dung nên bắt thêm.
@@ -535,10 +557,13 @@ export async function executeAgentLoop(
         result.content.includes('APPROVAL_REQUIRED:') ||
         result.content.startsWith('INTERACTIVE_QUESTION_PENDING:')
       ) {
+        // Dừng để hỏi người dùng là kết thúc bình thường, không phải chạm trần.
+        outcome = 'completed';
         return { text: result.content, continuation: sessionContinuation, tokensEstimate };
       }
     }
 
+    await events?.emit('step/end', { index: iteration, toolCalls: toolCalls.length });
     // Continue loop — LLM will see tool results and decide next action
     currentPrompt = ''; // No new user prompt, just tool results
   }
@@ -548,4 +573,12 @@ export async function executeAgentLoop(
     continuation: sessionContinuation,
     tokensEstimate,
   };
+  } finally {
+    await events?.emit('turn/end', {
+      agentId: config.agentId ?? 'default',
+      outcome,
+      steps,
+      tokensEstimate,
+    });
+  }
 }
