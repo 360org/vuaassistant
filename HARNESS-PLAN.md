@@ -1,7 +1,8 @@
 # Kế hoạch dựng lại kiến trúc Harness cho VuaAssistant
 
 > **Ngày:** 2026-08-17 · **Nguồn tham chiếu:** [deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness) (MIT)
-> **Trạng thái:** đề xuất — chờ Sếp chốt hướng trước khi bắt tay.
+> **Trạng thái:** đang làm — hướng đã chốt (lấy ý "everything is a plugin", KHÔNG lấy Cordis).
+> **Tiến độ:** 2/8 chặng xong · `main` @ `705a538`
 
 ---
 
@@ -108,15 +109,27 @@ của họ (registry là effect, đăng ký trả về disposer, không hardcode
 
 ---
 
-## 4. Ba chặng đề nghị
+## 4. Lộ trình 8 chặng
 
-| Chặng | Việc | Đụng vào | Rủi ro |
+Mỗi chặng đẩy lên `main` riêng, và giữa hai lần đẩy app vẫn phải mở lên dùng được.
+
+| # | Chặng | Trạng thái | Đụng vào |
 |---|---|---|---|
-| **A** | Tool tự khai `sideEffect`/`requiresApproval`; rail bỏ regex; MCP không khai → mặc định phải hỏi | `capability-rail.ts`, `providers/types.ts`, `native-tools/`, `mcp-tools/` | Thấp |
-| **B** | Sự kiện session append-only; mọi thứ model thấy đều phải có trong log; thêm invariant + gate kiểm chứng | `poll-loop.ts`, `db/`, `context-prune.ts`, `knowledge/` | Vừa |
-| **C** | Tách `turn`/`step` thành điểm mở rộng có kiểu; `poll-loop.ts` co lại còn phần điều phối | `poll-loop.ts` và mọi thứ cắm vào nó | Cao |
+| 01 | Kernel: plugin, effect, sự kiện có kiểu | ✅ `2dad0ff` | `src/kernel/` — 550 dòng |
+| 02 | 13 tool native tự khai tính chất | ✅ `705a538` | `native-tools/index.ts` |
+| 03 | `capability-rail` thành plugin trên `tools/pre-execute` | ▸ đang tới | `capability-rail.ts` 157 dòng |
+| 04 | Boot thành composition plugin | ○ chờ 03 | `index.ts`, `scheduler/`, `channels/` |
+| 05 | Tách `turn`/`step` thành điểm mở rộng | ○ chờ 04 | `poll-loop.ts` 563 dòng |
+| 06 | Prompt lắp từ tool đã đăng ký thật | ○ chờ 05 | `buildSystemPrompt` → `ctx.prompt` |
+| 07 | Sổ phiên append-only + invariant | ○ chờ 05 | `db/`, `context-prune.ts`, `knowledge/` |
+| 08 | Lan ra ngoài runner | ○ cuối | `ai-router/`, `src-tauri/`, `src/` |
 
-Chặng A độc lập và có ích dù sau này Sếp chọn hướng nào — nên làm trước tiên trong mọi trường hợp.
+**Chặng 03 là chặng đổi hành vi thật:** từ đó `computer_use` bắt đầu hỏi trước khi điều
+khiển chuột và bàn phím. Phải báo trước cho người dùng, không lặng lẽ đổi.
+
+**Chặng 06 vá một lỗi lệch đang có thật:** `buildSystemPrompt` liệt kê tool bằng văn xuôi
+viết tay — nói với model là có **9 tool** trong khi đăng ký **13**. Bốn tool `vault_list`,
+`search_memory`, `computer_use`, `delegate_task` model không được cho biết là có.
 
 ---
 
