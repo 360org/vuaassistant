@@ -10,6 +10,8 @@ import path from 'path';
 import { loadConfig } from '../config.js';
 import { readMemory } from '../memory/self-improve.js';
 import type { ToolDefinition, ToolResult } from '../providers/types.js';
+import type { Context, Plugin } from '../kernel/types.js';
+import type { ToolPolicy } from '../kernel/tools.js';
 
 function log(msg: string): void {
   console.error(`[native-tools] ${msg}`);
@@ -135,14 +137,26 @@ function workspacePath(input: string): string {
   return resolved;
 }
 
-/** A native tool with its definition and executor */
-export interface NativeTool {
+/**
+ * A native tool with its definition and executor.
+ *
+ * `sideEffect` và `requiresApproval` là **bắt buộc**, không có mặc định. Trước
+ * đây capability-rail đoán hai giá trị này bằng regex khớp vào tên tool, và sai
+ * cả hai chiều: `computer_use` (điều khiển chuột và bàn phím của người dùng) bị
+ * xếp là vô hại, còn `read_messages` chỉ đọc lại bị bắt duyệt. Bắt khai tại chỗ
+ * định nghĩa nghĩa là thêm tool mới mà quên khai thì **không biên dịch được** —
+ * người viết tool là người biết rõ nhất tool đó làm gì.
+ */
+export interface NativeTool extends ToolPolicy {
   definition: ToolDefinition;
   execute(args: Record<string, unknown>): Promise<string>;
 }
 
 // --- FileRead Tool ---
 const fileReadTool: NativeTool = {
+  // Chỉ đọc, và đã bị chặn trong workspace bởi assertInsideWorkspace.
+  sideEffect: false,
+  requiresApproval: false,
   definition: {
     name: 'file_read',
     description: 'Read the contents of a file from the filesystem.',
@@ -244,6 +258,9 @@ print(read_xlsx(sys.argv[1]))
 
 // --- FileWrite Tool ---
 const fileWriteTool: NativeTool = {
+  // Ghi tệp là đổi thế giới thật, nhưng ghi trong workspace là việc chính của agent nên không chặn từng lần.
+  sideEffect: true,
+  requiresApproval: false,
   definition: {
     name: 'file_write',
     description: 'Write content to a file. Creates parent directories if needed.',
@@ -280,6 +297,9 @@ const fileWriteTool: NativeTool = {
 
 // --- FileEdit Tool ---
 const fileEditTool: NativeTool = {
+  // Như file_write: sửa tệp trong workspace là việc thường ngày.
+  sideEffect: true,
+  requiresApproval: false,
   definition: {
     name: 'file_edit',
     description: 'Search and replace text in a file. Finds exact matches of old_text and replaces with new_text.',
@@ -313,6 +333,9 @@ const fileEditTool: NativeTool = {
 
 // --- Grep Tool ---
 const grepTool: NativeTool = {
+  // Chỉ đọc nội dung tệp.
+  sideEffect: false,
+  requiresApproval: false,
   definition: {
     name: 'grep',
     description: 'Search file contents using ripgrep-style pattern matching. Returns matching lines with file paths and line numbers.',
@@ -357,6 +380,9 @@ const grepTool: NativeTool = {
 
 // --- Glob Tool ---
 const globTool: NativeTool = {
+  // Chỉ liệt kê đường dẫn.
+  sideEffect: false,
+  requiresApproval: false,
   definition: {
     name: 'glob',
     description: 'List files matching a glob pattern.',
@@ -390,6 +416,9 @@ const globTool: NativeTool = {
 
 // --- HTTP Request Tool ---
 const httpRequestTool: NativeTool = {
+  // Cho phép cả POST/PUT/DELETE nên có tác dụng phụ thật; hạn mức mỗi giờ do OutboundLimiter giữ, không hỏi từng lần. Lối đoán theo tên cũ xếp nhầm tool này là vô hại.
+  sideEffect: true,
+  requiresApproval: false,
   definition: {
     name: 'http_request',
     description: 'Make an unauthenticated HTTP request. Credentialed operations must use an installed connector or gateway capability.',
@@ -444,6 +473,9 @@ function decodeHtml(value: string): string {
 
 // --- Web Search Tool ---
 const webSearchTool: NativeTool = {
+  // Chỉ tra cứu, không để lại dấu vết ở đâu.
+  sideEffect: false,
+  requiresApproval: false,
   definition: {
     name: 'web_search',
     description: 'Search the public web. Returns titles, links, and snippets from web results. Use http_request to read a selected public page.',
@@ -486,6 +518,9 @@ const webSearchTool: NativeTool = {
 
 // --- Credentialed Connector Gateway Tool ---
 const connectorRequestTool: NativeTool = {
+  // Dùng credential thật và gửi dữ liệu ra ngoài — đúng loại phải hỏi trước.
+  sideEffect: true,
+  requiresApproval: true,
   definition: {
     name: 'connector_request',
     description: 'Call the origin bound to a Vault reference. Use opaque {{credential:field}} variables; secret values are resolved and redacted by the trusted gateway.',
@@ -527,6 +562,9 @@ const connectorRequestTool: NativeTool = {
 
 // --- Vault List Tool ---
 const vaultListTool: NativeTool = {
+  // Chỉ liệt kê TÊN credential, không trả về giá trị.
+  sideEffect: false,
+  requiresApproval: false,
   definition: {
     name: 'vault_list',
     description: 'List the names (labels) and services of all credentials stored in your secure Vault. Use this to discover which credentials are available before making API requests or using placeholders.',
@@ -574,6 +612,9 @@ interface ScheduleInput {
 }
 
 const scheduleTaskTool: NativeTool = {
+  // Tạo tác vụ sẽ tự chạy sau này; ghi vào lịch của người dùng nhưng chưa gây hậu quả ra ngoài.
+  sideEffect: true,
+  requiresApproval: false,
   definition: {
     name: 'schedule_task',
     description:
@@ -665,6 +706,9 @@ const scheduleTaskTool: NativeTool = {
 };
 
 const searchMemoryTool: NativeTool = {
+  // Chỉ đọc bộ nhớ của chính agent.
+  sideEffect: false,
+  requiresApproval: false,
   definition: {
     name: 'search_memory',
     description: 'Search the agent long-term learned memory for durable user preferences, facts, and execution learnings.',
@@ -706,6 +750,9 @@ const searchMemoryTool: NativeTool = {
 // tool list. Upgrade path: split per-action when capability-rail needs
 // per-action gates (e.g. allow screenshot but not keyboard).
 const computerUseTool: NativeTool = {
+  // Điều khiển chuột, bàn phím và chụp màn hình THẬT của người dùng. Lối đoán theo tên cũ xếp tool này là vô hại — sai nguy hiểm nhất trong cả bảng.
+  sideEffect: true,
+  requiresApproval: true,
   definition: {
     name: 'computer_use',
     description:
@@ -811,6 +858,9 @@ const computerUseTool: NativeTool = {
 // ponytail: writes to messages_in directly using the same DB the host uses.
 // Upgrade path: full DAG parentTaskId tracking in a separate task_tree table.
 const delegateTaskTool: NativeTool = {
+  // Sinh ra một agent con chạy tiếp; bản thân việc giao việc chưa gửi gì ra ngoài, tool con vẫn đi qua đúng cửa này.
+  sideEffect: true,
+  requiresApproval: false,
   definition: {
     name: 'delegate_task',
     description:
@@ -929,3 +979,30 @@ export async function executeTool(name: string, args: Record<string, unknown>): 
     };
   }
 }
+
+/**
+ * Plugin cắm toàn bộ tool native vào `ctx.tools`.
+ *
+ * Đi qua `executeTool` chứ không gọi thẳng `tool.execute`, để giữ nguyên nhật
+ * ký kiểm toán (`.audit/tool_calls.log`) và cách bọc lỗi hiện có — chuyển sang
+ * kiến trúc plugin không được làm mất hai thứ đó.
+ */
+export const nativeToolsPlugin: Plugin = {
+  name: 'native-tools',
+  dependencies: ['tools'],
+  setup(ctx: Context) {
+    for (const tool of NATIVE_TOOLS) {
+      ctx.tools.register(
+        {
+          name: tool.definition.name,
+          description: tool.definition.description,
+          input_schema: tool.definition.input_schema,
+          sideEffect: tool.sideEffect,
+          requiresApproval: tool.requiresApproval,
+          execute: (args) => executeTool(tool.definition.name, args),
+        },
+        'native',
+      );
+    }
+  },
+};
