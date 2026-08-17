@@ -345,19 +345,36 @@ export async function executeAgentLoop(
   // RAG: ground the answer in this role's own documents. Done here rather than
   // in the webview so chat, Telegram and scheduled tasks all get it — the
   // webview could only ever ground the turns it handled itself.
-  let groundedContext = systemContext;
+  const events = config.ctx;
+  // Mở lượt TRƯỚC khi chèn thêm ngữ cảnh: nạp tri thức đã là việc của lượt này,
+  // và sổ `modelVisible` xoá theo `turn/start` — mở lượt sau lúc ghi thì xoá mất
+  // đúng thứ vừa ghi, model vẫn nhận đủ nhưng sổ rỗng.
+  await events?.emit('turn/start', { agentId: config.agentId ?? 'default', goal: prompt });
+
+  // Phần thêm vào phải đi qua sổ `modelVisible`, không nối chuỗi thẳng: nối
+  // thẳng thì lượt đó model được xem thêm những gì sẽ không còn dấu vết nào,
+  // và câu hỏi "sao nó trả lời kỳ vậy" thành không trả lời được.
+  const ledger = config.ctx?.modelVisible;
+  ledger?.reset();
   try {
     const excerpts = retrieveKnowledge(config.agentId, prompt);
     if (excerpts.length > 0) {
       log(`Grounding on ${excerpts.length} excerpt(s) from the role's documents`);
-      groundedContext = {
-        ...systemContext,
-        instructions: systemContext.instructions + formatExcerpts(excerpts),
-      };
+      ledger?.record({ source: 'knowledge', text: formatExcerpts(excerpts) });
+      if (!ledger) {
+        // Không có kernel (bài test cũ) thì giữ nguyên lối cũ để không đổi hành vi.
+        systemContext = {
+          ...systemContext,
+          instructions: systemContext.instructions + formatExcerpts(excerpts),
+        };
+      }
     }
   } catch (error) {
     log(`Knowledge lookup skipped: ${error instanceof Error ? error.message : String(error)}`);
   }
+  const groundedContext = ledger
+    ? { ...systemContext, instructions: ledger.assemble(systemContext.instructions) }
+    : systemContext;
 
   // Sổ lần thử, nuôi phanh vòng lặp bên dưới. Giữ trong bộ nhớ theo từng lượt.
   const attempts: Attempt[] = [];
@@ -367,8 +384,6 @@ export async function executeAgentLoop(
   const policy = readPolicy();
   const outboundLimiter = new OutboundLimiter(policy);
 
-  const events = config.ctx;
-  await events?.emit('turn/start', { agentId: config.agentId ?? 'default', goal: prompt });
   // Lượt phải được đóng trên MỌI lối ra, kể cả lối bị phanh cắt ngang. Dùng
   // `finally` chứ không rải lời gọi ở từng chỗ `return`: rải tay thì thêm một
   // lối ra mới là quên một chỗ, và không có gì bắt được cái quên đó.
