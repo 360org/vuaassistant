@@ -10,6 +10,7 @@ pub mod agent_fs;
 pub mod auth;
 pub mod computer_action;
 pub mod knowledge;
+pub mod migrate;
 pub mod runtime;
 #[cfg(feature = "sandbox")]
 pub mod sandbox;
@@ -595,6 +596,21 @@ pub fn run() {
                 Ok(value) => std::path::PathBuf::from(value),
                 Err(_) => runtime::resolve_project_dir(app.path().resource_dir()?),
             };
+            // Đổi identifier ở v1.1.59 làm app đọc/ghi ở thư mục hoàn toàn mới.
+            // Chuyển dữ liệu của bản cũ sang TRƯỚC khi mở Vault, nếu không thì
+            // Vault tạo tệp mới ở chỗ mới và từ đó không còn gì để chuyển nữa.
+            std::fs::create_dir_all(&dir)?;
+            match migrate::migrate_data_dir(&dir) {
+                Ok(migrate::Outcome::Migrated(files)) => {
+                    eprintln!("[vuaassistant] đã chuyển {files} tệp dữ liệu từ bản cũ sang {}", dir.display());
+                }
+                Ok(_) => {}
+                // Chuyển hỏng KHÔNG được làm app không mở lên được: dữ liệu cũ
+                // vẫn còn nguyên bên kia (chỉ copy, không move), nên cách đúng là
+                // báo rồi chạy tiếp với thư mục trống.
+                Err(error) => eprintln!("[vuaassistant] không chuyển được dữ liệu bản cũ: {error}"),
+            }
+
             vault::migrate_legacy_vault(&dir).map_err(std::io::Error::other)?;
             let broker = vault::start_broker(dir.clone()).map_err(std::io::Error::other)?;
             let runtime = Runtime::new(dir, project_dir, broker).map_err(std::io::Error::other)?;

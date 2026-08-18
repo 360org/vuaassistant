@@ -128,6 +128,11 @@ jobs:
       - name: Loopback OAuth contract test
         working-directory: src-tauri
         run: cargo run --example oauth_loopback_check
+      # Đổi identifier ở v1.1.59 làm app đọc/ghi ở thư mục khác; không chuyển
+      # dữ liệu thì người dùng nâng cấp mất sạch Vault, kết nối và lịch sử chat.
+      - name: Kiểm chuyển dữ liệu khi đổi identifier
+        working-directory: src-tauri
+        run: cargo run --example migrate_check
       # Optional WASM code-sandbox (off by default for a light build).
       - name: WASM sandbox contract test
         working-directory: src-tauri
