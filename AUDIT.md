@@ -44,7 +44,7 @@ sự thật duy nhất. Kiểm chứng đảo ngược: đặt identifier thành
 thì bài test đi theo đúng `.../com.test.sentinel/runtime`, chứng minh nó thật sự
 đọc tệp cấu hình chứ không trùng chuỗi ngẫu nhiên.
 
-### 2. Đổi `identifier` = xoá sổ dữ liệu người dùng cũ — CHƯA SỬA
+### 2. Đổi `identifier` = xoá sổ dữ liệu người dùng cũ — ĐÃ SỬA ở `da11837`
 
 Cùng lần đổi tên đó, app từ v1.1.59 trở đi đọc/ghi ở thư mục hoàn toàn mới:
 
@@ -59,9 +59,13 @@ mất kết nối nhà cung cấp, mất lịch sử chat, mất tác vụ hẹn
 `vault::migrate_legacy_vault` **không** giải quyết chuyện này — nó chỉ nâng cấp
 định dạng mã hoá (`v2:`) *bên trong* một thư mục, không chuyển giữa hai thư mục.
 
-**Đề xuất:** thêm bước di trú một lần trong `lib.rs` (chỗ `app.path().app_data_dir()`):
-nếu thư mục mới trống mà thư mục cũ có `vault.db` thì copy sang, ghi cờ `migrated.json`
-để không chạy lại. Phải làm **trước** khi phát hành v1.1.59 ra công chúng.
+**Đã sửa:** `src-tauri/src/migrate.rs` chuyển dữ liệu một lần lúc app khởi động, chạy
+**trước** khi mở Vault. Ba nguyên tắc đều nghiêng về phía an toàn: **copy chứ không
+move** (hỏng giữa chừng thì bản gốc còn nguyên), **không bao giờ đè** ở cả mức thư mục
+lẫn từng tệp, và ghi cờ `migrated-from.json` **sau** khi copy xong.
+
+Kiểm chứng bằng 14 mục trên thư mục thật, kèm hai phép đảo ngược: bỏ chốt không-đè và
+biến copy thành move — cả hai đều bị bắt. Đã nối vào CI (`cargo run --example migrate_check`).
 
 ---
 
@@ -152,7 +156,7 @@ còn nguyên. Bài học: audit phải đọc log CI thật, và mọi khẳng �
 
 ## ✅ Thứ tự đề nghị làm
 
-1. **Di trú thư mục dữ liệu** (P0-2) — chặn v1.1.59 tới tay người dùng cũ.
+1. ~~Di trú thư mục dữ liệu~~ (P0-2) — xong ở `da11837`.
 2. ~~Sửa identifier trong smoke test~~ — xong ở `bde3115`.
 3. Gộp `dataDir()` về một chỗ (P1-4) — nhỏ, ít rủi ro, chặn hẳn một lớp lỗi.
 4. `cfg`-gate `auth.rs` (P1-5) — 15 phút, `cargo check` sạch tiếng.
