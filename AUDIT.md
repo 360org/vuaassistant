@@ -1,6 +1,6 @@
 # 📋 Audit toàn bộ — VuaAssistant
 
-> **Ngày:** 2026-08-16 · **Phiên bản:** `v1.1.59` · **Nhánh:** `main` @ `bde3115`
+> **Ngày:** 2026-08-16 (cập nhật 18/08) · **Phiên bản:** `v1.1.59` · **Nhánh:** `main` @ `da11837`
 > **Phạm vi:** 29.414 dòng mã (frontend `src/`, Rust `src-tauri/`, Agent Runner, AI Router, 53 script kiểm chứng)
 > **Cách làm:** chạy thật `cargo check`, `npm run check`, đọc log CI thật trên GitHub Actions, đối chiếu từng khẳng định với mã nguồn.
 
@@ -13,7 +13,7 @@
 | Kiến trúc có đúng ý đồ không? | 🟢 Đúng. Một bộ não duy nhất ở Host Process, rail công cụ thi hành bằng máy, Vault mã hoá. |
 | Sức khoẻ CI? | 🟢 **Vừa sửa xong.** Trước `bde3115`, CI **đỏ trên cả 3 nền tảng** suốt 4 ngày. |
 | Nợ kỹ thuật? | 🟡 Ba nhóm rõ ràng: một refactor bỏ dở, một hằng số nhân bản 8 lần, 13 cảnh báo Rust. |
-| Có lỗi nào ảnh hưởng người dùng đang cài? | 🔴 **Có.** Đổi `identifier` ở v1.1.59 làm người dùng cũ mất toàn bộ dữ liệu khi nâng cấp — chưa có mã di trú. |
+| Có lỗi nào ảnh hưởng người dùng đang cài? | 🟢 **Đã sửa** ở `da11837`. Đổi `identifier` ở v1.1.59 từng làm người dùng cũ mất toàn bộ dữ liệu khi nâng cấp; nay có mã di trú, copy chứ không move và không bao giờ đè. |
 
 ---
 
