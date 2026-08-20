@@ -6,6 +6,22 @@ Ghi lại mọi thay đổi đáng chú ý của VuaAssistant. Định dạng th
 
 ## [Chưa phát hành]
 
+## [1.1.60] - 2026-08-20
+
+### Sửa lỗi
+- **Di trú dữ liệu an toàn khi đổi bundle identifier** (`src-tauri/src/migrate.rs`): Khắc phục lỗi mất dữ liệu khi nâng cấp lên v1.1.59 (đổi `com.vuaai.assistant` → `com.vuaai.vuaassistant`). Cơ chế di trú tự động copy an toàn (không move, không ghi đè dữ liệu đang có), đảm bảo toàn vẹn Vault, cấu hình và lịch sử.
+- **Khắc phục lỗi CI đỏ trên cả 3 nền tảng**: Đọc động identifier từ `tauri.conf.json` trong các script smoke test thay vì hardcode chuỗi cũ.
+
+### Nâng cấp Kiến trúc & Harness
+- **Kernel Plugin Architecture** (`agent-runner/src/kernel/`): Chuẩn hóa toàn bộ hệ thống mở rộng theo kiến trúc plugin với vòng đời rõ ràng (compose, invariants, loop-events, model-visible prompts, policy plugins, providers seams).
+- **Phủ toàn diện Invariant & Contract Checks**: Bổ sung 7 bộ kiểm tra invariant, đảm bảo công cụ tự khai báo quyền, phân tách rõ ràng giữa tool chỉ đọc và tool có tác dụng phụ / cần duyệt.
+
+## [1.1.59] - 2026-08-12
+
+### Nâng cấp
+- **Tauri v2 Standard Alignment**: Audit và đồng bộ cấu hình chuẩn hóa theo tiêu chuẩn Tauri v2.
+- **Identifier Update**: Cập nhật bundle identifier thành `com.vuaai.vuaassistant`.
+
 ## [1.1.58] - 2026-08-09
 
 ### Sửa lỗi
