@@ -38,7 +38,9 @@ use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 use tauri::{AppHandle, Emitter};
 
+#[cfg(target_os = "macos")]
 type Aes128CbcDec = cbc::Decryptor<Aes128>;
+#[cfg(target_os = "macos")]
 type HmacSha1 = Hmac<Sha1>;
 
 /// Landing page shown in the browser after the redirect.
