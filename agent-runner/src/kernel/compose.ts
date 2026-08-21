@@ -26,6 +26,9 @@ import { nativeToolsPlugin } from '../native-tools/index.js';
 import { builtinToolsPlugin } from '../mcp-tools/index.js';
 import { OutboundLimiter, readPolicy, type Policy } from '../policy.js';
 import type { AgentProvider } from '../providers/types.js';
+import { createMcpPlugin } from '../plugins/mcp.js';
+import { createSchedulerPlugin } from '../plugins/scheduler.js';
+import { createTelegramPlugin } from '../plugins/telegram.js';
 
 export interface ComposeOptions {
   /** Provider dùng cho vai kiểm. Bỏ trống thì vai kiểm không nạp. */
@@ -52,6 +55,7 @@ export async function composeRunner(options: ComposeOptions = {}): Promise<Kerne
   await kernel.use(toolsPlugin);
   await kernel.use(nativeToolsPlugin);
   await kernel.use(builtinToolsPlugin);
+  await kernel.use(createMcpPlugin());
   await kernel.use(promptPlugin);
   await kernel.use(toolListSectionPlugin);
   await kernel.use(modelVisiblePlugin);
@@ -72,6 +76,8 @@ export async function composeRunner(options: ComposeOptions = {}): Promise<Kerne
   }
 
   await kernel.use(createPolicyPlugin({ policy, limiter: new OutboundLimiter(policy) }));
+  await kernel.use(createSchedulerPlugin());
+  await kernel.use(createTelegramPlugin());
   await kernel.start();
 
   // Kiểm ngay lúc dựng xong, trên chính cây plugin vừa lắp. Vi phạm thì nổ ở

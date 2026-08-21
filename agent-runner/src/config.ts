@@ -8,10 +8,11 @@
  */
 import fs from 'fs';
 import path from 'path';
+import { getDataDir } from './util/data-dir.js';
 
 // Thư mục dữ liệu mặc định phải khớp với vỏ desktop (~/vuaassistant). Lệch tên
 // khiến runner đọc/ghi ở nơi không ai nhìn tới khi VUA_DATA_DIR chưa được set.
-const DATA_DIR = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '/tmp', 'vuaassistant');
+const DATA_DIR = getDataDir();
 const CONFIG_PATH = process.env.CONFIG_PATH || path.join(DATA_DIR, 'runner.json');
 
 export interface RunnerConfig {

@@ -34,13 +34,7 @@ import {
 import { getToolDefinitions, executeTool, needsReadApproval } from './native-tools/index.js';
 import { learnFromExchange } from './memory/self-improve.js';
 import { retrieveKnowledge, formatExcerpts } from './knowledge/index.js';
-import { mcpManager } from './mcp-client/index.js';
-import {
-  CAPABILITY_TOOL_DEFINITIONS,
-  capabilityFromSpec,
-  searchCapabilities,
-  type Capability,
-} from './capability-rail.js';
+import { CAPABILITY_TOOL_DEFINITIONS, capabilityFromSpec, searchCapabilities, type Capability } from './capability-rail.js';
 import { OutboundLimiter, readPolicy } from './policy.js';
 import { refusalMessage, verifyAction } from './verifier.js';
 import { clearBuiltinToolContext, executeBuiltinTool, getBuiltinToolDefinitions, hasBuiltinTool, setBuiltinToolContext } from './mcp-tools/index.js';
@@ -407,22 +401,25 @@ export async function executeAgentLoop(
     // thì phát hiện lúc chạy, nên đồng bộ vào sổ ở đây — và đăng ký dưới dạng
     // KHÔNG TIN CẬY: server lạ không tự khai được tính chất, nên mặc định coi
     // là nguy hiểm nhất có thể thay vì an toàn nhất.
-    for (const tool of await mcpManager.listAllTools()) {
-      if (tools.get(tool.name)) continue;
-      tools.registerUntrusted(
-        {
-          name: tool.name,
-          description: tool.description,
-          input_schema: tool.input_schema,
-          execute: async (args: Record<string, unknown>) =>
-            (await mcpManager.executeTool(tool.name, args)) ?? {
-              tool_call_id: '',
-              content: `Error: MCP tool "${tool.name}" failed to execute or server not found`,
-              is_error: true,
-            },
-        },
-        'mcp',
-      );
+    const mcp = config.ctx?.mcp;
+    if (mcp) {
+      for (const tool of await mcp.listAllTools()) {
+        if (tools.get(tool.name)) continue;
+        tools.registerUntrusted(
+          {
+            name: tool.name,
+            description: tool.description,
+            input_schema: tool.input_schema,
+            execute: async (args: Record<string, unknown>) =>
+              (await mcp.executeTool(tool.name, args)) ?? {
+                tool_call_id: '',
+                content: `Error: MCP tool "${tool.name}" failed to execute or server not found`,
+                is_error: true,
+              },
+          },
+          'mcp',
+        );
+      }
     }
     const capabilities: Capability[] = tools.list().map(capabilityFromSpec);
     const allTools = [...CAPABILITY_TOOL_DEFINITIONS, ...tools.definitions()];
@@ -532,7 +529,8 @@ export async function executeAgentLoop(
       } else if (hasBuiltinTool(tc.name)) {
         result = await executeBuiltinTool(tc.name, tc.arguments);
       } else if (tc.name.includes('__')) {
-        const mcpResult = await mcpManager.executeTool(tc.name, tc.arguments);
+        if (!config.ctx?.mcp) throw new Error('MCP Manager not initialized');
+        const mcpResult = await config.ctx.mcp.executeTool(tc.name, tc.arguments);
         if (mcpResult) {
           result = mcpResult;
         } else {

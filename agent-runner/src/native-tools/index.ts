@@ -31,7 +31,9 @@ function realRoot(configured: string): string {
   }
 }
 
-const DATA_DIR = process.env.VUA_DATA_DIR || '/tmp/vuaassistant';
+import { getDataDir } from '../util/data-dir.js';
+
+const DATA_DIR = getDataDir();
 
 const WORKSPACE_ROOT = realRoot(
   process.env.VUA_AGENT_WORKSPACE || path.join(DATA_DIR, 'workspace'),
@@ -670,7 +672,7 @@ const scheduleTaskTool: NativeTool = {
       return 'Error: each task needs name, prompt and schedule. Nothing was scheduled.';
     }
 
-    const dataDir = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '', 'vuaassistant');
+    const dataDir = getDataDir();
     fs.mkdirSync(dataDir, { recursive: true });
     const tasksFile = path.join(dataDir, 'scheduled_tasks.json');
 

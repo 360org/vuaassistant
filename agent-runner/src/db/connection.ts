@@ -12,11 +12,12 @@
 import fs from 'fs';
 import path from 'path';
 import { openDatabase, type DatabaseHandle } from './sqlite.js';
+import { getDataDir } from '../util/data-dir.js';
 
 // Cùng gốc dữ liệu với vỏ desktop (~/vuaassistant) để hai bên gặp nhau ở cùng
 // một hàng đợi IPC khi VUA_DATA_DIR chưa được set.
 const DEFAULT_IPC_DIR = process.env.VUA_IPC_DIR || path.join(
-  process.env.VUA_DATA_DIR || path.join(process.env.HOME || '/tmp', 'vuaassistant'),
+  getDataDir(),
   'ipc'
 );
 

@@ -14,17 +14,27 @@
 //! the code→key exchange stay in the frontend so all providers share one
 //! path. The obtained key is then stored in the credential Vault.
 
+#[cfg(target_os = "macos")]
 use aes::Aes128;
+#[cfg(target_os = "macos")]
 use cbc::cipher::{block_padding::Pkcs7, BlockDecryptMut, KeyIvInit};
+#[cfg(target_os = "macos")]
 use hmac::{Hmac, Mac};
+#[cfg(target_os = "macos")]
 use rand::{rngs::OsRng, RngCore};
+#[cfg(target_os = "macos")]
 use rusqlite::Connection;
+#[cfg(target_os = "macos")]
 use sha1::Sha1;
+#[cfg(target_os = "macos")]
 use sha2::{Digest, Sha256};
+#[cfg(target_os = "macos")]
 use std::fs::{self, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
 use std::net::{TcpListener, TcpStream};
+#[cfg(target_os = "macos")]
 use std::path::{Path, PathBuf};
+#[cfg(target_os = "macos")]
 use std::time::{Duration, Instant};
 use tauri::{AppHandle, Emitter};
 

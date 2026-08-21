@@ -6,13 +6,14 @@ import { findByName, getAllDestinations } from '../destinations.js';
 import type { ToolPolicy } from '../kernel/tools.js';
 import type { ToolDefinition } from '../providers/types.js';
 import { getBuiltinToolContext } from './context.js';
+import { getDataDir } from '../util/data-dir.js';
 
 const WORKSPACE_ROOT = path.resolve(
-  process.env.VUA_AGENT_WORKSPACE || path.join(process.env.VUA_DATA_DIR || '/tmp/vuaassistant', 'workspace'),
+  process.env.VUA_AGENT_WORKSPACE || path.join(getDataDir(), 'workspace'),
 );
 const OUTBOX_ROOT = process.env.VUA_AGENT_WORKSPACE
   ? path.resolve(process.env.VUA_AGENT_WORKSPACE, '..', 'outbox')
-  : path.resolve(process.env.VUA_DATA_DIR || '/tmp/vuaassistant', 'outbox');
+  : path.resolve(getDataDir(), 'outbox');
 
 export interface BuiltinTool extends ToolPolicy {
   definition: ToolDefinition;
@@ -258,9 +259,8 @@ const scheduleMessage: BuiltinTool = {
 
     if (!name || !prompt || !schedule) throw new Error('name, prompt and schedule are required');
 
-    const dataDir = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '', 'vuaassistant');
-    fs.mkdirSync(dataDir, { recursive: true });
-    const tasksFile = path.join(dataDir, 'scheduled_tasks.json');
+    fs.mkdirSync(getDataDir(), { recursive: true });
+    const tasksFile = path.join(getDataDir(), 'scheduled_tasks.json');
 
     let tasks: Record<string, unknown>[] = [];
     try {
@@ -302,8 +302,7 @@ const listScheduled: BuiltinTool = {
     },
   },
   async execute(): Promise<string> {
-    const dataDir = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '', 'vuaassistant');
-    const tasksFile = path.join(dataDir, 'scheduled_tasks.json');
+    const tasksFile = path.join(getDataDir(), 'scheduled_tasks.json');
     if (!fs.existsSync(tasksFile)) return 'No scheduled tasks found.';
 
     try {
@@ -341,8 +340,7 @@ const cancelScheduled: BuiltinTool = {
     const name = typeof args.name === 'string' ? args.name.trim() : undefined;
     if (!id && !name) throw new Error('Either id or name is required to cancel a task');
 
-    const dataDir = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '', 'vuaassistant');
-    const tasksFile = path.join(dataDir, 'scheduled_tasks.json');
+    const tasksFile = path.join(getDataDir(), 'scheduled_tasks.json');
     if (!fs.existsSync(tasksFile)) return 'No scheduled tasks found.';
 
     try {

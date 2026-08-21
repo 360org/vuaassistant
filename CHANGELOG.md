@@ -6,6 +6,20 @@ Ghi lại mọi thay đổi đáng chú ý của VuaAssistant. Định dạng th
 
 ## [Chưa phát hành]
 
+## [1.1.61] - 2026-08-21
+
+### Thay đổi lớn (Kiến trúc & Refactor)
+- **Plugin Architecture ("Everything is a plugin")**: Tách biệt hoàn toàn luồng chạy chính của `agent-runner`.
+  - Tách các module cốt lõi: `mcpManager`, `scheduler` và `telegram` thành các plugin độc lập (`createMcpPlugin`, `createSchedulerPlugin`, `createTelegramPlugin`).
+  - Gỡ bỏ hoàn toàn dependency tĩnh (Static import/call) tới `mcpManager` trong `src/poll-loop.ts`, `src/index.ts` và `src/mcp-tools/index.ts`. Toàn bộ hoạt động giao tiếp đi qua kernel context (`config.ctx?.mcp`).
+  - Quản lý vòng đời (Lifecycle & Disposers) an toàn: Các plugin tự hủy các timer/polling bằng `AbortController` và `Disposers` khi `kernel.dispose()` được kích hoạt, loại bỏ rò rỉ bộ nhớ.
+- **Thống nhất quản lý Thư mục Dữ liệu**:
+  - Tạo utility module `getDataDir` tại `agent-runner/src/util/data-dir.ts` giải quyết triệt để việc hardcode `/tmp` hay gọi trực tiếp `process.env.VUA_DATA_DIR` rải rác.
+  - Đồng bộ hoá toàn diện trên các file: `config.ts`, `scheduler/index.ts`, `db/connection.ts`, `policy.ts`, `memory/self-improve.ts`, `native-tools/index.ts`, `knowledge/index.ts`.
+
+### Sửa lỗi
+- **Fix rust warnings**: Khắc phục các cảnh báo `cfg` (target macOS) trong file `src-tauri/src/auth.rs`.
+
 ## [1.1.60] - 2026-08-20
 
 ### Sửa lỗi

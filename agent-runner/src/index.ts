@@ -4,9 +4,9 @@ import { loadConfig } from './config.js';
 import { ensureIpcDir, setMaxMessagesPerPrompt } from './db/index.js';
 import { createProvider, type ProviderName } from './providers/factory.js';
 import { runPollLoop } from './poll-loop.js';
-import { startScheduler } from './scheduler/index.js';
-import { startTelegramChannel } from './channels/telegram.js';
-import { mcpManager } from './mcp-client/index.js';
+// import { startScheduler } from './scheduler/index.js';
+// import { startTelegramChannel } from './channels/telegram.js';
+// import { mcpManager } from './mcp-client/index.js';
 import { ensureMemoryScaffold } from './memory/memory-scaffold.js';
 
 function log(msg: string): void {
@@ -42,9 +42,6 @@ async function main(): Promise<void> {
   // Set max messages per prompt from config
   setMaxMessagesPerPrompt(config.maxMessagesPerPrompt);
 
-  // Initialize external MCP servers
-  await mcpManager.init(config.mcpServers || {});
-
   // Create provider
   const provider = createProvider(providerName, {
     baseUrl: config.baseUrl,
@@ -60,7 +57,6 @@ async function main(): Promise<void> {
     ensureMemoryScaffold(agentDir);
   }
 
-
   log(`Provider created: ${provider.name}`);
 
   // Cây plugin dựng ở một chỗ duy nhất (kernel/compose.ts) để bài test kiểm
@@ -68,6 +64,9 @@ async function main(): Promise<void> {
   const kernel = await composeRunner({ provider, providerName, log });
   log(`Plugin đã nạp: ${kernel.loaded.join(', ')}`);
   log(`Tool đã đăng ký: ${kernel.root.tools.list().length}`);
+
+  // Initialize external MCP servers qua plugin
+  await kernel.root.mcp.init(config.mcpServers || {});
 
   // Dựng prompt SAU khi cây plugin nạp xong: phần liệt kê tool đọc từ sổ đăng
   // ký, nên dựng sớm là ra danh sách rỗng.
@@ -90,13 +89,21 @@ async function main(): Promise<void> {
 
   // Scheduled tasks live here, not in the webview: closing the app window must
   // not stop a schedule (idea.md §1.3 — the brain runs in the Host Process).
-  startScheduler(loopConfig);
+  kernel.root.scheduler.start(loopConfig);
 
   // Same reason for Telegram: the bot must answer with the window closed. The
   // AI Router holds the bot token; this only drives its token-free endpoints.
-  startTelegramChannel(loopConfig);
+  kernel.root.telegram.start(loopConfig);
 
   log('Entering poll loop...');
+
+  // Tiến hành dọn dẹp khi nhận tín hiệu kết thúc qua kernel.dispose
+  const cleanup = async () => {
+    log('Shutting down and disposing kernel...');
+    await kernel.dispose();
+  };
+  process.on('SIGTERM', () => cleanup().then(() => process.exit(0)));
+  process.on('SIGINT', () => cleanup().then(() => process.exit(0)));
 
   // Enter main poll loop (runs forever)
   await runPollLoop(loopConfig);
@@ -171,22 +178,9 @@ function buildSystemPrompt(
 
 // --- Process lifecycle ---
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  log('Received SIGTERM, shutting down...');
-  mcpManager.shutdown();
-  process.exit(0);
-});
-
-process.on('SIGINT', () => {
-  log('Received SIGINT, shutting down...');
-  mcpManager.shutdown();
-  process.exit(0);
-});
-
+// Graceful shutdown handled in main loop cleanup
 // Start
 main().catch((err) => {
   log(`Fatal error: ${err instanceof Error ? err.message : String(err)}`);
-  mcpManager.shutdown();
   process.exit(1);
 });

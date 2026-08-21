@@ -17,6 +17,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { getDataDir } from './util/data-dir.js';
 
 export interface Policy {
   /** Đường dẫn agent không được đụng tới, dù đã được cấp workspace. */
@@ -44,8 +45,7 @@ export const DEFAULT_POLICY: Policy = {
 };
 
 function policyFile(): string {
-  const dataDir = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '', 'vuaassistant');
-  return path.join(dataDir, 'policy.json');
+  return path.join(getDataDir(), 'policy.json');
 }
 
 /** Lấy mảng chuỗi sạch từ dữ liệu người dùng ghi ra; bỏ mọi thứ không phải chuỗi. */

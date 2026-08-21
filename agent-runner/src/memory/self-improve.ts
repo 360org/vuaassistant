@@ -17,6 +17,7 @@
 import fs from 'fs';
 import path from 'path';
 import type { PollLoopConfig } from '../poll-loop.js';
+import { getDataDir } from '../util/data-dir.js';
 
 const MAX_NOTES_PER_TURN = 3;
 const MEMORY_FILE = path.join('memory', 'memories', 'learned.md');
@@ -47,7 +48,7 @@ function log(msg: string): void {
 export function selfImproveEnabled(): boolean {
   const configPath =
     process.env.CONFIG_PATH ||
-    path.join(process.env.VUA_DATA_DIR || '', 'runner.json');
+    path.join(getDataDir(), 'runner.json');
   try {
     const raw = JSON.parse(fs.readFileSync(configPath, 'utf8'));
     return raw.selfImprove !== false;

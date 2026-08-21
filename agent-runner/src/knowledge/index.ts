@@ -13,6 +13,7 @@
 import fs from 'fs';
 import path from 'path';
 import { openDatabase, type DatabaseHandle } from '../db/sqlite.js';
+import { getDataDir } from '../util/data-dir.js';
 
 const DEFAULT_TOP_K = 4;
 const DEFAULT_MAX_CHARS = 6000;
@@ -34,7 +35,7 @@ let opened = false;
 
 function dbPath(): string {
   const ipcDir =
-    process.env.VUA_IPC_DIR || path.join(process.env.VUA_DATA_DIR || '', 'ipc');
+    process.env.VUA_IPC_DIR || path.join(getDataDir(), 'ipc');
   return path.join(ipcDir, 'knowledge.db');
 }
 

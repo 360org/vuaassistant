@@ -21,6 +21,7 @@ import { checkBudget, recordSpend, type BudgetStore } from '../daily-budget.js';
 import { executeAgentLoop, type PollLoopConfig } from '../poll-loop.js';
 import { notifyTelegram } from '../channels/telegram.js';
 import { isDue } from './schedule.js';
+import { getDataDir } from '../util/data-dir.js';
 
 const TICK_MS = 30_000;
 /**
@@ -49,8 +50,7 @@ function log(msg: string): void {
  * a task created from chat and one created in the UI are the same task.
  */
 function tasksFile(): string {
-  const dataDir = process.env.VUA_DATA_DIR || path.join(process.env.HOME || '', 'vuaassistant');
-  return path.join(dataDir, 'scheduled_tasks.json');
+  return path.join(getDataDir(), 'scheduled_tasks.json');
 }
 
 /** Read the shared task list. Missing or malformed file → no tasks. */
