@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- ================================================================= -->
+        <!-- Landing Page: Free VuaAssistant Agentic Desktop                   -->
+        <!-- URL: https://vuahethong.net/free-vuaassistant-agentic            -->
+        <!-- Chuẩn Odoo 17 Website Builder: Khung snippet Core 100%            -->
+        <!-- ================================================================= -->
+        <record id="page_free_vuaassistant_agentic" model="website.page">
+            <field name="name">VuaAssistant — Trợ Lý AI Để Bàn Dành Cho Mọi Người</field>
+            <field name="url">/free-vuaassistant-agentic</field>
+            <field name="type">qweb</field>
+            <field name="key">website.page_free_vuaassistant_agentic</field>
+            <field name="website_published">True</field>
+            <field name="is_published">True</field>
+            <field name="track">True</field>
+            <field name="arch" type="xml">
+                <t t-name="website.page_free_vuaassistant_agentic">
+                    <t t-call="website.layout">
+                        <div id="wrap" class="oe_structure oe_empty">
+
+                            <!-- HERO SECTION (s_cover) -->
+                            <section class="s_cover parallax s_parallax_is_fixed bg-900 pt96 pb96 o_colored_level" data-scroll-background-ratio="1" data-snippet="s_cover" data-name="Cover" style="background-image: radial-gradient(circle at 50% 20%, rgba(30, 58, 138, 0.45) 0%, rgba(15, 23, 42, 0.95) 75%);">
+                                <span class="s_parallax_bg oe_custom_bg" style="background-position: 50% 0;"/>
+                                <div class="o_we_bg_filter bg-900" style="opacity: 0.85;"/>
+                                <div class="container s_allow_columns text-center">
+                                    <div class="row justify-content-center">
+                                        <div class="col-lg-10">
+                                            <p class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 mb-4 font-monospace fs-6">
+                                                👑 VuaAssistant v1.1.62 — Thế Hệ Trợ Lý AI Agentic Mới
+                                            </p>
+                                            <h1 class="display-3 fw-bold text-white mb-4 lh-sm">
+                                                Trợ Lý AI Để Bàn Dành Cho <span class="text-warning">Mọi Người</span>
+                                            </h1>
+                                            <p class="lead text-light mb-5 fs-4 fw-normal opacity-90 mx-auto" style="max-width: 820px;">
+                                                Không cần biết lập trình, không gõ dòng lệnh, không cài đặt phức tạp.
+                                                <strong>Cài trong 2 phút</strong>, sở hữu ngay 230+ chuyên gia AI đỉnh cao (ChatGPT, Claude, Gemini) làm việc tự động cho bạn ngay trên máy tính.
+                                            </p>
+                                            <div class="d-flex flex-wrap justify-content-center gap-3 mb-5">
+                                                <a href="https://github.com/360org/v-assistant/releases/latest" class="btn btn-warning btn-lg px-5 py-3 fs-5 fw-bold shadow-lg rounded-pill" data-name="Download CTA">
+                                                    <i class="fa fa-download me-2"/> Tải Miễn Phí (macOS / Windows)
+                                                </a>
+                                                <a href="#tinh-nang-vuot-troi" class="btn btn-outline-light btn-lg px-4 py-3 fs-5 rounded-pill" data-name="Feature Link">
+                                                    <i class="fa fa-play-circle me-2"/> Khám Phá Tính Năng
+                                                </a>
+                                            </div>
+                                            <div class="d-flex flex-wrap justify-content-center align-items-center gap-4 text-white-50 fs-6">
+                                                <div><i class="fa fa-check-circle text-success me-1"/> 100% Miễn phí cài đặt</div>
+                                                <div><i class="fa fa-shield text-info me-1"/> Bảo mật On-Device (Không lộ dữ liệu)</div>
+                                                <div><i class="fa fa-bolt text-warning me-1"/> Đăng nhập 1-Click (Không cần API Key)</div>
+                                                <div><i class="fa fa-desktop text-light me-1"/> Native macOS, Windows &amp; Linux</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- PAIN POINTS VS SOLUTION (s_features) -->
+                            <section class="s_features pt64 pb64 bg-100 o_colored_level" data-snippet="s_features" data-name="Features" id="tai-sao-can-vuaassistant">
+                                <div class="container">
+                                    <div class="row justify-content-center mb-5 text-center">
+                                        <div class="col-lg-8">
+                                            <h6 class="text-primary text-uppercase fw-bold letter-spacing-1">Nỗi Đau Của Người Dùng Phổ Thông</h6>
+                                            <h2 class="display-6 fw-bold">Dùng AI Trên Trình Duyệt Quá Bất Tiện?</h2>
+                                            <p class="text-muted fs-5">Hãy xem VuaAssistant giúp bạn giải phóng 90% sự phiền toái hàng ngày như thế nào.</p>
+                                        </div>
+                                    </div>
+                                    <div class="row g-4">
+                                        <div class="col-lg-4 col-md-6 pt16 pb16">
+                                            <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center bg-white">
+                                                <div class="rounded-circle bg-danger-subtle text-danger mx-auto d-flex align-items-center justify-content-center mb-4" style="width: 70px; height: 70px;">
+                                                    <i class="fa fa-times-circle fa-2x"/>
+                                                </div>
+                                                <h4 class="fw-bold mb-3">Web AI Thông Thường</h4>
+                                                <ul class="list-unstyled text-muted text-start fs-6 space-y-2 mb-0">
+                                                    <li class="mb-2"><i class="fa fa-minus text-danger me-2"/> Phải mở hàng chục tab web (ChatGPT, Claude, Gemini...)</li>
+                                                    <li class="mb-2"><i class="fa fa-minus text-danger me-2"/> Copy-paste file thủ công, giới hạn dung lượng tải lên</li>
+                                                    <li class="mb-2"><i class="fa fa-minus text-danger me-2"/> Đổi phiên chat là AI quên sạch dữ liệu &amp; thói quen làm việc</li>
+                                                    <li class="mb-2"><i class="fa fa-minus text-danger me-2"/> Nguy cơ rò rỉ dữ liệu mật công ty lên máy chủ đám mây</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 pt16 pb16">
+                                            <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center bg-white">
+                                                <div class="rounded-circle bg-warning-subtle text-warning mx-auto d-flex align-items-center justify-content-center mb-4" style="width: 70px; height: 70px;">
+                                                    <i class="fa fa-code fa-2x"/>
+                                                </div>
+                                                <h4 class="fw-bold mb-3">Công Cụ Cho Lập Trình Viên</h4>
+                                                <ul class="list-unstyled text-muted text-start fs-6 space-y-2 mb-0">
+                                                    <li class="mb-2"><i class="fa fa-minus text-danger me-2"/> Bắt cài Docker, Python, Node, Terminal phức tạp</li>
+                                                    <li class="mb-2"><i class="fa fa-minus text-danger me-2"/> Bắt buộc phải có thẻ Visa thanh toán mua API Key</li>
+                                                    <li class="mb-2"><i class="fa fa-minus text-danger me-2"/> Giao diện dòng lệnh đen trắng, không thân thiện</li>
+                                                    <li class="mb-2"><i class="fa fa-minus text-danger me-2"/> Dễ bị xung đột môi trường và phần mềm hệ thống</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-12 pt16 pb16">
+                                            <div class="card h-100 border-2 border-primary shadow rounded-4 p-4 text-center bg-white position-relative overflow-hidden">
+                                                <div class="badge bg-primary position-absolute top-0 end-0 rounded-bottom-0 rounded-start-pill px-3 py-2 text-white">ĐỀ XUẤT SỐ 1</div>
+                                                <div class="rounded-circle bg-primary-subtle text-primary mx-auto d-flex align-items-center justify-content-center mb-4" style="width: 70px; height: 70px;">
+                                                    <i class="fa fa-crown fa-2x"/>
+                                                </div>
+                                                <h4 class="fw-bold text-primary mb-3">VuaAssistant Để Bàn</h4>
+                                                <ul class="list-unstyled text-dark text-start fs-6 space-y-2 mb-0">
+                                                    <li class="mb-2"><i class="fa fa-check text-success me-2"/> <strong>Tải &amp; Chạy ngay:</strong> Giao diện App đẹp mắt như Zalo/Slack</li>
+                                                    <li class="mb-2"><i class="fa fa-check text-success me-2"/> <strong>Đăng nhập 1 chạm:</strong> Dùng tài khoản có sẵn hoặc dùng thử miễn phí</li>
+                                                    <li class="mb-2"><i class="fa fa-check text-success me-2"/> <strong>230+ Chuyên Gia:</strong> Kế toán, Luật, Marketing, Sales có sẵn</li>
+                                                    <li class="mb-2"><i class="fa fa-check text-success me-2"/> <strong>Bảo mật 100%:</strong> Tài liệu phân tích ngay trong máy của bạn</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- CORE ADVANTAGES (s_three_columns) -->
+                            <section class="s_three_columns pt64 pb64 bg-white o_colored_level" data-snippet="s_three_columns" data-name="Columns" id="tinh-nang-vuot-troi">
+                                <div class="container">
+                                    <div class="row justify-content-center mb-5 text-center">
+                                        <div class="col-lg-8">
+                                            <h6 class="text-primary text-uppercase fw-bold letter-spacing-1">Sự Tiện Dụng &amp; Vượt Trội</h6>
+                                            <h2 class="display-5 fw-bold">6 Điểm Khiến VuaAssistant Khác Biệt</h2>
+                                            <p class="text-muted fs-5">Thiết kế theo triết lý "Tối giản cho người dùng — Sức mạnh cho công việc".</p>
+                                        </div>
+                                    </div>
+                                    <div class="row g-4 d-flex align-items-stretch">
+                                        <!-- Item 1 -->
+                                        <div class="col-lg-4 col-md-6 pt16 pb16">
+                                            <div class="card text-bg-white h-100 border p-4 rounded-4 shadow-sm">
+                                                <div class="text-primary fs-1 mb-3"><i class="fa fa-magic"/></div>
+                                                <h4 class="fw-bold mb-2">1. Cài 2 Phút, Dùng Tức Thì</h4>
+                                                <p class="text-muted mb-0">Không cần cấu hình máy chủ, không Docker. Tải file về cài là mở lên chat ngay lập tức với tốc độ phản hồi cực nhanh.</p>
+                                            </div>
+                                        </div>
+                                        <!-- Item 2 -->
+                                        <div class="col-lg-4 col-md-6 pt16 pb16">
+                                            <div class="card text-bg-white h-100 border p-4 rounded-4 shadow-sm">
+                                                <div class="text-primary fs-1 mb-3"><i class="fa fa-users"/></div>
+                                                <h4 class="fw-bold mb-2">2. Kho 230+ Chuyên Gia (Agent Store)</h4>
+                                                <p class="text-muted mb-0">Tuyển dụng "nhân sự AI" chỉ bằng 1 cú click: Kế toán trưởng, Luật sư hợp đồng, Copywriter, Chuyên gia SEO, Trợ lý Giám đốc... Mỗi vai trò có trí nhớ riêng biệt.</p>
+                                            </div>
+                                        </div>
+                                        <!-- Item 3 -->
+                                        <div class="col-lg-4 col-md-6 pt16 pb16">
+                                            <div class="card text-bg-white h-100 border p-4 rounded-4 shadow-sm">
+                                                <div class="text-primary fs-1 mb-3"><i class="fa fa-file-text-o"/></div>
+                                                <h4 class="fw-bold mb-2">3. Kéo Thả Đọc Mọi Tài Liệu</h4>
+                                                <p class="text-muted mb-0">Ném file PDF, Word, bảng tính Excel, slide PowerPoint vào cửa sổ chat. AI tự động đọc hiểu, tóm tắt và trích xuất số liệu chuẩn xác ngay trên máy bạn.</p>
+                                            </div>
+                                        </div>
+                                        <!-- Item 4 -->
+                                        <div class="col-lg-4 col-md-6 pt16 pb16">
+                                            <div class="card text-bg-white h-100 border p-4 rounded-4 shadow-sm">
+                                                <div class="text-primary fs-1 mb-3"><i class="fa fa-lock"/></div>
+                                                <h4 class="fw-bold mb-2">4. Kho Khóa Bảo Mật (App Vault)</h4>
+                                                <p class="text-muted mb-0">Mã hóa chuẩn ngân hàng AES-256 nội bộ. Toàn bộ mật khẩu, tài khoản và dữ liệu nhạy cảm được bảo vệ tuyệt đối, AI chỉ thấy mã ẩn danh.</p>
+                                            </div>
+                                        </div>
+                                        <!-- Item 5 -->
+                                        <div class="col-lg-4 col-md-6 pt16 pb16">
+                                            <div class="card text-bg-white h-100 border p-4 rounded-4 shadow-sm">
+                                                <div class="text-primary fs-1 mb-3"><i class="fa fa-calendar-check-o"/></div>
+                                                <h4 class="fw-bold mb-2">5. Hẹn Giờ &amp; Tự Động Báo Cáo</h4>
+                                                <p class="text-muted mb-0">Lên lịch để AI tự động cào tin tức, tổng hợp báo cáo lúc 8:00 sáng và gửi thẳng kết quả vào Telegram hoặc màn hình máy tính của bạn.</p>
+                                            </div>
+                                        </div>
+                                        <!-- Item 6 -->
+                                        <div class="col-lg-4 col-md-6 pt16 pb16">
+                                            <div class="card text-bg-white h-100 border p-4 rounded-4 shadow-sm">
+                                                <div class="text-primary fs-1 mb-3"><i class="fa fa-comments"/></div>
+                                                <h4 class="fw-bold mb-2">6. Dạy Kỹ Năng Ngay Trong Chat</h4>
+                                                <p class="text-muted mb-0">Chỉ cần nhắn tin: <em>"Tạo cho anh kỹ năng nghiên cứu đối thủ"</em> — AI tự động lập trình và cập nhật kỹ năng mới mà bạn không cần sửa code.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- COMPARISON TABLE (s_comparisons) -->
+                            <section class="s_comparisons pt64 pb64 bg-100 o_colored_level" data-snippet="s_comparisons" data-name="Comparisons">
+                                <div class="container">
+                                    <div class="row justify-content-center mb-5 text-center">
+                                        <div class="col-lg-8">
+                                            <h6 class="text-primary text-uppercase fw-bold letter-spacing-1">So Sánh Trực Quan</h6>
+                                            <h2 class="display-6 fw-bold">Tại Sao Nên Chọn VuaAssistant?</h2>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive bg-white rounded-4 shadow-sm p-4">
+                                        <table class="table table-hover align-middle mb-0">
+                                            <thead class="table-light">
+                                                <tr class="fs-5">
+                                                    <th class="py-3" style="width: 35%;">Tiêu chí</th>
+                                                    <th class="text-center py-3" style="width: 20%;">ChatGPT / Claude Web</th>
+                                                    <th class="text-center py-3" style="width: 20%;">Tool Open Source khác</th>
+                                                    <th class="text-center py-3 text-primary fw-bold" style="width: 25%;">👑 VuaAssistant</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="fs-6">
+                                                <tr>
+                                                    <td class="fw-semibold">Cài đặt &amp; Bắt đầu</td>
+                                                    <td class="text-center text-muted">Mở trình duyệt web</td>
+                                                    <td class="text-center text-danger"><i class="fa fa-times me-1"/> Cài Docker/Python/CLI phức tạp</td>
+                                                    <td class="text-center text-success fw-bold"><i class="fa fa-check-circle me-1"/> Cài 2 phút, bấm đúp mở app</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="fw-semibold">Đa mô hình (Multi-AI)</td>
+                                                    <td class="text-center text-danger"><i class="fa fa-times me-1"/> 1 web chỉ dùng 1 hãng</td>
+                                                    <td class="text-center text-warning">Tự config key từng bên</td>
+                                                    <td class="text-center text-success fw-bold"><i class="fa fa-check-circle me-1"/> 116+ AI (ChatGPT, Claude, Gemini)</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="fw-semibold">Phân tích tài liệu (RAG)</td>
+                                                    <td class="text-center text-warning">Upload lên cloud bên thứ 3</td>
+                                                    <td class="text-center text-warning">Phải setup vector DB riêng</td>
+                                                    <td class="text-center text-success fw-bold"><i class="fa fa-check-circle me-1"/> Kéo thả on-device, bảo mật 100%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="fw-semibold">Kho vai trò Agent Store</td>
+                                                    <td class="text-center text-muted">GPTs lẻ tẻ, chung bộ nhớ</td>
+                                                    <td class="text-center text-danger"><i class="fa fa-times me-1"/> Không có catalog sẵn</td>
+                                                    <td class="text-center text-success fw-bold"><i class="fa fa-check-circle me-1"/> 230+ Agent chuẩn The Agency</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="fw-semibold">Tự học &amp; Ghi nhớ (Memory)</td>
+                                                    <td class="text-center text-muted">Bộ nhớ phẳng hạn chế</td>
+                                                    <td class="text-center text-danger"><i class="fa fa-times me-1"/> Không tự suy ngẫm</td>
+                                                    <td class="text-center text-success fw-bold"><i class="fa fa-check-circle me-1"/> Tự động đúc kết kinh nghiệm sau chat</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="fw-semibold">Hẹn giờ &amp; Tự động hóa</td>
+                                                    <td class="text-center text-danger"><i class="fa fa-times me-1"/> Không hỗ trợ</td>
+                                                    <td class="text-center text-warning">Phải viết mã cron</td>
+                                                    <td class="text-center text-success fw-bold"><i class="fa fa-check-circle me-1"/> Hẹn giờ tự chạy + Gửi Telegram</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- HOW IT WORKS (s_numbers) -->
+                            <section class="s_numbers pt64 pb64 bg-white o_colored_level" data-snippet="s_numbers" data-name="Numbers">
+                                <div class="container text-center">
+                                    <h6 class="text-primary text-uppercase fw-bold letter-spacing-1 mb-2">Bắt Đầu Thật Dễ Dàng</h6>
+                                    <h2 class="display-5 fw-bold mb-5">3 Bước Đơn Giản Để Sở Hữu Trợ Lý AI</h2>
+                                    <div class="row g-4 justify-content-center">
+                                        <div class="col-lg-4 col-md-6 pt16 pb16">
+                                            <div class="card text-bg-white h-100 border p-4 rounded-4 shadow-sm">
+                                                <div class="display-4 fw-bold text-primary mb-3">01</div>
+                                                <h4 class="fw-bold mb-2">Tải Ứng Dụng</h4>
+                                                <p class="text-muted mb-0">Tải bộ cài đặt phù hợp với máy tính của bạn (macOS Apple Silicon/Intel, Windows x64, Linux).</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 pt16 pb16">
+                                            <div class="card text-bg-white h-100 border p-4 rounded-4 shadow-sm">
+                                                <div class="display-4 fw-bold text-primary mb-3">02</div>
+                                                <h4 class="fw-bold mb-2">Chọn AI Bạn Thích</h4>
+                                                <p class="text-muted mb-0">Đăng nhập 1 chạm bằng tài khoản ChatGPT, Claude, Google Gemini hoặc dùng chế độ Dùng Thử Miễn Phí.</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 pt16 pb16">
+                                            <div class="card text-bg-white h-100 border p-4 rounded-4 shadow-sm">
+                                                <div class="display-4 fw-bold text-primary mb-3">03</div>
+                                                <h4 class="fw-bold mb-2">Giao Việc &amp; Thảnh Thơi</h4>
+                                                <p class="text-muted mb-0">Chọn chuyên gia bạn cần (Kế toán, Marketing, Soạn hợp đồng...) và để AI hoàn thành công việc giúp bạn.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- FAQ SECTION (s_faq_collapse) -->
+                            <section class="s_faq_collapse pt64 pb64 bg-100 o_colored_level" data-snippet="s_faq_collapse" data-name="Accordion">
+                                <div class="container">
+                                    <div class="row justify-content-center mb-5 text-center">
+                                        <div class="col-lg-8">
+                                            <h6 class="text-primary text-uppercase fw-bold letter-spacing-1">Hỏi Đáp Thường Gặp</h6>
+                                            <h2 class="display-6 fw-bold">Giải Đáp Mọi Thắc Mắc Của Bạn</h2>
+                                        </div>
+                                    </div>
+                                    <div class="row justify-content-center">
+                                        <div class="col-lg-9">
+                                            <div id="faqAccordion" class="accordion" role="tablist">
+
+                                                <div class="card bg-white mb-3 border-0 shadow-sm rounded-4 overflow-hidden" data-name="Item">
+                                                    <a href="#" role="tab" data-bs-toggle="collapse" aria-expanded="true" class="card-header bg-white text-dark text-decoration-none py-3 px-4 d-flex justify-content-between align-items-center" data-bs-target="#faqCollapse1">
+                                                        <span class="fs-5 fw-bold">Tôi không rành về kỹ thuật hay công nghệ thì có dùng được không?</span>
+                                                        <i class="fa fa-chevron-down text-muted"/>
+                                                    </a>
+                                                    <div class="collapse show" role="tabpanel" id="faqCollapse1" data-bs-parent="#faqAccordion">
+                                                        <div class="card-body text-muted fs-6 px-4 pb-4 pt-2">
+                                                            <strong>Hoàn toàn dùng được!</strong> VuaAssistant được thiết kế đặc biệt cho người dùng văn phòng và người dùng phổ thông. Bạn chỉ cần tải về, cài đặt như một phần mềm bình thường (như Zalo, Word), sau đó mở lên và gõ yêu cầu bằng tiếng Việt tự nhiên. Không cần gõ bất kỳ câu lệnh lập trình nào.
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="card bg-white mb-3 border-0 shadow-sm rounded-4 overflow-hidden" data-name="Item">
+                                                    <a href="#" role="tab" data-bs-toggle="collapse" aria-expanded="false" class="card-header bg-white text-dark text-decoration-none py-3 px-4 d-flex justify-content-between align-items-center collapsed" data-bs-target="#faqCollapse2">
+                                                        <span class="fs-5 fw-bold">Tài liệu nội bộ và số liệu của tôi có bị lộ ra ngoài không?</span>
+                                                        <i class="fa fa-chevron-down text-muted"/>
+                                                    </a>
+                                                    <div class="collapse" role="tabpanel" id="faqCollapse2" data-bs-parent="#faqAccordion">
+                                                        <div class="card-body text-muted fs-6 px-4 pb-4 pt-2">
+                                                            <strong>Tuyệt đối an toàn.</strong> Khác với các website AI công cộng, VuaAssistant xử lý trích xuất và lưu trữ dữ liệu (Knowledge RAG) trực tiếp trên ổ cứng máy tính của bạn (on-device). Mật khẩu và thông tin đăng nhập được mã hóa AES-256 chuẩn bảo mật ngân hàng trong kho App Vault nội bộ.
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="card bg-white mb-3 border-0 shadow-sm rounded-4 overflow-hidden" data-name="Item">
+                                                    <a href="#" role="tab" data-bs-toggle="collapse" aria-expanded="false" class="card-header bg-white text-dark text-decoration-none py-3 px-4 d-flex justify-content-between align-items-center collapsed" data-bs-target="#faqCollapse3">
+                                                        <span class="fs-5 fw-bold">Tôi có phải mua tài khoản hay nạp tiền trước mới dùng được không?</span>
+                                                        <i class="fa fa-chevron-down text-muted"/>
+                                                    </a>
+                                                    <div class="collapse" role="tabpanel" id="faqCollapse3" data-bs-parent="#faqAccordion">
+                                                        <div class="card-body text-muted fs-6 px-4 pb-4 pt-2">
+                                                            <strong>Không bắt buộc.</strong> Ứng dụng cung cấp chế độ Dùng Thử Miễn Phí ngay sau khi cài. Ngoài ra, nếu bạn đã có sẵn tài khoản ChatGPT Plus, Claude Pro, hoặc Google Gemini, bạn có thể đăng nhập 1 chạm để sử dụng hạn mức có sẵn mà không tốn thêm bất kỳ chi phí nào.
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="card bg-white mb-0 border-0 shadow-sm rounded-4 overflow-hidden" data-name="Item">
+                                                    <a href="#" role="tab" data-bs-toggle="collapse" aria-expanded="false" class="card-header bg-white text-dark text-decoration-none py-3 px-4 d-flex justify-content-between align-items-center collapsed" data-bs-target="#faqCollapse4">
+                                                        <span class="fs-5 fw-bold">VuaAssistant có thể giúp tôi làm những công việc gì?</span>
+                                                        <i class="fa fa-chevron-down text-muted"/>
+                                                    </a>
+                                                    <div class="collapse" role="tabpanel" id="faqCollapse4" data-bs-parent="#faqAccordion">
+                                                        <div class="card-body text-muted fs-6 px-4 pb-4 pt-2">
+                                                            Hầu như mọi tác vụ văn phòng:
+                                                            <ul class="mt-2 mb-0">
+                                                                <li>Đọc, tóm tắt và đối chiếu hợp đồng, tài liệu PDF, báo cáo tài chính Excel.</li>
+                                                                <li>Viết email, soạn thảo bài đăng Facebook, kịch bản video, bài viết chuẩn SEO.</li>
+                                                                <li>Lập kế hoạch công việc và tự động hẹn giờ chạy báo cáo mỗi ngày.</li>
+                                                                <li>Tư vấn nghiệp vụ chuyên sâu theo từng vai trò chuyên gia trong Agent Store.</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- CALL TO ACTION (s_call_to_action) -->
+                            <section class="s_call_to_action bg-primary text-white pt96 pb96 o_colored_level" data-snippet="s_call_to_action" data-name="Call to Action" style="background-image: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);">
+                                <div class="container s_allow_columns text-center">
+                                    <div class="row justify-content-center">
+                                        <div class="col-lg-9">
+                                            <h2 class="display-5 fw-bold mb-4">Sẵn Sàng Nâng Tầm Năng Suất Của Bạn?</h2>
+                                            <p class="lead mb-5 text-light opacity-90 fs-4">
+                                                Hàng ngàn người dùng đã tiết kiệm 3-5 giờ làm việc mỗi ngày cùng VuaAssistant. Tải ngay hôm nay — Miễn phí 100%!
+                                            </p>
+                                            <div class="d-flex flex-wrap justify-content-center gap-3">
+                                                <a href="https://github.com/360org/v-assistant/releases/latest" class="btn btn-warning btn-lg px-5 py-3 fs-5 fw-bold shadow-lg rounded-pill" data-name="Download CTA Final">
+                                                    <i class="fa fa-download me-2"/> Tải Bản Cài Đặt Ngay
+                                                </a>
+                                                <a href="https://vuahethong.net" class="btn btn-outline-light btn-lg px-4 py-3 fs-5 rounded-pill" data-name="Ecosystem Link">
+                                                    <i class="fa fa-globe me-2"/> Hệ Sinh Thái 360 CORP
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                        </div>
+                    </t>
+                </t>
+            </field>
+        </record>
+    </data>
+</odoo>
