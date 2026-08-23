@@ -8,8 +8,7 @@
  */
 
 import { invoke } from "@tauri-apps/api/core";
-import type { Engine, ChatMessage } from "./engine";
-import type { ProviderId } from "@/lib/catalog";
+import type { Engine, ChatMessage, ChatOptions } from "./engine";
 
 export interface OutboundMessage {
   id: number;
@@ -79,7 +78,7 @@ export async function runtimeDir(): Promise<string | null> {
 export const nanoclawEngine: Engine = {
   async *chat(
     messages: ChatMessage[],
-    options: { provider: ProviderId; agentName?: string; agentId?: string; sessionId?: string },
+    options: ChatOptions,
   ) {
     const lastUser = [...messages].reverse().find((m) => m.role === "user");
     if (!lastUser) return;
@@ -99,7 +98,12 @@ export const nanoclawEngine: Engine = {
       meta: JSON.stringify({
         provider: options.provider,
         agent: options.agentName ?? null,
-        platformId: "desktop",
+        platformId: JSON.stringify({
+          platform: "desktop",
+          skillName: options.skillName,
+          skillTools: options.skillTools,
+          skillInstructions: options.skillInstructions,
+        }),
         channelType: "chat",
         threadId: options.sessionId ?? groupId,
       }),

@@ -200,6 +200,15 @@ export async function runPollLoop(config: PollLoopConfig): Promise<void> {
         if (meta.skillName && meta.skillInstructions) {
           const customInstructions = `${config.systemContext.instructions || ''}\n\n=== Active Skill: ${meta.skillName} ===\n${meta.skillInstructions}`;
           activeSystemContext = { ...config.systemContext, instructions: customInstructions };
+          if (config.ctx?.skills) {
+            config.ctx.skills.register({
+              name: meta.skillName,
+              title: meta.skillName,
+              description: meta.skillName,
+              tools: Array.isArray(meta.skillTools) ? meta.skillTools : undefined,
+              instructions: meta.skillInstructions,
+            });
+          }
         }
       } catch {
         // Ignore parse errors

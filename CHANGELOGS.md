@@ -4,6 +4,14 @@ Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu tr
 
 ## [Unreleased]
 
+## [1.1.62] — 2026-08-23
+
+### Kiến trúc Executable Skills & In-Chat Lifecycle (DeepSeek Harness style)
+*   **Skill thực thi gắn trực tiếp Plugin/Tool (Executable Skills):** Hỗ trợ khai báo `tools: [...]` và `vua-tools` trong YAML frontmatter của `SKILL.md`. Bổ sung `skillsPlugin` và `SkillRegistry` vào Kernel runtime (`agent-runner/src/kernel/skills.ts`) để bind động capabilities khi kích hoạt skill.
+*   **Vòng đời Skill trong Chat (In-Chat Lifecycle):** Bổ sung native tools `create_or_update_skill` và `read_skill_file` cho phép Agent tự động tạo, lưu file đĩa và chỉnh sửa nội dung Skill trực tiếp theo câu lệnh của người dùng trong hội thoại.
+*   **Hot-Reload trạng thái qua SQLite IPC:** Đồng bộ sự kiện `skill:updated` tức thì lên React Store mà không cần khởi động lại ứng dụng.
+*   **Kiểm chứng Hợp đồng:** Bổ sung `scripts/executable-skills-check.mjs` vào quy trình test tổng thể `npm run check`.
+
 ## [1.1.56] — 2026-08-07
 
 ### Tối ưu hóa Trải nghiệm Kết nối (UX Models Load)

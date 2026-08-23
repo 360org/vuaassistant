@@ -137,11 +137,33 @@ phím; `http_request` và `delegate_task` tính là có tác dụng phụ.
 
 ---
 
-## 5. Lưu ý về thứ tự ưu tiên
+## 6. Giai đoạn 2: Kiến trúc Skill & Plugin gọi trực tiếp (DeepSeek Harness style)
 
-Trong repo còn **một lỗi P0 chưa vá**: đổi `identifier` ở v1.1.59 làm người dùng cũ nâng cấp là
-mất sạch Vault, kết nối và lịch sử chat (xem `AUDIT.md` mục 02). Việc đó chặn phát hành và chỉ tốn
-một buổi; kiến trúc harness thì không chặn ai cả. Đề nghị vá P0 trước, rồi vào chặng A.
+> **Mục tiêu**: Nâng cấp Skill từ dạng chỉ "chứa prompt markdown" thành **Executable Skill Definition** liên kết trực tiếp với các Plugin/Tools trên Kernel. Người dùng có thể **ra lệnh trực tiếp trong ô chat** để tạo mới, cập nhật mã/chỉ dẫn Skill mà không cần copy-paste thủ công.
+
+### 6.1. Thiết kế Skill thực thi (Executable Skills)
+1. **Liên kết Plugin ↔ Skill**:
+   - Skill khai báo danh sách tools/plugins cần dùng (`tools: ["file_read", "http_request", "mcp__github"]`).
+   - Kernel tự động bind context và permissions tương ứng khi Skill được kích hoạt trong phiên chat.
+2. **Kịch bản thực thi nhiều bước (Workflow / Agentic Step)**:
+   - Thay vì chỉ nhúng toàn bộ markdown vào system prompt, Skill có thể định nghĩa các bước thực thi tuần tự hoặc tool call logic.
+
+### 6.2. Tạo & Cập nhật Skill trực tiếp qua Chat (In-chat Skill Lifecycle)
+1. **Dynamic Tool `create_or_update_skill`**:
+   - Thêm tool cho Agent Runner: `create_or_update_skill({ name, title, description, tools, instructions, version })`.
+   - Tool tự động ghi file `skills/<name>/SKILL.md` hoặc custom storage, đồng thời kích hoạt event hot-reload trên UI và Runner mà không cần restart app.
+2. **Dynamic Tool `edit_skill_file` / `read_skill_file`**:
+   - Cho phép Agent đọc cấu trúc hiện tại của Skill và sửa trực tiếp từng đoạn chỉ dẫn hoặc logic thực thi theo lệnh của người dùng trong chat.
 
 ---
-*Nguồn đối chiếu: `docs/architecture.md`, `AGENTS.md`, `docs/subsystems/{invariants,tools}.md` của deepseek-harness @ shallow clone 17/08/2026.*
+
+## 7. Roadmap triển khai Giai đoạn 2
+
+| # | Hạng mục | Trạng thái | Mô tả chi tiết |
+|---|---|---|---|
+| 09 | **Skill Plugin Seam**: Đưa Skill Registry vào Kernel Context | ✅ Hoàn thành | Tạo `skillRegistry` trên Kernel, nạp skill kèm plugin binding (`agent-runner/src/kernel/skills.ts`) |
+| 10 | **In-chat Skill Creator / Updater Tools**: Bộ công cụ quản lý Skill | ✅ Hoàn thành | `create_or_update_skill`, `read_skill_file` native tools tự động lưu file đĩa và phát IPC |
+| 11 | **Hot-Reload & State Sync**: Đồng bộ Real-time giữa Runner & UI | ✅ Hoàn thành | Lưu file vật lý disk + phát event cập nhật tức thì trên React Store qua SQLite IPC |
+| 12 | **Skill Execution Pipeline**: Hỗ trợ kịch bản thực thi qua Plugin | ✅ Hoàn thành | Truyền `skillTools` qua `platformId` metadata tunnel & bind động vào Capability Rail |
+| 13 | **Contract Checks & Invariants**: Kiểm chứng toàn diện | ✅ Hoàn thành | Script test `scripts/executable-skills-check.mjs` tích hợp trọn vẹn vào `npm run check` |
+

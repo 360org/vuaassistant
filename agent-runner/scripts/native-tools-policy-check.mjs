@@ -33,7 +33,7 @@ const tools = kernel.root.tools;
 
 // --- 1. Cắm đủ, không sót ---------------------------------------------------
 const names = tools.list().map((t) => t.name);
-check(`cắm đủ 13 tool native vào ctx.tools (thấy ${names.length})`, names.length === 13);
+check(`cắm đủ 15 tool native vào ctx.tools (thấy ${names.length})`, names.length === 15);
 check('mọi tool đều mang nguồn "native"', tools.list().every((t) => t.origin === 'native'));
 
 // --- 2. Đối chiếu với lối đoán cũ -------------------------------------------

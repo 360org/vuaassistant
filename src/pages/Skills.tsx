@@ -243,6 +243,7 @@ export function Skills() {
                         onClick={() => {
                           useSkill(template.prompt || template.description, {
                             name: template.name,
+                            tools: template.tools,
                             instructions: template.instructions,
                           });
                           setView("chat");
@@ -307,6 +308,7 @@ export function Skills() {
                       onClick={() => {
                         useSkill(skill.prompt, {
                           name: skill.name,
+                          tools: skill.tools,
                           instructions: skill.instructions,
                         });
                         setView("chat");

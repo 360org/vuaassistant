@@ -6,7 +6,19 @@ Ghi lại mọi thay đổi đáng chú ý của VuaAssistant. Định dạng th
 
 ## [Chưa phát hành]
 
-## [1.1.61] - 2026-08-21
+## [1.1.62] - 2026-08-23
+
+### Nâng cấp Kiến trúc (Executable Skills & In-Chat Lifecycle)
+- **Executable Skills Architecture (DeepSeek Harness style)**:
+  - Skill không còn đơn thuần là chỉ dẫn markdown tĩnh; hỗ trợ khai báo binding trực tiếp với Plugins/Tools (`tools: [...]` và `vua-tools`) trong YAML frontmatter.
+  - Tích hợp `skillsPlugin` và `SkillRegistry` vào Kernel runtime (`agent-runner/src/kernel/skills.ts`), hỗ trợ tra cứu dependencies công cụ và quản lý vòng đời (Disposer) an toàn.
+  - Tự động tunnel thông tin `skillTools` qua `platformId` metadata từ Desktop Shell xuống Agent Runner và dynamic binding vào Capability Rail.
+- **In-Chat Skill Lifecycle Tools**:
+  - Bổ sung native tools `create_or_update_skill` và `read_skill_file` cho phép người dùng ra lệnh trực tiếp trong chat để tạo, đọc và sửa đổi file `SKILL.md` vật lý mà không cần copy-paste thủ công.
+- **Live Hot-Reload qua SQLite IPC**:
+  - Gửi sự kiện `skill:updated` qua kênh outbound IPC `skill_update` để React Store tự động đồng bộ tức thì lên giao diện không cần khởi động lại ứng dụng.
+- **Kiểm chứng Hợp đồng (Contract Checks)**:
+  - Tích hợp script `scripts/executable-skills-check.mjs` vào quy trình CI/test suite chuẩn `npm run check`.
 
 ### Thay đổi lớn (Kiến trúc & Refactor)
 - **Plugin Architecture ("Everything is a plugin")**: Tách biệt hoàn toàn luồng chạy chính của `agent-runner`.

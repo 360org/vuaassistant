@@ -24,6 +24,7 @@ import { createPolicyPlugin } from './policy-plugin.js';
 import { createVerifierPlugin } from './verifier-plugin.js';
 import { nativeToolsPlugin } from '../native-tools/index.js';
 import { builtinToolsPlugin } from '../mcp-tools/index.js';
+import { skillsPlugin } from './skills.js';
 import { OutboundLimiter, readPolicy, type Policy } from '../policy.js';
 import type { AgentProvider } from '../providers/types.js';
 import { createMcpPlugin } from '../plugins/mcp.js';
@@ -55,6 +56,7 @@ export async function composeRunner(options: ComposeOptions = {}): Promise<Kerne
   await kernel.use(toolsPlugin);
   await kernel.use(nativeToolsPlugin);
   await kernel.use(builtinToolsPlugin);
+  await kernel.use(skillsPlugin);
   await kernel.use(createMcpPlugin());
   await kernel.use(promptPlugin);
   await kernel.use(toolListSectionPlugin);

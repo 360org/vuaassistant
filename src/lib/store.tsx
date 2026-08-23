@@ -122,9 +122,10 @@ export interface CustomSkill {
   source: string;
 }
 
-/** The skill steering a chat: its name and full SKILL.md instructions. */
+/** The skill steering a chat: its name, tools and full SKILL.md instructions. */
 export interface ActiveSkill {
   name: string;
+  tools?: string[];
   instructions: string;
 }
 
@@ -804,6 +805,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
         after = Math.max(after, row.id);
         if (row.channel_type === "telegram" && row.thread_id) appendTelegram(row.thread_id, row);
         else if (row.channel_type === "scheduled") appendScheduled(row);
+        else if (row.channel_type === "skill_update") {
+          try {
+            const data = JSON.parse(row.content);
+            if (data.event === "skill:updated" && data.raw) {
+              addCustomSkill({ raw: data.raw, source: data.name ? `created:${data.name}` : `created:${Date.now()}` });
+            }
+          } catch {
+            // Ignore parse error
+          }
+        }
       }
       if (rows.length > 0) localStorage.setItem(WATERMARK, String(after));
     };

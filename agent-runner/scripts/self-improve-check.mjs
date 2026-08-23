@@ -30,7 +30,7 @@ const {
   reflectAndLearn,
   learnFromExchange,
   selfImproveEnabled,
-} = await import('../src/memory/self-improve.ts');
+} = await import('../dist/memory/self-improve.js');
 
 // --- parsing a model reply ---------------------------------------------------
 check('an array is pulled out of surrounding prose', parseNotes('Sure!\n["a","b"]\nDone').length === 2);
@@ -54,7 +54,7 @@ const stubProvider = {
   },
   isSessionInvalid: () => false,
 };
-const config = { provider: stubProvider, providerName: 'stub', agentId: 'default', agentDir, systemContext: { instructions: '' }, tools: (await (await import('../src/kernel/compose.ts')).composeRunner()).root.tools };
+const config = { provider: stubProvider, providerName: 'stub', agentId: 'default', agentDir, systemContext: { instructions: '' }, tools: (await (await import('../dist/kernel/compose.js')).composeRunner()).root.tools };
 
 nextReply = '["Prefers Vietnamese", "Runs a coffee shop"]';
 let notes = await reflectAndLearn(config, { user: 'chào em', assistant: 'chào anh' }, []);

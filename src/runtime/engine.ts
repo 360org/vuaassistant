@@ -55,6 +55,8 @@ export interface ChatOptions {
   sessionId?: string;
   /** Active skill's name — shown to the model as the task it's running. */
   skillName?: string;
+  /** Tools required by the active skill */
+  skillTools?: string[];
   /** Active skill's full SKILL.md instructions, injected as guidance. */
   skillInstructions?: string;
   /** True when the user has an active global subscription (OpenRouter key in Vault) */

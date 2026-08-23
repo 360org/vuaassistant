@@ -921,6 +921,131 @@ const delegateTaskTool: NativeTool = {
   },
 };
 
+// --- In-chat Skill Management Tools (Executable Skills Lifecycle) ---
+
+const createOrUpdateSkillTool: NativeTool = {
+  sideEffect: true,
+  requiresApproval: false,
+  definition: {
+    name: 'create_or_update_skill',
+    description:
+      'Create or update an Executable Skill directly on disk and in the application library. ' +
+      'Use this whenever the user asks to create, update, or edit a skill in chat (e.g. "tạo skill", "cập nhật skill", "viết skill"). ' +
+      'Pass required tools (e.g. ["file_read", "http_request"]) if the skill executes workflows.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: 'Unique slug identifier (kebab-case, e.g. "excel-analyzer", "web-scraper").' },
+        title: { type: 'string', description: 'User-friendly title (e.g. "Phân Tích Dữ Liệu Excel").' },
+        description: { type: 'string', description: 'Short summary of what the skill does.' },
+        category: { type: 'string', description: 'Category (e.g. "Development", "Productivity", "Marketing", "Data").' },
+        emoji: { type: 'string', description: 'Icon emoji (e.g. "📊", "⚡", "🛠️").' },
+        prompt: { type: 'string', description: 'Suggested default user prompt when activating the skill.' },
+        tools: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'List of tools/plugins this skill calls or requires (e.g. ["file_read", "file_write", "http_request"]).',
+        },
+        instructions: { type: 'string', description: 'Full step-by-step markdown instructions for the AI when performing this skill.' },
+      },
+      required: ['name', 'title', 'description', 'instructions'],
+    },
+  },
+  async execute(args): Promise<string> {
+    const slug = String(args.name || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    if (!slug) return 'Error: skill name (slug) is required.';
+    const title = String(args.title || slug).trim();
+    const description = String(args.description || '').trim();
+    const category = String(args.category || 'General').trim();
+    const emoji = String(args.emoji || '⚡').trim();
+    const prompt = String(args.prompt || '').trim();
+    const tools = Array.isArray(args.tools) ? args.tools.map(String) : [];
+    const instructions = String(args.instructions || '').trim();
+
+    const toolsList = tools.length ? `tools: [${tools.map((t) => `"${t}"`).join(', ')}]\n` : '';
+    const toolsLine = tools.length ? `  vua-tools: "${tools.join(', ')}"\n` : '';
+    const rawMd = `---
+name: ${slug}
+description: ${description}
+${toolsList}metadata:
+  vua-title: "${title}"
+  vua-emoji: "${emoji}"
+  vua-category: "${category}"
+  vua-tagline: "${description}"
+  vua-prompt: "${prompt}"
+${toolsLine}---
+
+# ${title}
+
+${instructions}
+`.trim();
+
+    const dataDir = getDataDir();
+    const skillsDir = path.join(dataDir, 'skills', slug);
+    fs.mkdirSync(skillsDir, { recursive: true });
+    const skillPath = path.join(skillsDir, 'SKILL.md');
+    fs.writeFileSync(skillPath, rawMd, 'utf8');
+
+    // Notify outbound IPC so desktop React UI auto syncs
+    try {
+      const { writeMessageOut } = await import('../db/index.js');
+      writeMessageOut({
+        id: `skill-sync-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        platform_id: 'system',
+        channel_type: 'skill_update',
+        thread_id: null,
+        kind: 'event',
+        content: JSON.stringify({
+          event: 'skill:updated',
+          name: slug,
+          title,
+          raw: rawMd,
+          path: skillPath,
+        }),
+      });
+    } catch {
+      // IPC optional in isolated test mode
+    }
+
+    log(`Created/updated skill "${title}" (${slug}) at ${skillPath}`);
+    return `✅ Đã lưu và cập nhật thành công Skill "${title}" (${slug})!\n- Đường dẫn: ${skillPath}\n- Tools liên kết: ${tools.length ? tools.join(', ') : 'Mặc định'}\nSkill có hiệu lực tức thì trên giao diện và trong phiên làm việc.`;
+  },
+};
+
+const readSkillFileTool: NativeTool = {
+  sideEffect: false,
+  requiresApproval: false,
+  definition: {
+    name: 'read_skill_file',
+    description: 'Read the raw markdown and metadata of an existing Skill by its name slug.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: 'Skill slug name (e.g. "excel-formula", "translate").' },
+      },
+      required: ['name'],
+    },
+  },
+  async execute(args): Promise<string> {
+    const slug = String(args.name || '').trim().toLowerCase();
+    if (!slug) return 'Error: skill name is required.';
+
+    // Check custom skills dir first, then built-in
+    const customPath = path.join(getDataDir(), 'skills', slug, 'SKILL.md');
+    if (fs.existsSync(customPath)) {
+      return fs.readFileSync(customPath, 'utf8');
+    }
+
+    // Built-in skills fallback path
+    const builtInPath = path.resolve(process.cwd(), 'skills', slug, 'SKILL.md');
+    if (fs.existsSync(builtInPath)) {
+      return fs.readFileSync(builtInPath, 'utf8');
+    }
+
+    return `Skill "${slug}" not found in custom storage (${customPath}) or built-in repository.`;
+  },
+};
+
 /** All built-in native tools */
 export const NATIVE_TOOLS: NativeTool[] = [
   fileReadTool,
@@ -936,6 +1061,8 @@ export const NATIVE_TOOLS: NativeTool[] = [
   searchMemoryTool,
   computerUseTool,
   delegateTaskTool,
+  createOrUpdateSkillTool,
+  readSkillFileTool,
 ];
 
 /** Get tool definitions for all native tools (for sending to LLM) */

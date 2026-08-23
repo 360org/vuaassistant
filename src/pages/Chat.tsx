@@ -112,6 +112,7 @@ export function Chat() {
   const activateSkillTemplate = (sk: SkillTemplate) => {
     useSkill(sk.prompt || `Hãy sử dụng kỹ năng "${sk.name}" để hỗ trợ tôi: `, {
       name: sk.name,
+      tools: sk.tools,
       instructions: sk.instructions,
     });
     if (sk.prompt) setInput(sk.prompt);
@@ -597,6 +598,7 @@ export function Chat() {
         agentId: activeAgent?.id,
         sessionId: activeSessionId ?? undefined,
         skillName: activeSkill?.name,
+        skillTools: activeSkill?.tools,
         skillInstructions: activeSkill?.instructions,
       })) {
         if (controller.signal.aborted) break;

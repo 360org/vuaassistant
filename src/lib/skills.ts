@@ -14,6 +14,8 @@ export interface AgentSkill {
   /** Spec `description` — what the skill does and when to use it. */
   description: string;
   metadata: Record<string, string>;
+  /** Tools/plugins explicitly required by this skill (e.g. ['file_read', 'http_request', 'schedule_task']) */
+  tools?: string[];
   /** Markdown body: the instructions loaded when the skill activates. */
   instructions: string;
 }
@@ -26,6 +28,8 @@ export interface SkillTemplate {
   description: string;
   /** Pre-filled into the chat composer when the user clicks Use. */
   prompt: string;
+  /** Tools required by the skill */
+  tools?: string[];
   /** Full instruction body, for the engine once real providers are wired. */
   instructions: string;
   /** Nguồn skill: built-in, URL, hoặc skill tự tạo local. */
@@ -47,16 +51,32 @@ export function parseSkillMd(raw: string): AgentSkill {
   const top: Record<string, string> = {};
   const metadata: Record<string, string> = {};
   let inMetadata = false;
+  let inTools = false;
+  const tools: string[] = [];
 
   for (const line of match[1].split(/\r?\n/)) {
     if (!line.trim() || line.trim().startsWith("#")) continue;
     const indented = /^\s/.test(line);
     const entry = line.trim().match(/^([\w-]+):\s*(.*)$/);
-    if (!entry) continue;
+    if (!entry) {
+      // Check list item (e.g. tools item under tools:)
+      const listItem = line.trim().match(/^-\s+(.+)$/);
+      if (listItem && inTools) {
+        tools.push(unquote(listItem[1].trim()));
+      }
+      continue;
+    }
     const [, key, rawValue] = entry;
     if (!indented) {
       inMetadata = key === "metadata" && rawValue === "";
-      if (!inMetadata) top[key] = unquote(rawValue);
+      inTools = key === "tools" && rawValue === "";
+      if (key === "tools" && rawValue) {
+        // inline list e.g. tools: [a, b]
+        const clean = rawValue.replace(/^\[|\]$/g, "").split(",").map((s) => unquote(s.trim())).filter(Boolean);
+        tools.push(...clean);
+      } else if (!inMetadata && !inTools) {
+        top[key] = unquote(rawValue);
+      }
     } else if (inMetadata) {
       metadata[key] = unquote(rawValue);
     }
@@ -66,7 +86,7 @@ export function parseSkillMd(raw: string): AgentSkill {
   if (!top.description) {
     throw new Error(`skill ${top.name}: frontmatter is missing \`description\``);
   }
-  return { name: top.name, description: top.description, metadata, instructions: body };
+  return { name: top.name, description: top.description, metadata, tools: tools.length ? tools : undefined, instructions: body };
 }
 
 /**
@@ -151,11 +171,14 @@ function unquote(value: string): string {
   return value;
 }
 
-const files = import.meta.glob<string>("../../skills/*/SKILL.md", {
-  query: "?raw",
-  import: "default",
-  eager: true,
-});
+const files: Record<string, string> =
+  typeof import.meta !== "undefined" && typeof (import.meta as unknown as { glob?: unknown }).glob === "function"
+    ? import.meta.glob<string>("../../skills/*/SKILL.md", {
+        query: "?raw",
+        import: "default",
+        eager: true,
+      })
+    : {};
 
 /** Maps a parsed Agent Skill onto the app's card/template shape. */
 export function toTemplate(skill: AgentSkill, provenance = "built-in"): SkillTemplate {
@@ -166,6 +189,7 @@ export function toTemplate(skill: AgentSkill, provenance = "built-in"): SkillTem
     category: skill.metadata["vua-category"] ?? "General",
     description: skill.metadata["vua-tagline"] ?? skill.description,
     prompt: skill.metadata["vua-prompt"] ?? "",
+    tools: skill.tools,
     instructions: skill.instructions,
     provenance,
     version: skill.metadata["vua-version"] ?? skill.metadata.version,

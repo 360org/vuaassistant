@@ -1,7 +1,7 @@
 {
   "name": "vuaassistant",
   "private": true,
-  "version": "1.1.61",
+  "version": "1.1.62",
   "type": "module",
   "description": "VuaAssistant — AI for everyone. Download, install, login, connect, start.",
   "author": {
@@ -18,7 +18,7 @@
     "build": "node scripts/sync-9router.mjs && npm run build:runner && npm run bundle:node && npm run bundle:ai-router && node scripts/validate-skills.mjs && tsc && vite build",
     "check:desktop-bundle": "node scripts/desktop-bundle-contract-check.mjs",
     "check:desktop-oauth": "node scripts/desktop-oauth-check.mjs",
-    "check": "npm run build && npm run check:desktop-bundle && npm run check:desktop-oauth && node scripts/pack-rebind-check.mjs && node scripts/host-process-contract-check.mjs && node scripts/ai-router-deps-check.mjs && node scripts/connection-test-check.mjs && node scripts/ai-router-contract-check.mjs && node scripts/ai-router-multi-account-check.mjs && node scripts/credential-boundary-check.mjs && node scripts/connector-capability-check.mjs && node scripts/tool-loop-check.mjs && node scripts/login-check.mjs && node scripts/onboarding-connection-check.mjs && node scripts/local-user-check.mjs && node scripts/isolation-check.mjs && node scripts/connector-check.mjs && node scripts/rag-check.mjs && node scripts/models-availability-check.mjs && node scripts/provider-error-check.mjs",
+    "check": "npm run build && npm run check:desktop-bundle && npm run check:desktop-oauth && node scripts/pack-rebind-check.mjs && node scripts/host-process-contract-check.mjs && node scripts/ai-router-deps-check.mjs && node scripts/connection-test-check.mjs && node scripts/ai-router-contract-check.mjs && node scripts/ai-router-multi-account-check.mjs && node scripts/credential-boundary-check.mjs && node scripts/connector-capability-check.mjs && node scripts/tool-loop-check.mjs && node scripts/login-check.mjs && node scripts/onboarding-connection-check.mjs && node scripts/local-user-check.mjs && node scripts/isolation-check.mjs && node scripts/connector-check.mjs && node scripts/rag-check.mjs && node scripts/models-availability-check.mjs && node scripts/provider-error-check.mjs && node scripts/executable-skills-check.mjs",
     "version:set": "node scripts/bump-version.mjs",
     "build:demo": "vite build -c vite.demo.config.ts && node scripts/inline-demo.mjs",
     "validate:skills": "node scripts/validate-skills.mjs",
