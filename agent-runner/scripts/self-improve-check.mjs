@@ -2,6 +2,13 @@
 // facts from an exchange, skips what it already knows, writes them into its own
 // memory tree, and honours the user's setting. Deterministic, no network.
 // Run: npx tsx scripts/self-improve-check.mjs
+//
+// Nạp từ `src/` chứ KHÔNG từ `dist/`, giống 26 script kiểm chứng còn lại.
+// Bản cũ nạp từ `dist/` nên chỉ chạy được ở máy đã build sẵn: job `agent-runner`
+// trong CI chỉ chạy `npm install` rồi `npm run check`, không hề build, nên nó
+// đỏ với ERR_MODULE_NOT_FOUND — trong khi ở máy dev vẫn xanh vì `dist/` còn sót
+// lại từ lần build trước. Ba bản phát hành (v1.1.61, v1.1.62, v1.1.63) đã ra
+// trong lúc CI đỏ vì đúng lỗi này.
 
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync, existsSync } from 'fs';
 import { tmpdir } from 'os';
@@ -30,7 +37,7 @@ const {
   reflectAndLearn,
   learnFromExchange,
   selfImproveEnabled,
-} = await import('../dist/memory/self-improve.js');
+} = await import('../src/memory/self-improve.ts');
 
 // --- parsing a model reply ---------------------------------------------------
 check('an array is pulled out of surrounding prose', parseNotes('Sure!\n["a","b"]\nDone').length === 2);
@@ -54,7 +61,7 @@ const stubProvider = {
   },
   isSessionInvalid: () => false,
 };
-const config = { provider: stubProvider, providerName: 'stub', agentId: 'default', agentDir, systemContext: { instructions: '' }, tools: (await (await import('../dist/kernel/compose.js')).composeRunner()).root.tools };
+const config = { provider: stubProvider, providerName: 'stub', agentId: 'default', agentDir, systemContext: { instructions: '' }, tools: (await (await import('../src/kernel/compose.ts')).composeRunner()).root.tools };
 
 nextReply = '["Prefers Vietnamese", "Runs a coffee shop"]';
 let notes = await reflectAndLearn(config, { user: 'chào em', assistant: 'chào anh' }, []);
