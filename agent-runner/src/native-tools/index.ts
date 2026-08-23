@@ -1046,6 +1046,154 @@ const readSkillFileTool: NativeTool = {
   },
 };
 
+// --- In-chat Agent Profile, Soul & Instructions Management ---
+
+const updateAgentProfileTool: NativeTool = {
+  sideEffect: true,
+  requiresApproval: false,
+  definition: {
+    name: 'update_agent_profile',
+    description:
+      'Update an AI Agent profile, custom instructions ("kim chỉ nam"), personality ("soul/tính cách"), or metadata directly on disk. ' +
+      'Use this whenever the user asks in chat to update an agent\'s instructions, prompt, soul, or profile (e.g. "update agent erp expert cho anh kim chỉ nam là...", "đổi tính cách agent thành...").',
+    input_schema: {
+      type: 'object',
+      properties: {
+        agent_name: {
+          type: 'string',
+          description: 'The slug or name of the agent (e.g. "erp-expert", "research-analyst", "content-writer", "marketing-pro", "developer").',
+        },
+        instructions: {
+          type: 'string',
+          description: 'New or updated custom instructions / business logic / "kim chỉ nam" for this agent.',
+        },
+        soul: {
+          type: 'string',
+          description: 'New or updated personality, tone, character traits / "tính cách" for this agent.',
+        },
+        title: {
+          type: 'string',
+          description: 'Optional display title / name for the agent.',
+        },
+        description: {
+          type: 'string',
+          description: 'Optional short summary / role description for the agent.',
+        },
+      },
+      required: ['agent_name'],
+    },
+  },
+  async execute(args): Promise<string> {
+    const rawName = String(args.agent_name || '').trim();
+    if (!rawName) return 'Error: agent_name is required.';
+    const slug = rawName.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    const instructions = args.instructions !== undefined ? String(args.instructions).trim() : null;
+    const soul = args.soul !== undefined ? String(args.soul).trim() : null;
+    const title = args.title !== undefined ? String(args.title).trim() : null;
+    const description = args.description !== undefined ? String(args.description).trim() : null;
+
+    const dataDir = getDataDir();
+    const agentDir = path.join(dataDir, 'agents', slug);
+    const { ensureMemoryScaffold } = await import('../memory/memory-scaffold.js');
+    ensureMemoryScaffold(agentDir);
+
+    const updatedItems: string[] = [];
+
+    // 1. Update instructions.md if provided
+    if (instructions !== null) {
+      const instPath = path.join(agentDir, 'instructions.md');
+      const header = `# ${title || slug} — Instructions\n\n`;
+      const content = instructions.startsWith('#') ? instructions : `${header}${instructions}\n`;
+      fs.writeFileSync(instPath, content, 'utf8');
+      updatedItems.push(`Kim chỉ nam / Chỉ dẫn công việc (instructions.md)`);
+    }
+
+    // 2. Update soul.md if provided
+    if (soul !== null) {
+      const soulPath = path.join(agentDir, 'soul.md');
+      const header = `# ${title || slug} — Soul & Personality\n\n`;
+      const content = soul.startsWith('#') ? soul : `${header}${soul}\n`;
+      fs.writeFileSync(soulPath, content, 'utf8');
+      updatedItems.push(`Tính cách / Giọng điệu (soul.md)`);
+    }
+
+    // 3. Notify outbound IPC so desktop React UI auto syncs agentConfigs
+    try {
+      const { writeMessageOut } = await import('../db/index.js');
+      writeMessageOut({
+        id: `agent-sync-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        platform_id: 'system',
+        channel_type: 'agent_update',
+        thread_id: null,
+        kind: 'event',
+        content: JSON.stringify({
+          event: 'agent:updated',
+          agentId: slug,
+          instructions: instructions ?? undefined,
+          soul: soul ?? undefined,
+          name: title ?? undefined,
+          description: description ?? undefined,
+        }),
+      });
+    } catch {
+      // IPC optional in test mode
+    }
+
+    log(`Updated agent profile "${slug}" at ${agentDir}: ${updatedItems.join(', ')}`);
+    return `✅ Đã cập nhật thành công Agent "${title || slug}"!\n- Thư mục: ${agentDir}\n- Các phần đã cập nhật: ${updatedItems.length ? updatedItems.join(', ') : 'Cấu hình agent'}\nThay đổi có hiệu lực ngay lập tức trong phiên làm việc của Agent.`;
+  },
+};
+
+const readAgentProfileTool: NativeTool = {
+  sideEffect: false,
+  requiresApproval: false,
+  definition: {
+    name: 'read_agent_profile',
+    description: 'Read the current custom instructions (instructions.md), personality (soul.md), and memory summary of an agent by slug.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        agent_name: { type: 'string', description: 'Agent slug name (e.g. "erp-expert", "marketing-pro").' },
+      },
+      required: ['agent_name'],
+    },
+  },
+  async execute(args): Promise<string> {
+    const slug = String(args.agent_name || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    if (!slug) return 'Error: agent_name is required.';
+
+    const dataDir = getDataDir();
+    const agentDir = path.join(dataDir, 'agents', slug);
+    if (!fs.existsSync(agentDir)) {
+      return `Agent "${slug}" chưa có thư mục cấu hình tại ${agentDir}.`;
+    }
+
+    const instPath = path.join(agentDir, 'instructions.md');
+    const soulPath = path.join(agentDir, 'soul.md');
+    const memIndexPath = path.join(agentDir, 'memory', 'index.md');
+
+    let out = `=== AGENT PROFILE: ${slug} ===\nĐường dẫn: ${agentDir}\n\n`;
+
+    if (fs.existsSync(instPath)) {
+      out += `--- INSTRUCTIONS (instructions.md) ---\n${fs.readFileSync(instPath, 'utf8')}\n\n`;
+    } else {
+      out += `--- INSTRUCTIONS ---\n(Chưa có file instructions.md)\n\n`;
+    }
+
+    if (fs.existsSync(soulPath)) {
+      out += `--- SOUL & PERSONALITY (soul.md) ---\n${fs.readFileSync(soulPath, 'utf8')}\n\n`;
+    } else {
+      out += `--- SOUL & PERSONALITY ---\n(Chưa có file soul.md)\n\n`;
+    }
+
+    if (fs.existsSync(memIndexPath)) {
+      out += `--- MEMORY INDEX (memory/index.md) ---\n${fs.readFileSync(memIndexPath, 'utf8')}\n`;
+    }
+
+    return out.trim();
+  },
+};
+
 /** All built-in native tools */
 export const NATIVE_TOOLS: NativeTool[] = [
   fileReadTool,
@@ -1063,6 +1211,8 @@ export const NATIVE_TOOLS: NativeTool[] = [
   delegateTaskTool,
   createOrUpdateSkillTool,
   readSkillFileTool,
+  updateAgentProfileTool,
+  readAgentProfileTool,
 ];
 
 /** Get tool definitions for all native tools (for sending to LLM) */

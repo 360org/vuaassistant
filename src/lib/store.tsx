@@ -413,6 +413,7 @@ interface AppStore extends PersistedState {
     config: ProviderConfig,
   ) => Promise<void>;
   addCustomSkill: (skill: CustomSkill) => void;
+  updateCustomSkill: (source: string, raw: string) => void;
   removeCustomSkill: (source: string) => void;
   toggleEngineSkill: (skillId: string) => void;
   setMcpServers: (servers: Record<string, McpServerConfig>) => void;
@@ -814,6 +815,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
           } catch {
             // Ignore parse error
           }
+        } else if (row.channel_type === "agent_update") {
+          try {
+            const data = JSON.parse(row.content);
+            if (data.event === "agent:updated" && data.agentId) {
+              setState((s) => {
+                const cur = s.agentConfigs[data.agentId] ?? {
+                  instructions: "",
+                  soul: "",
+                  memory: [],
+                  skills: [],
+                };
+                return {
+                  ...s,
+                  agentConfigs: {
+                    ...s.agentConfigs,
+                    [data.agentId]: {
+                      ...cur,
+                      ...(data.instructions !== undefined ? { instructions: data.instructions } : {}),
+                      ...(data.soul !== undefined ? { soul: data.soul } : {}),
+                    },
+                  },
+                };
+              });
+            }
+          } catch {
+            // Ignore parse error
+          }
         }
       }
       if (rows.length > 0) localStorage.setItem(WATERMARK, String(after));
@@ -983,6 +1011,41 @@ export function AppProvider({ children }: { children: ReactNode }) {
         agentConfigs: nextAgentCfgs,
       };
     });
+  }, []);
+
+  const updateCustomSkill = useCallback((source: string, raw: string) => {
+    let skillId = "";
+    try {
+      const parsed = parseSkillMd(raw);
+      skillId = parsed.name;
+    } catch {
+      /* fallback */
+    }
+
+    setState((s) => {
+      const nextCustom = s.customSkills.map((c) =>
+        c.source === source ? { ...c, raw } : c,
+      );
+      if (!skillId) return { ...s, customSkills: nextCustom };
+
+      const nextEngineSkills = Array.from(new Set([...s.installedEngineSkills, skillId]));
+      return {
+        ...s,
+        customSkills: nextCustom,
+        installedEngineSkills: nextEngineSkills,
+      };
+    });
+
+    // Save physical file to customDataPath/skills/ if it is a local custom skill
+    if (skillId) {
+      void import("@tauri-apps/api/core").then(({ invoke }) => {
+        void invoke("save_custom_data_text", {
+          customDir: localStorage.getItem("vua:custom-data-path") || "~/vuaassistant",
+          relativePath: `skills/${skillId}/SKILL.md`,
+          content: raw,
+        }).catch(() => {});
+      }).catch(() => {});
+    }
   }, []);
 
   const removeCustomSkill = useCallback((source: string) => {
@@ -1656,6 +1719,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       importAgent,
       removeCustomAgent,
       addCustomSkill,
+      updateCustomSkill,
       removeCustomSkill,
       toggleEngineSkill,
       setMcpServers,

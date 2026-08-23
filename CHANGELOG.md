@@ -6,6 +6,17 @@ Ghi lại mọi thay đổi đáng chú ý của VuaAssistant. Định dạng th
 
 ## [Chưa phát hành]
 
+## [1.1.63] - 2026-08-23
+
+### Tính năng Mới & Cải tiến
+- **In-Chat Agent Profile & Soul Customization**:
+  - Cho phép người dùng ra lệnh bằng ngôn ngữ tự nhiên trong Chat để cập nhật hồ sơ, Kim chỉ nam công việc (`instructions.md`), và Tính cách/Giọng điệu (`soul.md`) của bất kỳ AI Agent nào.
+  - Bổ sung native tools `update_agent_profile` và `read_agent_profile` trên Host Process Runner, tự động ghi file trực tiếp xuống thư mục `agents/<agentName>/` và bắn IPC event `agent_update` để đồng bộ giao diện React tức thì.
+- **Skill Detail View & Direct Editor Modal**:
+  - Bổ sung `SkillDetailModal` trên giao diện mục **Skills**, cho phép xem chi tiết toàn bộ nội dung kịch bản, metadata và chỉnh sửa trực tiếp nội dung `SKILL.md` (đối với Custom Skills).
+- **Bộ Kiểm thử & Verification Suite**:
+  - Bổ sung `scripts/agent-profile-check.mjs` kiểm chứng luồng cập nhật `instructions.md`, `soul.md` và memory scaffold trên đĩa vật lý, tích hợp vào CI check.
+
 ## [1.1.62] - 2026-08-23
 
 ### Nâng cấp Kiến trúc (Executable Skills & In-Chat Lifecycle)

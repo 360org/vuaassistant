@@ -1,16 +1,18 @@
 import { useMemo, useState } from "react";
-import { Download, Trash2, Wand2 } from "lucide-react";
-import { SKILLS, smartParseSkill, normalizeGithubSkillUrls, toTemplate } from "@/lib/skills";
+import { Download, Trash2, Wand2, Eye } from "lucide-react";
+import { SKILLS, smartParseSkill, normalizeGithubSkillUrls, toTemplate, type SkillTemplate } from "@/lib/skills";
 import { useApp } from "@/lib/store";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SkillDetailModal } from "@/components/SkillDetailModal";
 
 export function Skills() {
   const {
     useSkill,
     customSkills,
     addCustomSkill,
+    updateCustomSkill,
     removeCustomSkill,
     installedEngineSkills,
     toggleEngineSkill,
@@ -22,6 +24,14 @@ export function Skills() {
   const [url, setUrl] = useState("");
   const [installing, setInstalling] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Modal State for viewing & editing details of a skill
+  const [selectedSkill, setSelectedSkill] = useState<{
+    template: SkillTemplate;
+    raw?: string;
+    source?: string;
+    isCustom: boolean;
+  } | null>(null);
 
   const activeAgent = useMemo(() => {
     return agents.find((a) => a.id === activeAgentId) ?? null;
@@ -203,6 +213,7 @@ export function Skills() {
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
           {filteredCustom.map(({ template, source }) => {
             const isInstalled = installedEngineSkills.includes(template.id);
+            const customSkillItem = customSkills.find((c) => c.source === source);
             return (
               <Card key={source} className="flex flex-col border-neutral-800 bg-neutral-900/60 p-4">
                 <div className="flex items-start justify-between">
@@ -222,18 +233,29 @@ export function Skills() {
                   Nguồn: {template.provenance}{template.version ? ` · v${template.version}` : ""}
                 </p>
                 <div className="mt-4 flex items-center justify-between gap-2 border-t border-neutral-800/80 pt-3">
-                  <Button
-                    size="sm"
-                    variant={isInstalled ? "outline" : "primary"}
-                    onClick={() => toggleEngineSkill(template.id)}
-                    className={
-                      isInstalled
-                        ? "text-xs text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/40 cursor-pointer"
-                        : "bg-gold-500 text-neutral-950 font-semibold hover:bg-gold-400 cursor-pointer"
-                    }
-                  >
-                    {isInstalled ? "Tắt Skill" : "⚡ Bật Skill"}
-                  </Button>
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      size="sm"
+                      variant={isInstalled ? "outline" : "primary"}
+                      onClick={() => toggleEngineSkill(template.id)}
+                      className={
+                        isInstalled
+                          ? "text-xs text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/40 cursor-pointer"
+                          : "bg-gold-500 text-neutral-950 font-semibold hover:bg-gold-400 cursor-pointer"
+                      }
+                    >
+                      {isInstalled ? "Tắt Skill" : "⚡ Bật Skill"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setSelectedSkill({ template, raw: customSkillItem?.raw, source, isCustom: true })}
+                      title="Xem & Chỉnh sửa chi tiết Skill"
+                      className="text-xs text-neutral-300 hover:bg-neutral-800 border-neutral-700 cursor-pointer"
+                    >
+                      <Eye className="size-3.5 mr-1" /> Chi tiết
+                    </Button>
+                  </div>
 
                   <div className="flex items-center gap-1.5">
                     {isInstalled && (
@@ -288,18 +310,29 @@ export function Skills() {
                   Nguồn: {skill.provenance}{skill.version ? ` · v${skill.version}` : ""}
                 </p>
                 <div className="mt-4 flex items-center justify-between gap-2 border-t border-neutral-800/80 pt-3">
-                  <Button
-                    size="sm"
-                    variant={isInstalled ? "outline" : "primary"}
-                    onClick={() => toggleEngineSkill(skill.id)}
-                    className={
-                      isInstalled
-                        ? "text-xs text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/40 cursor-pointer"
-                        : "bg-gold-500 text-neutral-950 font-semibold hover:bg-gold-400 cursor-pointer"
-                    }
-                  >
-                    {isInstalled ? "Tắt Skill" : "⚡ Bật Skill"}
-                  </Button>
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      size="sm"
+                      variant={isInstalled ? "outline" : "primary"}
+                      onClick={() => toggleEngineSkill(skill.id)}
+                      className={
+                        isInstalled
+                          ? "text-xs text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/40 cursor-pointer"
+                          : "bg-gold-500 text-neutral-950 font-semibold hover:bg-gold-400 cursor-pointer"
+                      }
+                    >
+                      {isInstalled ? "Tắt Skill" : "⚡ Bật Skill"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setSelectedSkill({ template: skill, isCustom: false })}
+                      title="Xem chi tiết nội dung Skill"
+                      className="text-xs text-neutral-300 hover:bg-neutral-800 border-neutral-700 cursor-pointer"
+                    >
+                      <Eye className="size-3.5 mr-1" /> Chi tiết
+                    </Button>
+                  </div>
 
                   {isInstalled && (
                     <Button
@@ -328,6 +361,24 @@ export function Skills() {
           Không có kỹ năng nào được bật cho vai trò này. Bạn có thể bật chúng trong cấu hình vai trò.
         </div>
       )}
+
+      {/* Skill Detail & Edit Modal */}
+      <SkillDetailModal
+        isOpen={Boolean(selectedSkill)}
+        onClose={() => setSelectedSkill(null)}
+        skill={selectedSkill?.template ?? null}
+        rawContent={selectedSkill?.raw}
+        source={selectedSkill?.source}
+        isCustom={selectedSkill?.isCustom ?? false}
+        onSave={(source, newRaw) => {
+          updateCustomSkill(source, newRaw);
+          setSelectedSkill(null);
+        }}
+        onUse={(prompt, data) => {
+          useSkill(prompt, data);
+          setView("chat");
+        }}
+      />
 
     </div>
   );
