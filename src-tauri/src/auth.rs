@@ -360,6 +360,7 @@ fn decrypt_chrome_cookie_value(host_key: &str, encrypted_value: &[u8], key: &[u8
     Ok(None)
 }
 
+#[cfg(target_os = "macos")]
 fn hex_encode(bytes: &[u8]) -> String {
     const HEX: &[u8; 16] = b"0123456789abcdef";
     let mut out = String::with_capacity(bytes.len() * 2);

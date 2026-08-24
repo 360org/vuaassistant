@@ -53,6 +53,7 @@ export async function composeRunner(options: ComposeOptions = {}): Promise<Kerne
   const policy = options.policy ?? readPolicy();
   const kernel = createKernel();
 
+  await kernel.use(invariantsPlugin);
   await kernel.use(toolsPlugin);
   await kernel.use(nativeToolsPlugin);
   await kernel.use(builtinToolsPlugin);
@@ -61,7 +62,6 @@ export async function composeRunner(options: ComposeOptions = {}): Promise<Kerne
   await kernel.use(promptPlugin);
   await kernel.use(toolListSectionPlugin);
   await kernel.use(modelVisiblePlugin);
-  await kernel.use(invariantsPlugin);
   await kernel.use(coreInvariantsPlugin);
   await kernel.use(modelVisibleInvariantPlugin);
   await kernel.use(createProvidersPlugin({ configured: options.providerName }));

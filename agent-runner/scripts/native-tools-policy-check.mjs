@@ -112,7 +112,7 @@ check('gỡ kernel xong không còn tool nào treo lại', conLai === 0);
 
 console.log(
   pass
-    ? '\n✓ 13 tool native tự khai tính chất; hai chỗ lối đoán cũ sai nguy hiểm nhất đã được sửa'
+    ? `\n✓ ${names.length} tool native tự khai tính chất; hai chỗ lối đoán cũ sai nguy hiểm nhất đã được sửa`
     : '\n✗ FAILED',
 );
 process.exit(pass ? 0 : 1);

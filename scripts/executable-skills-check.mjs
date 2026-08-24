@@ -61,13 +61,36 @@ console.log("✓ Parse Skill YAML frontmatter với inline tools array thành c�
 
 // 3. Test Kernel SkillRegistry plugin
 import { createKernel } from "../agent-runner/dist/kernel/runtime.js";
+import { invariantsPlugin } from "../agent-runner/dist/kernel/invariants.js";
+import { toolsPlugin } from "../agent-runner/dist/kernel/tools.js";
 import { skillsPlugin } from "../agent-runner/dist/kernel/skills.js";
 
 const kernel = createKernel();
+await kernel.use(invariantsPlugin);
+await kernel.use(toolsPlugin);
 await kernel.use(skillsPlugin);
 await kernel.start();
 
 assert.ok(kernel.root.skills, "kernel.root.skills phải tồn tại");
+
+// Đăng ký tool trước để thỏa mãn invariant 'skills'
+kernel.root.tools.register({
+  name: "file_read",
+  description: "read file",
+  input_schema: { type: "object" },
+  sideEffect: false,
+  requiresApproval: false,
+  execute: async () => ({ tool_call_id: "", content: "" }),
+}, "native");
+
+kernel.root.tools.register({
+  name: "file_write",
+  description: "write file",
+  input_schema: { type: "object" },
+  sideEffect: true,
+  requiresApproval: false,
+  execute: async () => ({ tool_call_id: "", content: "" }),
+}, "native");
 
 const unregister = kernel.root.skills.register({
   name: "excel-pro",
@@ -81,9 +104,35 @@ assert.strictEqual(kernel.root.skills.has("excel-pro"), true);
 assert.strictEqual(kernel.root.skills.get("excel-pro")?.title, "Excel Pro");
 assert.deepStrictEqual(kernel.root.skills.getRequiredTools("excel-pro"), ["file_read", "file_write"]);
 
+// Kiểm tra trùng tên phải ném lỗi
+assert.throws(() => {
+  kernel.root.skills.register({
+    name: "excel-pro",
+    title: "Bản đè",
+    description: "test trùng",
+    instructions: "test",
+  });
+}, /skill "excel-pro" đã được đăng ký rồi/);
+
+// Invariant kiểm tra tool ma phải nổ
+kernel.root.skills.register({
+  name: "fake-tool-skill",
+  title: "Skill ma",
+  description: "test tool ma",
+  tools: ["tool_khong_ton_tai"],
+  instructions: "test",
+});
+
+let invariantFailed = false;
+try {
+  await kernel.root.invariants.verify();
+} catch (e) {
+  invariantFailed = true;
+  assert.ok(e.message.includes("yêu cầu 1 tool không tồn tại: tool_khong_ton_tai"));
+}
+assert.strictEqual(invariantFailed, true, "Invariant skills phải ném khi có tool ma");
+
 unregister();
-assert.strictEqual(kernel.root.skills.has("excel-pro"), false);
-console.log("✓ Kernel SkillRegistry đăng ký, tra cứu và dispose plugin binding thành công");
 
 // 4. Test In-chat native tools: create_or_update_skill & read_skill_file
 import { executeTool } from "../agent-runner/dist/native-tools/index.js";
