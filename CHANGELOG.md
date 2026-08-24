@@ -6,6 +6,24 @@ Ghi lại mọi thay đổi đáng chú ý của VuaAssistant. Định dạng th
 
 ## [Chưa phát hành]
 
+## [1.1.64] - 2026-08-24
+
+### Cải tiến & Kỷ luật Kernel
+- **Đồng bộ Kỷ luật Sổ Skill với Kernel (DeepSeek Harness style)**:
+  - `skills.register()` ném lỗi ngay khi trùng tên skill thay vì im lặng ghi đè.
+  - Bổ sung Invariant `skills` vào Kernel Invariant Registry (`agent-runner/src/kernel/skills.ts`): Bắt buộc mọi tool mà skill yêu cầu phải tồn tại trong sổ `ctx.tools`, ngăn chặn tool ma/lậu.
+  - Cập nhật thứ tự nạp plugin trong `agent-runner/src/kernel/compose.ts` (`invariantsPlugin` nạp trước).
+
+### Tối ưu & Dọn dẹp Mã nguồn
+- **Loại bỏ mã chết Frontend**:
+  - Dọn sạch các tệp không sử dụng: `ChatComposer.tsx`, `ChatMessageList.tsx`, `AgentStateContext.tsx`.
+- **Tách module giao diện Chat**:
+  - Tách `FilePreviewModal.tsx` thành sub-component độc lập trong `src/components/chat/modals/`.
+- **Fix Cảnh báo Rust Backend**:
+  - Gắn `#[cfg(target_os = "macos")]` cho `hex_encode` trong `src-tauri/src/auth.rs`, giúp `cargo check` sạch 100% cảnh báo trên mọi nền tảng.
+- **Sửa hiển thị test policy**:
+  - Cập nhật đếm động 17 native tools trong `agent-runner/scripts/native-tools-policy-check.mjs`.
+
 ## [1.1.63] - 2026-08-23
 
 ### Tính năng Mới & Cải tiến
