@@ -4,7 +4,7 @@
 > - `[x]` = 100% Đã hoàn thành, có bài kiểm chứng tự động (contract checks / invariants / live tests)
 > - Toàn bộ tính năng trong danh sách này đều hoạt động thực tế trên bản macOS/Windows/Linux native.
 >
-> *Cập nhật: 2026-08-25 (Phiên bản v1.1.65 — AIaC 3.0 Standard Docs & Multi-Agent Protocols)*
+> *Cập nhật: 2026-08-25 (Phiên bản v1.1.66 — Hooks Lifecycle & Persistent Task DAG)*
 
 ---
 
@@ -68,6 +68,7 @@
 - [x] **Executable Skills (DeepSeek Harness style)**: Skill khai báo & gọi trực tiếp plugins/tools (`file_read`, `http_request`, `mcp`, `schedule_task`...)
 - [x] **In-chat Skill Management**: Người dùng ra lệnh trong chat để tạo mới hoặc cập nhật nội dung Skill (`create_or_update_skill`, `read_skill_file`)
 - [x] **Live Skill Sync**: Tự động lưu file vật lý `skills/<name>/SKILL.md` và hot-reload lên UI/Runner không cần restart app (`scripts/executable-skills-check.mjs`)
+- [x] **Task DAG Management (Learn Claude Code & Harness style)**: Đồ thị tác vụ phụ thuộc bền vững trên đĩa với các công cụ `task_create`, `task_update`, `task_get`, `task_list` (`agent-runner/scripts/tasks-check.mjs`)
 
 ### 2.6 Trang Knowledge
 - [x] Upload tài liệu: PDF, Word, Excel, PowerPoint, Text
@@ -196,12 +197,14 @@
 
 ## 10. Kiểm Thử & CI/CD
 
-- [x] `npm run check` tích hợp 18 bài kiểm chứng contract tự động
-- [x] `cd agent-runner && npm run check` chạy toàn bộ 26 bài test Kernel & Invariants
+- [x] `npm run check` tích hợp 21 bài kiểm chứng contract tự động
+- [x] `cd agent-runner && npm run check` chạy toàn bộ 29 bài test Kernel, Hooks, Tasks & Invariants
 - [x] `cargo check` biên dịch sạch Rust backend
 - [x] Desktop Bundle Contract Check (`scripts/desktop-bundle-contract-check.mjs`)
 - [x] Desktop OAuth Check (`scripts/desktop-oauth-check.mjs`)
 - [x] Executable Skills Lifecycle Check (`scripts/executable-skills-check.mjs`)
+- [x] Hooks Lifecycle Check (`agent-runner/scripts/hooks-check.mjs`)
+- [x] Task DAG & Cycle Detection Check (`agent-runner/scripts/tasks-check.mjs`)
 - [x] GitHub Actions Release Workflow: Tự động build installer đa nền tảng (macOS Intel/Apple Silicon, Windows, Linux) khi có tag `v*`
 - [x] Bundle Agent Runner + Node runtime vào Tauri resources (Zero-dependency)
 - [x] Code signing & notarize macOS
@@ -218,7 +221,8 @@
 | **AI Providers & AI Router Sidecar** | 100% Hoàn thành | 116 providers kế thừa, multi-account, combo packs |
 | **Universal Agent Runner & Kernel** | 100% Hoàn thành | Kernel plugin seam, Two-DB SQLite IPC, loop guard |
 | **Executable Skills & In-Chat Lifecycle** | 100% Hoàn thành | YAML frontmatter tools, CRUD skill in chat, hot sync |
+| **Hooks & Task DAG Extensions** | 100% Hoàn thành | Lifecycle interception, TaskStore DAG, cycle detection |
 | **Knowledge RAG & Tri thức On-device** | 100% Hoàn thành | Local TF-IDF chunking, PDF/Word/Excel parsing |
 | **Vault & Bảo mật Credential** | 100% Hoàn thành | AES-256-CBC, opaque ref boundary, auto-redact |
 | **Channels (Desktop + Telegram)** | 100% Hoàn thành | Long-polling 2 chiều, web lock single-instance |
-| **Testing & CI/CD** | 100% Hoàn thành | 44 contract tests (18 root + 26 runner) 100% PASS |
+| **Testing & CI/CD** | 100% Hoàn thành | 50 contract tests (21 root + 29 runner) 100% PASS |

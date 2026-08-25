@@ -4,6 +4,23 @@ Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu tr
 
 ## [Unreleased]
 
+## [1.1.66] — 2026-08-25
+
+### Mở rộng Kiến trúc Kernel: Hooks Lifecycle & Persistent Task DAG
+*   **Hooks Lifecycle Plugin (`hooksPlugin` — s04_hooks pattern):**
+    *   Thêm `agent-runner/src/plugins/hooks.ts` cho phép đăng ký lắng nghe và can thiệp vào các mốc vòng đời của Agent: `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `TurnComplete`.
+    *   Tự động liên kết với thác nước `tools/pre-execute` để chặn các lệnh gọi tool không an toàn hoặc ghi nhận nhật ký thực thi (duration, kết quả).
+    *   Hỗ trợ Disposer theo chuẩn Effect Discipline để gỡ sạch sẽ không để lại rác khi plugin tắt.
+*   **Task System Plugin (`taskSystemPlugin` — s10_task_system pattern):**
+    *   Thêm `agent-runner/src/plugins/tasks.ts` quản lý đồ thị tác vụ phụ thuộc (Task DAG) bền vững trên đĩa tại `.tasks/`.
+    *   Hỗ trợ vòng đời tác vụ rõ ràng: `pending` ➔ `in_progress` ➔ `completed`.
+    *   Thuật toán phát hiện chu trình phụ thuộc (Cycle Detection) chống lặp vô tận khi cấu hình `blockedBy`.
+    *   Tự động tính toán trạng thái `canStart` cho từng task dựa trên trạng thái của các task phụ thuộc.
+    *   Cung cấp bộ 4 công cụ tương tác: `task_create`, `task_update`, `task_get`, `task_list` được tích hợp vào `ctx.tools`.
+*   **Bộ Kiểm thử Tự động & Contract Checks Mở rộng:**
+    *   Thêm `agent-runner/scripts/hooks-check.mjs` (5 assertions) và `agent-runner/scripts/tasks-check.mjs` (14 assertions) kiểm chứng 100% các kịch bản thực thi, chặn tool, phát hiện chu trình và gỡ sạch plugin.
+    *   Nâng tổng số bài kiểm thử của Agent Runner từ 27 lên 29 bài test tự động (tất cả 100% PASS).
+
 ## [1.1.65] — 2026-08-25
 
 ### Chuẩn hóa Cấu trúc Tài liệu & Multi-Agent Protocol

@@ -30,6 +30,8 @@ import type { AgentProvider } from '../providers/types.js';
 import { createMcpPlugin } from '../plugins/mcp.js';
 import { createSchedulerPlugin } from '../plugins/scheduler.js';
 import { createTelegramPlugin } from '../plugins/telegram.js';
+import { createHooksPlugin } from '../plugins/hooks.js';
+import { createTaskSystemPlugin } from '../plugins/tasks.js';
 
 export interface ComposeOptions {
   /** Provider dùng cho vai kiểm. Bỏ trống thì vai kiểm không nạp. */
@@ -55,6 +57,8 @@ export async function composeRunner(options: ComposeOptions = {}): Promise<Kerne
 
   await kernel.use(invariantsPlugin);
   await kernel.use(toolsPlugin);
+  await kernel.use(createHooksPlugin());
+  await kernel.use(createTaskSystemPlugin());
   await kernel.use(nativeToolsPlugin);
   await kernel.use(builtinToolsPlugin);
   await kernel.use(skillsPlugin);
