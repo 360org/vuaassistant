@@ -4,6 +4,15 @@ Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu tr
 
 ## [Unreleased]
 
+## [1.1.65] — 2026-08-25
+
+### Chuẩn hóa Cấu trúc Tài liệu & Multi-Agent Protocol
+*   **Chuẩn hóa Phân bổ Tài liệu AIaC 3.0 (`docs/*`):**
+    *   Tái cấu trúc thư mục tài liệu: chuyển toàn bộ các tệp chi tiết vào `docs/` (`docs/ARCH.md`, `docs/SPEC.md`, `docs/IDEA.md`, `docs/DEPLOY_GUIDE.md`, `docs/CHANGELOGS.md`, `docs/CHECKLIST.md`, `docs/HARNESS-PLAN.md`, `docs/AUDIT.md`, `docs/DEVELOPMENT.md`, `docs/SECURITY.md`...).
+    *   Giữ thư mục Root tinh gọn tuyệt đối theo chuẩn (chỉ gồm `README.md`, `AGENTS.md`, `.claude/`).
+*   **Quy chuẩn Điều phối Multi-Agent (`AGENTS.md`):**
+    *   Bổ sung tài liệu `AGENTS.md` tại thư mục Root, chuẩn hóa phân bổ vai trò, model assignment và nguyên tắc "Everything is a Plugin" lấy cảm hứng từ DeepSeek Harness và Learn Claude Code.
+
 ## [1.1.64] — 2026-08-24
 
 ### Kỷ luật Kernel & Dọn dẹp Mã nguồn

@@ -57,7 +57,7 @@ for (const { file, fn } of edits) {
 
 console.log(
   `\nVersion set to ${version}. Next:\n` +
-    `  1. Update CHANGELOG.md (move Unreleased → [${version}])\n` +
+    `  1. Update docs/CHANGELOGS.md (move Unreleased → [${version}])\n` +
     `  2. npm run check   # everything green before committing\n` +
     `  3. git commit -am "release: v${version}" && git tag v${version} && git push --tags\n` +
     `  → the Release workflow builds macOS/Windows/Linux installers.`,

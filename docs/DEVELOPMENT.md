@@ -79,7 +79,7 @@ git push
 
 ```bash
 npm run version:set 0.1.1        # đổi version ở package.json, tauri.conf.json, Cargo.*
-# chuyển mục "Chưa phát hành" trong CHANGELOG.md → "[0.1.1]"
+# chuyển mục "Chưa phát hành" trong docs/CHANGELOGS.md → "[0.1.1]"
 npm run check                    # xanh
 git commit -am "release: v0.1.1"
 git tag v0.1.1 && git push --tags

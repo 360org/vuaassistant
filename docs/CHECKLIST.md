@@ -4,22 +4,22 @@
 > - `[x]` = 100% Đã hoàn thành, có bài kiểm chứng tự động (contract checks / invariants / live tests)
 > - Toàn bộ tính năng trong danh sách này đều hoạt động thực tế trên bản macOS/Windows/Linux native.
 >
-> *Cập nhật: 2026-08-24 (Phiên bản v1.1.64 — Kernel Invariant Registry & Zero Warning Native Backend)*
+> *Cập nhật: 2026-08-25 (Phiên bản v1.1.65 — AIaC 3.0 Standard Docs & Multi-Agent Protocols)*
 
 ---
 
 ## 1. Tài liệu & Quy chuẩn Dự án
 
 - [x] `README.md` — Giới thiệu dự án & hướng dẫn sử dụng
-- [x] `SPEC.md` — Đặc tả kỹ thuật & yêu cầu chức năng
-- [x] `ARCH.md` — Tài liệu kiến trúc hệ thống
-- [x] `DEPLOY_GUIDE.md` — Hướng dẫn triển khai
-- [x] `CHANGELOGS.md` — Nhật ký phát triển module
-- [x] `CHANGELOG.md` — Lịch sử thay đổi theo phiên bản
-- [x] `PROJECT-HISTORY.md` — Lịch sử toàn bộ hành trình dự án
-- [x] `DEVELOPMENT.md` — Quy trình phát triển cho developer
-- [x] `HARNESS-PLAN.md` — Kế hoạch & kiểm chứng kiến trúc Harness / Kernel Plugin
-- [x] `AUDIT.md` — Báo cáo audit định kỳ hệ thống & kiểm chứng CI/CD
+- [x] `AGENTS.md` — Quy chuẩn điều phối Multi-Agent
+- [x] `docs/SPEC.md` — Đặc tả kỹ thuật & yêu cầu chức năng
+- [x] `docs/ARCH.md` — Tài liệu kiến trúc hệ thống
+- [x] `docs/DEPLOY_GUIDE.md` — Hướng dẫn triển khai
+- [x] `docs/CHANGELOGS.md` — Nhật ký thay đổi & phát triển kiến trúc
+- [x] `docs/PROJECT-HISTORY.md` — Lịch sử toàn bộ hành trình dự án
+- [x] `docs/DEVELOPMENT.md` — Quy trình phát triển cho developer
+- [x] `docs/HARNESS-PLAN.md` — Kế hoạch & kiểm chứng kiến trúc Harness / Kernel Plugin
+- [x] `docs/AUDIT.md` — Báo cáo audit định kỳ hệ thống & kiểm chứng CI/CD
 - [x] Đồng bộ toàn bộ tài liệu khớp 100% với kiến trúc Universal Agent Runner & Zero-Docker
 
 ---

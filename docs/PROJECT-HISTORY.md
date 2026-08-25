@@ -5,8 +5,8 @@
 > không cấu hình, không terminal, không Docker cho người dùng cuối.
 
 Tài liệu này kể lại **cái gì đã làm, quyết định ra sao, và vì sao**. Trạng thái
-chi tiết từng tính năng nằm ở [`idea.md`](./idea.md); nhật ký phiên bản ở
-[`CHANGELOG.md`](./CHANGELOG.md); quy trình dev ở [`DEVELOPMENT.md`](./DEVELOPMENT.md).
+chi tiết từng tính năng nằm ở [`docs/IDEA.md`](./IDEA.md); nhật ký phiên bản ở
+[`docs/CHANGELOGS.md`](./CHANGELOGS.md); quy trình dev ở [`docs/DEVELOPMENT.md`](./DEVELOPMENT.md).
 
 ---
 
@@ -163,4 +163,4 @@ Chi tiết: [`DEVELOPMENT.md`](./DEVELOPMENT.md).
 
 ---
 
-*Cập nhật liên tục khi có tính năng mới. Xem `CHANGELOG.md` để biết chi tiết từng thay đổi.*
+*Cập nhật liên tục khi có tính năng mới. Xem `docs/CHANGELOGS.md` để biết chi tiết từng thay đổi.*
