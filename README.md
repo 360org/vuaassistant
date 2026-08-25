@@ -96,13 +96,25 @@ npm run tauri dev
 npm run tauri build
 ```
 
-Kiểm thử (xem [`DEVELOPMENT.md`](./DEVELOPMENT.md) để biết quy trình đầy đủ):
+Kiểm thử (xem [`docs/DEVELOPMENT.md`](./docs/DEVELOPMENT.md) để biết quy trình đầy đủ):
 
 ```bash
 npm run check                     # build + toàn bộ test frontend
 cd agent-runner && npm run check  # typecheck + e2e (poll loop + IPC) + native tools
 cd src-tauri && cargo run --example oauth_loopback_check
 ```
+
+## Tài liệu chi tiết (`docs/*`)
+
+Toàn bộ tài liệu chi tiết của dự án được quản lý tập trung trong thư mục [`docs/`](./docs/):
+- [`docs/IDEA.md`](./docs/IDEA.md) — Ý tưởng & bối cảnh cốt lõi
+- [`docs/SPEC.md`](./docs/SPEC.md) — Đặc tả kỹ thuật & yêu cầu chức năng
+- [`docs/ARCH.md`](./docs/ARCH.md) — Kiến trúc hệ thống 3 tầng
+- [`docs/DEPLOY_GUIDE.md`](./docs/DEPLOY_GUIDE.md) — Hướng dẫn triển khai & đóng gói
+- [`docs/CHANGELOGS.md`](./docs/CHANGELOGS.md) — Lịch sử phát triển & kiến trúc qua từng phiên bản
+- [`docs/CHECKLIST.md`](./docs/CHECKLIST.md) — Danh mục tính năng hoàn thành (100% Verified)
+- [`docs/HARNESS-PLAN.md`](./docs/HARNESS-PLAN.md) — Kế hoạch & kiểm chứng kiến trúc DeepSeek Harness
+- [`docs/AUDIT.md`](./docs/AUDIT.md) — Báo cáo audit hệ thống & kiểm chứng CI/CD
 
 ## Cấu trúc dự án
 
