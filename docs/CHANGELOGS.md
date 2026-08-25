@@ -2,8 +2,6 @@
 
 Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu trúc hệ thống.
 
-## [Unreleased]
-
 ## [1.1.66] — 2026-08-25
 
 ### Mở rộng Kiến trúc Kernel: Hooks Lifecycle & Persistent Task DAG
