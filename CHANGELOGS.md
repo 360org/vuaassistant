@@ -4,6 +4,33 @@ Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu tr
 
 ## [Unreleased]
 
+## [1.1.64] — 2026-08-24
+
+### Kỷ luật Kernel & Dọn dẹp Mã nguồn
+*   **Kỷ luật Sổ Đăng ký Skill (Kernel Invariant):**
+    *   `skills.register()` ném lỗi ngay lập tức khi phát hiện trùng tên skill thay vì im lặng ghi đè làm sai lệch hành vi.
+    *   Bổ sung Invariant `skills` vào Kernel Invariant Registry (`agent-runner/src/kernel/skills.ts`): Bắt buộc mọi tool mà skill khai báo phải có mặt trong sổ `ctx.tools`. Ngăn chặn hoàn toàn lỗi cấu hình tool ma hoặc tool ngoại vi chưa được cấp phép.
+    *   Cập nhật thứ tự nạp plugin trong `agent-runner/src/kernel/compose.ts` (`invariantsPlugin` nạp trước) để đảm bảo mọi invariant được nạp sẵn sàng trước khi nạp các plugin nghiệp vụ.
+*   **Tối ưu Frontend & Dọn dẹp Mã chết:**
+    *   Loại bỏ 3 tệp mã chết không còn sử dụng: `ChatComposer.tsx`, `ChatMessageList.tsx`, `AgentStateContext.tsx`.
+    *   Tách `FilePreviewModal.tsx` thành sub-component độc lập trong `src/components/chat/modals/`, giúp module `Chat.tsx` tinh gọn và dễ bảo trì.
+*   **Sạch sẽ Cảnh báo Rust Backend:**
+    *   Gắn `#[cfg(target_os = "macos")]` cho hàm `hex_encode` trong `src-tauri/src/auth.rs`, giúp `cargo check` sạch 100% cảnh báo trên mọi nền tảng (0 errors, 0 warnings).
+*   **Cập nhật Kiểm chứng Native Tools Policy:**
+    *   Cập nhật đếm động 17 native tools trong `agent-runner/scripts/native-tools-policy-check.mjs`.
+
+## [1.1.63] — 2026-08-23
+
+### Tùy biến Hồ sơ & Tính cách Agent trong Chat (In-Chat Agent Profile & Soul)
+*   **In-Chat Agent Profile & Soul Customization:**
+    *   Người dùng có thể ra lệnh tự nhiên trong hội thoại để cập nhật trực tiếp Kim chỉ nam (`instructions.md`) và Tính cách/Giọng điệu (`soul.md`) của Agent.
+    *   Bổ sung 2 native tools `update_agent_profile` và `read_agent_profile` trên Host Process Runner, tự động ghi file trực tiếp xuống thư mục `agents/<agentName>/` và phát sự kiện IPC `agent_update` để đồng bộ tức thì lên giao diện React.
+*   **Trình xem & Soạn thảo Kịch bản Skill (Skill Detail View & Direct Editor):**
+    *   Bổ sung `SkillDetailModal` trên giao diện mục **Skills**, cho phép xem chi tiết toàn bộ nội dung kịch bản, metadata và chỉnh sửa trực tiếp nội dung `SKILL.md` đối với Custom Skills.
+*   **Kiểm chứng CI & Bộ nhớ Tự học (Self-Improve CI Fix):**
+    *   Sửa lỗi script `self-improve-check.mjs` nạp trực tiếp từ `src/` thay vì `dist/`, giải quyết triệt để lỗi CI fail trên GitHub Actions.
+    *   Bổ sung `scripts/agent-profile-check.mjs` vào bộ kiểm thử CI tổng thể `npm run check`.
+
 ## [1.1.62] — 2026-08-23
 
 ### Kiến trúc Executable Skills & In-Chat Lifecycle (DeepSeek Harness style)

@@ -4,7 +4,7 @@
 > - `[x]` = 100% Đã hoàn thành, có bài kiểm chứng tự động (contract checks / invariants / live tests)
 > - Toàn bộ tính năng trong danh sách này đều hoạt động thực tế trên bản macOS/Windows/Linux native.
 >
-> *Cập nhật: 2026-08-23 (Phiên bản v1.1.62 — Executable Skills & Kernel Plugin Architecture)*
+> *Cập nhật: 2026-08-24 (Phiên bản v1.1.64 — Kernel Invariant Registry & Zero Warning Native Backend)*
 
 ---
 
@@ -19,6 +19,7 @@
 - [x] `PROJECT-HISTORY.md` — Lịch sử toàn bộ hành trình dự án
 - [x] `DEVELOPMENT.md` — Quy trình phát triển cho developer
 - [x] `HARNESS-PLAN.md` — Kế hoạch & kiểm chứng kiến trúc Harness / Kernel Plugin
+- [x] `AUDIT.md` — Báo cáo audit định kỳ hệ thống & kiểm chứng CI/CD
 - [x] Đồng bộ toàn bộ tài liệu khớp 100% với kiến trúc Universal Agent Runner & Zero-Docker
 
 ---
