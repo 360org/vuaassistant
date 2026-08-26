@@ -164,6 +164,20 @@ export interface LocalUser {
   providerLabel?: string;
   /** Secondary line, normally the linked account identity. */
   detail?: string;
+  /** Email address associated with the user profile. */
+  email?: string;
+  /** Phone number if synced from 360 CORP / vuahethong SSO. */
+  phone?: string;
+  /** Custom avatar URL or emoji for the user profile. */
+  avatar?: string;
+  /** SSO Token from 360 CORP / vuahethong.net if authenticated via SSO. */
+  ssoToken?: string;
+  /** Organization affiliation (e.g. "360 CORP", "Vua Hệ Thống"). */
+  organization?: string;
+  /** Whether the account is synced with vuahethong.net */
+  syncedWithVuahethong?: boolean;
+  /** Last sync timestamp */
+  lastSyncedAt?: number;
   /** AI Router connection that authenticated this device-local profile. */
   connectionId?: string;
   createdAt: number;
@@ -394,7 +408,7 @@ interface AppStore extends PersistedState {
   oauthError: string | null;
   completeOnboarding: (provider: ProviderId, integrations: string[]) => void;
   /** Change the local profile label without changing any vendor credential. */
-  updateLocalUser: (name: string) => void;
+  updateLocalUser: (patch: string | Partial<LocalUser>) => void;
   /** Create the device-local profile from its first linked AI account only. */
   ensureLocalUser: (input: Omit<LocalUser, "createdAt">) => void;
   /** Remove the device-local profile after its linked credential is revoked. */
@@ -885,10 +899,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [],
   );
 
-  const updateLocalUser = useCallback((name: string) => {
-    const clean = name.trim().slice(0, 80);
-    if (!clean) return;
-    setState((s) => s.user ? { ...s, user: { ...s.user, name: clean } } : s);
+  const updateLocalUser = useCallback((patch: string | Partial<LocalUser>) => {
+    setState((s) => {
+      if (!s.user) return s;
+      if (typeof patch === "string") {
+        const clean = patch.trim().slice(0, 80);
+        return clean ? { ...s, user: { ...s.user, name: clean } } : s;
+      }
+      return {
+        ...s,
+        user: {
+          ...s.user,
+          ...patch,
+          name: patch.name ? patch.name.trim().slice(0, 80) : s.user.name,
+        },
+      };
+    });
   }, []);
 
   const ensureLocalUser = useCallback((input: Omit<LocalUser, "createdAt">) => {

@@ -16,8 +16,8 @@ const baseUrl = process.env.AI_ROUTER_BASE_URL || `http://127.0.0.1:${PORT}/v1`;
 
 async function reachable() {
   try {
-    await fetch(`${baseUrl}/models`, { signal: AbortSignal.timeout(1500) });
-    return true;
+    const res = await fetch(`${baseUrl}/models`, { signal: AbortSignal.timeout(5000) });
+    return res.ok;
   } catch {
     return false;
   }
@@ -85,6 +85,15 @@ const claude = await post("/oauth/authorize", {
 assert(claude.response.ok, `Claude authorize failed: ${claude.payload.error || claude.response.status}`);
 assert(claude.payload.redirectUri === "http://localhost:443/callback", "Claude fixed callback URI changed unexpectedly.");
 
+const codex = await post("/oauth/authorize", {
+  provider: "codex",
+  redirectUri: "http://localhost:1420/callback",
+});
+assert(codex.response.ok, `Codex authorize failed: ${codex.payload.error || codex.response.status}`);
+assert(codex.payload.authUrl?.includes("auth.openai.com"), "Codex did not return an OpenAI authorization URL.");
+assert(codex.payload.redirectUri === "http://localhost:1455/auth/callback", "Codex callback URI changed unexpectedly.");
+assert(codex.payload.state && codex.payload.codeVerifier, "Codex authorization is missing PKCE state.");
+
 const invalidExchange = await post("/oauth/exchange", {
   provider: "antigravity",
   code: "not-a-real-code",
@@ -96,5 +105,15 @@ assert(invalidExchange.response.status === 422, "Invalid Antigravity code must b
 assert(typeof invalidExchange.payload.error === "string" && invalidExchange.payload.error.length > 0, "AI Router must return an OAuth error payload.");
 assert(!invalidExchange.payload.error.includes("Load failed"), "OAuth exchange must not leak a WebView Load failed error.");
 
-console.log("desktop OAuth contract passed: sidecar boots, Antigravity + Claude authorize, exchange error path");
+const invalidCodexExchange = await post("/oauth/exchange", {
+  provider: "codex",
+  code: "not-a-real-code",
+  redirectUri: "http://localhost:1455/auth/callback",
+  codeVerifier: codex.payload.codeVerifier,
+  state: codex.payload.state,
+});
+assert(invalidCodexExchange.response.status === 422, "Invalid Codex code must be rejected by AI Router.");
+assert(typeof invalidCodexExchange.payload.error === "string" && invalidCodexExchange.payload.error.length > 0, "AI Router must return a Codex OAuth error payload.");
+
+console.log("desktop OAuth contract passed: sidecar boots, Antigravity + Claude + Codex authorize & exchange checked");
 router?.kill();

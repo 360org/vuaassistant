@@ -1,6 +1,6 @@
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Check, ChevronDown, ChevronUp, CornerUpLeft, Eraser, FileText, FolderOpen, Layers3, Loader2, Maximize2, Minimize2, Paperclip, Pencil, Plus, RotateCcw, Search, SendHorizonal, Square, Trash2, UploadCloud, Wand2, X, ClipboardList, CheckCircle2 } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, CornerUpLeft, Eraser, FileText, FolderOpen, Layers3, Loader2, Maximize2, Minimize2, Paperclip, Pencil, Plus, RotateCcw, Search, SendHorizonal, Square, Trash2, UploadCloud, Wand2, X, ClipboardList, CheckCircle2, Bot } from "lucide-react";
 import { useApp, fileObjectURLs } from "@/lib/store";
 import { SKILLS, parseSkillMd, toTemplate, type SkillTemplate } from "@/lib/skills";
 import { getKnowledgeFileRecord } from "@/runtime/knowledge";
@@ -1094,16 +1094,26 @@ export function Chat() {
                 <div
                   key={m.id}
                   className={cn(
-                    "flex items-start",
+                    "flex items-start gap-2.5",
                     isUser ? "justify-end" : "justify-start",
                   )}
                 >
                   {!isUser && (
                     <div
-                      className="size-7 rounded-full bg-neutral-850 border border-neutral-800 flex items-center justify-center text-sm shrink-0 mr-2.5 mt-0.5 shadow-md select-none"
+                      className="size-8 rounded-xl bg-gradient-to-br from-neutral-800 to-neutral-900 border border-neutral-750 flex items-center justify-center text-sm shrink-0 mt-0.5 shadow-md ring-1 ring-gold-500/20 select-none overflow-hidden"
                       title={activeAgent?.name || "VuaAssistant"}
                     >
-                      {activeAgent?.emoji || "🤖"}
+                      {activeAgent?.emoji ? (
+                        <span className="text-base leading-none">{activeAgent.emoji}</span>
+                      ) : (
+                        <div className="relative flex size-full items-center justify-center bg-gold-500/10 text-gold-400">
+                          <Bot className="size-4.5" />
+                          <span className="absolute -top-0.5 -right-0.5 flex size-2">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold-400 opacity-60" />
+                            <span className="relative inline-flex size-2 rounded-full bg-gold-400" />
+                          </span>
+                        </div>
+                      )}
                     </div>
                   )}
                   <div className="flex flex-col max-w-[85%]">
@@ -1231,6 +1241,17 @@ export function Chat() {
                       </div>
                     </div>
                   </div>
+                  {isUser && (
+                    <div
+                      className="relative flex size-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-gold-500 to-amber-300 text-xs font-bold text-neutral-950 shadow-md ring-1 ring-gold-400/30 select-none mt-0.5"
+                      title={user?.name || "Bạn (User)"}
+                    >
+                      {(user?.name || "U").charAt(0).toUpperCase()}
+                      {user?.syncedWithVuahethong && (
+                        <span className="absolute -bottom-0.5 -right-0.5 flex size-2.5 items-center justify-center rounded-full bg-emerald-500 ring-1.5 ring-neutral-900" title="360 CORP SSO" />
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}

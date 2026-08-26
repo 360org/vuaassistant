@@ -227,7 +227,9 @@ function providerCatalog() {
         apiKey: authModes.includes("apikey")
           || entry.authType === "apikey"
           || entry.category === "apiKey"
-          || entry.category === "freeTier",
+          || entry.category === "apikey"
+          || entry.category === "freeTier"
+          || entry.category === "free",
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name));

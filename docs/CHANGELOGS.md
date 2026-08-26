@@ -2,6 +2,22 @@
 
 Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu trúc hệ thống.
 
+## [1.1.67] — 2026-08-26
+
+### Nâng Cấp Trải Nghiệm Chat, Profile & 360 CORP SSO
+*   **[NEW] Nâng cấp Bot Avatar & User Profile Chat Bubble:**
+    *   Nâng cấp icon AI Bot dạng High-Tech Container bo góc hiện đại `rounded-xl`, gradient công nghệ kết hợp đèn tín hiệu hoạt động `animate-ping` thời gian thực.
+    *   Bổ sung User Avatar hiển thị bên phải tin nhắn của người dùng (đối diện với Bot) kèm huy hiệu nhận diện đồng bộ `360 CORP SSO`.
+*   **[NEW] Module Quản lý Hồ sơ Người dùng & Tích hợp 1-Click 360 CORP SSO (`UserProfileModal`):**
+    *   Bổ sung modal quản lý thông tin định danh cục bộ (Họ tên, Email, Số điện thoại, Tổ chức).
+    *   Tích hợp nút đăng nhập 1-Click SSO kết nối trực tiếp với trung tâm xác thực `auth_sso_center` tại `https://vuahethong.net/vuaoffice/auth`.
+    *   Tự động khởi tạo local profile và đồng bộ trạng thái tài khoản với đám mây Vua Hệ Thống mà không cần đăng ký thủ công nhiều lần.
+*   **[IMPROVE] Đồng bộ & Mở rộng Store `LocalUser`:**
+    *   Mở rộng interface `LocalUser` trong `src/lib/store.tsx` hỗ trợ lưu trữ chi tiết: `email`, `phone`, `avatar`, `ssoToken`, `organization`, `syncedWithVuahethong`, `lastSyncedAt`.
+    *   Sidebar hiển thị trạng thái tài khoản và biểu tượng badge SSO thời gian thực.
+*   **[FIX] Hoàn thiện Bộ Kiểm thử OAuth Providers:**
+    *   Bổ sung kiểm thử PKCE authorize và token exchange cho OpenAI Codex, Antigravity, Claude và OpenRouter trong `scripts/desktop-oauth-check.mjs`.
+
 ## [1.1.66] — 2026-08-25
 
 ### Mở rộng Kiến trúc Kernel: Hooks Lifecycle & Persistent Task DAG

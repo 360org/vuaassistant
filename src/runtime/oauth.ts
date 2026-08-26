@@ -75,7 +75,7 @@ export interface ManualSignInAttempt {
 
 const AI_ROUTER_OAUTH_URL = "http://127.0.0.1:36360/v1/oauth";
 
-const ROUTER_OAUTH_PROVIDER: Partial<Record<string, string>> = {
+export const ROUTER_OAUTH_PROVIDER: Partial<Record<string, string>> = {
   gemini: "antigravity",
   "gemini-cli": "gemini-cli",
   antigravity: "antigravity",
@@ -231,9 +231,7 @@ function callbackUrl(provider: ProviderId): string {
 export async function beginManualSignIn(provider: ProviderId): Promise<ManualSignInAttempt> {
   const routerProvider = ROUTER_OAUTH_PROVIDER[provider];
   if (routerProvider) {
-    const redirectUri = routerProvider === "codex"
-      ? "http://localhost:1455/auth/callback"
-      : routerProvider === "claude"
+    const redirectUri = routerProvider === "claude"
       ? "http://localhost:443/callback"
       : "http://localhost:1420/callback";
 
@@ -657,11 +655,9 @@ async function signInViaRouter(
   routerProvider: string,
   onAuthUrl?: (url: string) => void,
 ): Promise<LoginResult> {
-  const redirectUri = routerProvider === "codex"
-    ? "http://localhost:1455/auth/callback"
-    : routerProvider === "claude"
-      ? "http://localhost:443/callback"
-      : "http://localhost:1420/callback";
+  const redirectUri = routerProvider === "claude"
+    ? "http://localhost:443/callback"
+    : "http://localhost:1420/callback";
 
   const response = await fetch(`${AI_ROUTER_OAUTH_URL}/authorize`, {
     method: "POST",

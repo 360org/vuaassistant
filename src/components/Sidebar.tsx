@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Blocks,
   Bot,
@@ -17,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { useApp, type View } from "@/lib/store";
 import { Logo } from "@/components/Logo";
 import { SidebarAdBanner } from "@/components/SidebarAdBanner";
+import { UserProfileModal } from "@/components/UserProfileModal";
 import { t } from "@/lib/i18n";
 
 const items: { view: View; key: Parameters<typeof t>[0]; icon: LucideIcon }[] = [
@@ -41,6 +43,7 @@ export function Sidebar({
   onNavigate?: () => void;
 }) {
   const { view, setView, user, appUpdate, language } = useApp();
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const currentVersion = appUpdate?.currentVersion || (typeof __V_ASSISTANT_VERSION__ !== "undefined" ? __V_ASSISTANT_VERSION__ : "1.1.3");
 
   const go = (v: View) => {
@@ -51,12 +54,13 @@ export function Sidebar({
   const goUpdate = () => go("settings");
 
   return (
-    <aside
-      className={cn(
-        "flex h-full w-60 shrink-0 flex-col border-r border-neutral-800 bg-neutral-900/40 p-3",
-        className,
-      )}
-    >
+    <>
+      <aside
+        className={cn(
+          "flex h-full w-60 shrink-0 flex-col border-r border-neutral-800 bg-neutral-900/40 p-3",
+          className,
+        )}
+      >
       <div className="flex items-center gap-2.5 px-2 py-3">
         <Logo />
         <div className="min-w-0 flex-1">
@@ -120,11 +124,15 @@ export function Sidebar({
         </button>
 
         <button
-          onClick={() => go("settings")}
-          className="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border border-neutral-800 bg-neutral-900 px-2.5 py-2 text-left transition-colors hover:border-neutral-700"
+          onClick={() => setShowProfileModal(true)}
+          className="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border border-neutral-800 bg-neutral-900 px-2.5 py-2 text-left transition-colors hover:border-neutral-700 hover:bg-neutral-850 shadow-sm"
+          title="Quản lý tài khoản & 360 CORP SSO"
         >
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-gold-300 to-gold-600 text-sm font-bold text-neutral-950">
+          <span className="relative flex size-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-gold-300 to-gold-600 text-sm font-bold text-neutral-950 shadow-inner">
             {(user?.name ?? "V").charAt(0).toUpperCase()}
+            {user?.syncedWithVuahethong && (
+              <span className="absolute -bottom-0.5 -right-0.5 flex size-2.5 rounded-full bg-emerald-500 ring-2 ring-neutral-900" />
+            )}
           </span>
           <span className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-1">
@@ -133,11 +141,17 @@ export function Sidebar({
               </span>
             </div>
             <span className="mt-0.5 block truncate text-[11px] text-neutral-500">
-              Powered by VuaAI.net
+              {user?.syncedWithVuahethong ? "360 CORP SSO" : "Powered by VuaAI.net"}
             </span>
           </span>
         </button>
       </div>
     </aside>
+
+    <UserProfileModal
+      isOpen={showProfileModal}
+      onClose={() => setShowProfileModal(false)}
+    />
+  </>
   );
 }
