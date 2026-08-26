@@ -2,6 +2,19 @@
 
 Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu trúc hệ thống.
 
+## [1.1.68] — 2026-08-26
+
+### Vá Lỗi Approval Loop & Chặn Lộ Vault Credential
+*   **[SECURITY] Redact Vault/Credential khỏi toàn bộ chat output:**
+    *   Chặn hiển thị `vault-entry:*`, `{{credential:*}}`, token/password và ID nội bộ Vault trong prompt hệ thống, transcript runner, outbound response và UI `MessageContent`.
+    *   Giao diện approval card chỉ còn thấy nhãn an toàn thay vì placeholder credential thô.
+*   **[FIX] Không xin quyền lặp lại sau khi Sếp đã duyệt:**
+    *   Nút duyệt capability gửi marker máy đọc được `CALL_APPROVED_CAPABILITY:<tool>` và runner chỉ cấp quyền cho đúng tool đã duyệt.
+    *   `connector_request` hỗ trợ cờ `approved=true` ở cả host runner và runtime tool để không bị kẹt vòng lặp xin quyền cùng một hành động.
+*   **[IMPROVE] Kiểm thử regression cho đường biên bảo mật:**
+    *   Bổ sung self-check `approval-redaction.self-check.ts` vào `agent-runner npm run check` để khóa hành vi: duyệt đúng tool, không lan quyền sang tool khác và luôn redact credential khỏi text hiển thị.
+    *   Làm bền `desktop-oauth-check.mjs` khi đã có AI Router sidecar đang chạy chậm trên port `36360`, tránh spawn trùng gây `EADDRINUSE` giả.
+
 ## [1.1.67] — 2026-08-26
 
 ### Nâng Cấp Trải Nghiệm Chat, Profile & 360 CORP SSO

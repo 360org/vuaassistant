@@ -534,6 +534,7 @@ const connectorRequestTool: NativeTool = {
         method: { type: 'string', description: 'GET, POST, PUT, PATCH or DELETE' },
         headers: { type: 'object', description: 'Headers; credentials must use {{credential:field}} variables' },
         body: { type: 'string', description: 'Optional request body with opaque credential variables' },
+        approved: { type: 'boolean', description: 'Only true after the user approves this exact connector action.' },
       },
       required: ['credential_ref', 'url'],
     },

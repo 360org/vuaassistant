@@ -157,6 +157,7 @@ const connectorRequestTool: AgentTool = {
           },
           headers: { type: "object", additionalProperties: { type: "string" } },
           body: { type: "string", description: "Request body (JSON), if any." },
+          approved: { type: "boolean", description: "Only true after the user approves this exact connector action." },
         },
         required: ["credential_ref", "url"],
       },
@@ -173,6 +174,7 @@ const connectorRequestTool: AgentTool = {
       method: args.method ? String(args.method) : "GET",
       headers: args.headers ?? {},
       body: args.body != null ? String(args.body) : undefined,
+      approved: args.approved === true,
     });
     const raw = await invoke<string>("runtime_connector_request", { payload });
     const result = JSON.parse(raw) as { status?: number; body?: string; error?: string };

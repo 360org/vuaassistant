@@ -480,7 +480,7 @@ export function Chat() {
   };
 
   const approveCapability = async (capabilityName: string) => {
-    await send(`Đã phê duyệt thực thi hành động ${capabilityName}. Hãy tiếp tục và gọi lại execute_capability với approved=true.`, true);
+    await send(`CALL_APPROVED_CAPABILITY:${capabilityName}\nSếp đã duyệt đúng hành động này. Tiếp tục thực thi ngay với approved=true, không xin duyệt lại và không hiển thị vault-entry hoặc credential placeholder trong câu trả lời.`, true);
   };
 
   const answerQuestion = async (answer: string) => {

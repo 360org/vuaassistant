@@ -95,7 +95,13 @@ export const toolListSectionPlugin: Plugin = {
           return `- ${tool.name}: ${tool.description}${mark}`;
         });
         if (!lines.length) return '';
-        return ['Bạn có các công cụ sau:', ...lines].join('\n');
+        return [
+          'Bạn có các công cụ sau:',
+          ...lines,
+          '',
+          'Bảo mật Vault: không bao giờ in vault-entry:* refs, {{credential:*}} placeholders, token, password hoặc ID nội bộ Vault ra câu trả lời cho người dùng. Chỉ mô tả bằng tên tài khoản thân thiện.',
+          'Khi người dùng đã duyệt một capability nhạy cảm và prompt có CALL_APPROVED_CAPABILITY:<tool>, hãy gọi đúng tool đó (trực tiếp hoặc qua execute_capability) với approved=true; không xin duyệt lại cùng hành động.',
+        ].join('\n');
       },
     });
   },

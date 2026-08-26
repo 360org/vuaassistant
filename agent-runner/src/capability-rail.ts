@@ -62,6 +62,18 @@ export function capabilityFromSpec(spec: ToolSpec): Capability {
   };
 }
 
+export function approvedCapabilityFromPrompt(prompt: string): string | null {
+  const marker = prompt.match(/CALL_APPROVED_CAPABILITY:\s*([a-zA-Z0-9_-]+)/i);
+  if (marker) return marker[1];
+
+  const natural = prompt.match(/Đã phê duyệt thực thi hành động\s+([a-zA-Z0-9_-]+)/i);
+  return natural?.[1] ?? null;
+}
+
+export function approvalCoversTool(approvedCapability: string | null, toolName: string): boolean {
+  return approvedCapability === toolName;
+}
+
 export function searchCapabilities(capabilities: Capability[], query: string, limit = 8): string {
   const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
   const scored = capabilities

@@ -16,16 +16,21 @@ const baseUrl = process.env.AI_ROUTER_BASE_URL || `http://127.0.0.1:${PORT}/v1`;
 
 async function reachable() {
   try {
-    const res = await fetch(`${baseUrl}/models`, { signal: AbortSignal.timeout(5000) });
+    const res = await fetch(`${baseUrl}/models`, { signal: AbortSignal.timeout(10_000) });
     return res.ok;
   } catch {
     return false;
   }
 }
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 /** Start the sidecar unless something already answers on the port. */
 async function ensureRouter() {
-  if (await reachable()) return null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (await reachable()) return null;
+    await sleep(250);
+  }
 
   const sidecar = path.join(repoRoot, "ai-router/src/sidecar.mjs");
   if (!existsSync(sidecar)) {
@@ -47,7 +52,7 @@ async function ensureRouter() {
       throw new Error(`AI Router sidecar exited early (code ${child.exitCode}):\n${stderr.trim()}`);
     }
     if (await reachable()) return child;
-    await new Promise((resolve) => setTimeout(resolve, 250));
+    await sleep(250);
   }
   child.kill();
   throw new Error(`AI Router sidecar did not become ready on port ${PORT}:\n${stderr.trim()}`);

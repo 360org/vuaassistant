@@ -34,7 +34,7 @@ import {
 import { getToolDefinitions, executeTool, needsReadApproval } from './native-tools/index.js';
 import { learnFromExchange } from './memory/self-improve.js';
 import { retrieveKnowledge, formatExcerpts } from './knowledge/index.js';
-import { CAPABILITY_TOOL_DEFINITIONS, capabilityFromSpec, searchCapabilities, type Capability } from './capability-rail.js';
+import { CAPABILITY_TOOL_DEFINITIONS, approvedCapabilityFromPrompt, approvalCoversTool, capabilityFromSpec, searchCapabilities, type Capability } from './capability-rail.js';
 import { OutboundLimiter, readPolicy } from './policy.js';
 import { refusalMessage, verifyAction } from './verifier.js';
 import { clearBuiltinToolContext, executeBuiltinTool, getBuiltinToolDefinitions, hasBuiltinTool, setBuiltinToolContext } from './mcp-tools/index.js';
@@ -63,6 +63,12 @@ function generateId(): string {
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function redactUserVisibleText(value: string): string {
+  return value
+    .replace(/vault-entry:[a-zA-Z0-9_-]+/g, '[Vault credential]')
+    .replace(/\{\{credential:[^}]+\}\}/g, '[credential]');
 }
 
 export interface PollLoopConfig {
@@ -234,7 +240,7 @@ export async function runPollLoop(config: PollLoopConfig): Promise<void> {
         setTranscript(sessionId, [
           ...priorTranscript,
           { role: 'user', content: prompt },
-          { role: 'assistant', content: result.text },
+          { role: 'assistant', content: redactUserVisibleText(result.text) },
         ]);
       }
 
@@ -246,7 +252,7 @@ export async function runPollLoop(config: PollLoopConfig): Promise<void> {
           platform_id: routing.platformId,
           channel_type: routing.channelType,
           thread_id: routing.threadId,
-          content: JSON.stringify({ text: result.text }),
+          content: JSON.stringify({ text: redactUserVisibleText(result.text) }),
         });
       }
 
@@ -340,6 +346,7 @@ export async function executeAgentLoop(
   // that orphaned function-call turn: it must immediately follow a user turn or
   // another function response.
   const tools = config.tools;
+  const approvedCapability = approvedCapabilityFromPrompt(prompt);
   const conversationHistory: ChatMessage[] = [...priorTranscript, { role: 'user', content: prompt }];
   let currentPrompt = '';
   let finalText: string | null = null;
@@ -522,7 +529,7 @@ export async function executeAgentLoop(
             : {};
         result = tools.get(inner)
           ? await tools.execute(inner, innerArgs, {
-              approved: tc.arguments.approved === true,
+              approved: tc.arguments.approved === true || approvalCoversTool(approvedCapability, inner),
               goal: prompt,
             })
           : { tool_call_id: tc.id, content: `Unknown capability: ${inner}`, is_error: true };
@@ -532,7 +539,7 @@ export async function executeAgentLoop(
         // Nay mọi thứ đi chung một cửa `tools.execute`, kể cả tool do plugin
         // chưa viết đăng ký sau này.
         result = await tools.execute(tc.name, tc.arguments, {
-          approved: tc.arguments.approved === true,
+          approved: tc.arguments.approved === true || approvalCoversTool(approvedCapability, tc.name),
           goal: prompt,
         });
       } else if (hasBuiltinTool(tc.name)) {

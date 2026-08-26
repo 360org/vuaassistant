@@ -115,7 +115,9 @@ export function buildSystemPrompt(options: ChatOptions): string {
     "then use connector_request with its opaque ref and " +
     "{{credential:<field>}} variables. The trusted gateway resolves those " +
     "values outside your context. Do not ask " +
-    "the user for a password that is already in the Vault.\n\n" +
+    "the user for a password that is already in the Vault. Never print " +
+    "vault-entry:* refs, credential placeholders, tokens, passwords, or internal " +
+    "Vault IDs in chat; describe them only as the friendly account label.\n\n" +
     "When the user provides a working directory or file path (e.g. \"Thư mục/File làm việc: 📁 /path/to/folder\" or relative/absolute file paths), immediately call glob with that exact path to inspect it. If access is denied, respond with exactly `PERMISSION_REQUEST: <the exact absolute directory path>` and nothing else; never ask the user to copy it into a workspace. Do NOT output generic responses when a file or directory path is given.\n\n" +
     "When the user asks to schedule a job, recurring task, reminder, or automated posting (e.g. \"đặt lịch đăng bài\", \"lập lịch\", \"tạo schedule\"), you MUST call the create_schedule tool with { name, prompt, schedule } to officially register and display the scheduled task on the Scheduled page.\n\n" +
     "When the user asks to create, write, or design a new skill or custom skill (e.g. \"tạo skill\", \"tạo kỹ năng\", \"viết skill mới\"), you MUST call the create_skill tool with { name, description, title, emoji, category, prompt, instructions } to automatically package, save, and display the new Skill directly in the user's Skills menu and application storage.\n\n" +

@@ -7,8 +7,13 @@ import { ShieldAlert, CheckCircle2, XCircle, Copy, Check, HelpCircle, Send, File
  * unfinished block hidden also prevents streamed reasoning from flashing
  * briefly before its closing tag arrives.
  */
+const redactSensitiveChatText = (value: string) => value
+  .replace(/vault-entry:[a-zA-Z0-9_-]+/g, "[Vault credential]")
+  .replace(/\{\{credential:[^}]+\}\}/g, "[credential]");
+
 export function visibleAssistantText(content: string): string {
   if (!content) return "";
+  content = redactSensitiveChatText(content);
   const thinkMatch = content.match(/<think(?:ing)?\b[^>]*>([\s\S]*?)(?:<\/think(?:ing)?>|$)/i);
   const reasoning = thinkMatch ? thinkMatch[1].trim() : "";
   const cleaned = content
@@ -293,6 +298,7 @@ export function MessageContent({
   const [selectedAnswer, setSelectedAnswer] = useState("");
   const [textAnswer, setTextAnswer] = useState("");
   const visible = assistant ? visibleAssistantText(content) : content;
+  const wireContent = assistant ? redactSensitiveChatText(content) : content;
 
   // Detect interactive question payload
   const interactiveQuestionMatch = visible.match(/^INTERACTIVE_QUESTION_PENDING:\s*(\{[\s\S]+\})$/);
@@ -305,8 +311,8 @@ export function MessageContent({
     // Ignore parse errors
   }
 
-  const permissionMatch = content.match(/^\[\[VUA_PERMISSION:(.+)\]\]$/);
-  const legacyPermissionMatch = content.match(/^(?:Tool error: Access denied: agent tools are restricted to the assigned workspace\. )?PERMISSION_REQUEST:\s*(.+)$/);
+  const permissionMatch = wireContent.match(/^\[\[VUA_PERMISSION:(.+)\]\]$/);
+  const legacyPermissionMatch = wireContent.match(/^(?:Tool error: Access denied: agent tools are restricted to the assigned workspace\. )?PERMISSION_REQUEST:\s*(.+)$/);
 
   let detectedPath: string | null = null;
 
@@ -330,8 +336,8 @@ export function MessageContent({
   // Detect File Payload JSON
   let filePayload: { filePath: string; fileName: string; caption?: string } | null = null;
   try {
-    if (content.trim().startsWith("{") && content.trim().endsWith("}")) {
-      const parsed = JSON.parse(content);
+    if (wireContent.trim().startsWith("{") && wireContent.trim().endsWith("}")) {
+      const parsed = JSON.parse(wireContent);
       if (parsed && typeof parsed.filePath === "string" && typeof parsed.fileName === "string") {
         filePayload = parsed;
       }
@@ -341,7 +347,7 @@ export function MessageContent({
   }
 
   // Detect APPROVAL_REQUIRED
-  const approvalMatch = content.match(/(?:Tool error:\s*)?APPROVAL_REQUIRED:\s*(.+)$/);
+  const approvalMatch = wireContent.match(/(?:Tool error:\s*)?APPROVAL_REQUIRED:\s*(.+)$/);
   let approvalMsg: string | null = null;
   let approvalCapabilityName = "";
   if (approvalMatch) {
