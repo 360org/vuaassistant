@@ -49,6 +49,12 @@ export interface ProvidersPluginOptions {
 export function createProvidersPlugin(options: ProvidersPluginOptions = {}): Plugin {
   return {
     name: 'providers',
+    // Khai phụ thuộc, và ở dưới gọi `ctx.invariants.register` KHÔNG optional
+    // chaining. Hai thứ này đi cùng nhau: `?.` biến một lỗi thứ tự nạp thành
+    // im lặng bỏ qua — invariant không đăng ký, `verify()` vẫn trả số dương nên
+    // cả chốt "sổ rỗng" cũng không bắt được. Ba plugin còn lại đều khai phụ
+    // thuộc; chỗ này từng là ngoại lệ duy nhất.
+    dependencies: ['invariants'],
     setup(ctx: Context) {
       const local = new Map<string, ProviderFactory>();
 
@@ -91,7 +97,7 @@ export function createProvidersPlugin(options: ProvidersPluginOptions = {}): Plu
       // Invariant: cấu hình gọi tên nhà cung cấp nào thì nhà cung cấp đó phải
       // thật sự có mặt. Hai phía này lệch nhau được — và khi lệch thì người
       // dùng thấy "không chat được" chứ không thấy nguyên nhân.
-      ctx.invariants?.register('providers', (_context, fail) => {
+      ctx.invariants.register('providers', (_context, fail) => {
         if (seam.names().length === 0) {
           fail('không có nhà cung cấp model nào được đăng ký');
         }
