@@ -2,6 +2,15 @@
 
 Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu trúc hệ thống.
 
+## [1.1.71] — 2026-08-27
+
+### Release Chính Thức Có Chữ Ký Bắt Buộc
+*   **[FIX] Chặn release macOS treo hoặc publish sai Gatekeeper:**
+    *   Giới hạn job macOS release ở `180` phút để workflow fail-fast thay vì treo vô hạn khi Tauri notarize/build không trả log.
+    *   Build macOS chỉ đóng gói `app,dmg` cần thiết, bật verbose log để thấy rõ bước sign/notarize trong GitHub Actions.
+*   **[SECURITY] Siết notarization/signing cho public release:**
+    *   Cấu hình `providerShortName` cho Apple notarization và giữ gate bắt buộc `codesign`, Developer ID `W360S JOINT STOCK COMPANY (ZC3H8887XS)`, `TeamIdentifier=ZC3H8887XS`, anti-ad-hoc và `spctl` trước upload artifact.
+
 ## [1.1.70] — 2026-08-27
 
 ### Vá Lỗi ChatGPT/OpenAI OAuth & Khóa Gate Code Sign
