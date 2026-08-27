@@ -2,6 +2,14 @@
 
 Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu trúc hệ thống.
 
+## [1.1.75] — 2026-08-27
+
+### Vá Lỗi Post-Job Cache Treo Sau Khi Ký macOS
+*   **[FIX] Loại bỏ `swatinem/rust-cache@v2` khỏi workflow release:**
+    *   Bản `v1.1.74` đã build, ký Developer ID, pass `spctl` và upload macOS Intel nhưng bị kẹt ở bước post-job cache cleanup, khiến matrix Apple Silicon không được chạy tiếp.
+*   **[SECURITY] Giữ nguyên gate chữ ký bắt buộc trước upload:**
+    *   macOS artifact vẫn chỉ được upload sau khi pass `codesign --verify --deep --strict`, đúng Developer ID, đúng `TeamIdentifier=ZC3H8887XS`, không ad-hoc và pass `spctl`.
+
 ## [1.1.74] — 2026-08-27
 
 ### Vá Lỗi YAML Release & Gỡ Treo Ký macOS
