@@ -17,6 +17,7 @@ import path from "node:path";
 
 const root = path.resolve(import.meta.dirname, "..");
 const onboarding = fs.readFileSync(path.join(root, "src", "pages", "Onboarding.tsx"), "utf8");
+const settings = fs.readFileSync(path.join(root, "src", "components", "settings", "ModelSettings.tsx"), "utf8");
 
 let pass = true;
 const check = (name, cond) => {
@@ -66,6 +67,13 @@ check(
 check(
   "lối nhập khoá cũng báo lỗi khi chưa đăng ký được",
   /chưa đăng ký được với AI Router/.test(onboarding),
+);
+
+// 5. Settings cũng là lối đăng nhập AI; không được báo thành công nếu AI Router
+//    chưa lưu được provider, vì sau đó màn Models sẽ rỗng.
+check(
+  "settings không nuốt lỗi ghi kết nối AI Router",
+  !/saveConnectionAndCleanupDuplicates\([\s\S]{0,900}?\)\.catch\(\(\) => \{\}\)/.test(settings),
 );
 
 assert.ok(pass, "onboarding connection contract failed");

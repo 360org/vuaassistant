@@ -2,6 +2,16 @@
 
 Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu trúc hệ thống.
 
+## [1.1.76] — 2026-08-27
+
+### Vá Lỗi ChatGPT Lưu Kết Nối & Load Models
+*   **[FIX] Lưu đăng nhập ChatGPT đúng provider registry của AI Router:**
+    *   Luồng ChatGPT/OpenAI OAuth vẫn hiển thị nhãn ChatGPT trên UI nhưng lưu connection subscription dưới provider `codex`, tránh lỗi 400 khi AI Router không có provider id `chatgpt`.
+*   **[FIX] Không báo đăng nhập thành công khi Settings chưa lưu được AI Router:**
+    *   Các lối OAuth/API key trong Settings không còn nuốt lỗi `saveConnectionAndCleanupDuplicates`, nên lỗi lưu connection hiện ra ngay thay vì vào màn Models rỗng.
+*   **[IMPROVE] Reset trạng thái lỗi khi lưu lại connection:**
+    *   Khi đăng nhập lại hoặc lưu lại credential, AI Router đưa connection về `Pending test` và xoá lỗi cũ để models load lại ngay; chỉ connection bị test fail mới bị ẩn.
+
 ## [1.1.75] — 2026-08-27
 
 ### Vá Lỗi Post-Job Cache Treo Sau Khi Ký macOS

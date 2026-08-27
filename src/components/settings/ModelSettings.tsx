@@ -183,7 +183,7 @@ export function ModelSettings() {
         null,
         undefined,
         customBaseUrl.trim() || undefined
-      ).catch(() => {});
+      );
 
       setConnectMessage(`✅ Kết nối thành công API Key cho ${finalName}!`);
       setCustomBaseUrl("");
@@ -349,7 +349,7 @@ export function ModelSettings() {
                 key,
                 "subscription",
                 tokens
-              ).catch(() => {});
+              );
             }
             setConnectMessage(`✅ Đăng nhập thành công tài khoản OAuth ${selectedProvider.name}!`);
             await loadConnections();
@@ -357,8 +357,8 @@ export function ModelSettings() {
               setShowProviderManager(false);
             }, 1000);
           }
-        }).catch(() => {
-          /* manual paste will handle it if background popup fails */
+        }).catch((err) => {
+          setConnectMessage(`❌ Lỗi OAuth: ${err instanceof Error ? err.message : String(err)}`);
         }).finally(() => {
           setConnecting(false);
         });
@@ -441,7 +441,7 @@ export function ModelSettings() {
           "subscription",
           null,
           manualCallbackUrl.trim()
-        ).catch(() => {});
+        );
 
         setConnectMessage(`✅ Xác thực & lưu kết nối thành công tài khoản OAuth ${selectedProvider.name}!`);
         setManualCallbackUrl("");

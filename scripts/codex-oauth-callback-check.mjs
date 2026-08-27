@@ -23,6 +23,19 @@ assert(
   "OAuth token exchange must send the normalized core provider to AI Router.",
 );
 assert(
+  aiRouterClient.includes('function aiRouterConnectionProvider(provider: string, authType: "subscription" | "api-key"): string') &&
+    aiRouterClient.includes('return authType === "subscription" ? routerOAuthProvider(provider) : provider.toLowerCase();'),
+  "ChatGPT/OpenAI subscription connections must normalize to codex while API keys keep their registry provider id.",
+);
+assert(
+  aiRouterClient.includes('provider: routerProviderId'),
+  "ChatGPT/OpenAI saved subscription connections must use the AI Router registry provider id (codex), not the UI provider id.",
+);
+assert(
+  aiRouterClient.includes('`${routerProviderId}_${Date.now()}`'),
+  "ChatGPT/OpenAI connection ids must be created under the normalized AI Router provider id.",
+);
+assert(
   codexProvider.includes('openid profile email offline_access api.connectors.read api.connectors.invoke'),
   "Codex OAuth must request the official connector scopes used by upstream Codex CLI.",
 );
