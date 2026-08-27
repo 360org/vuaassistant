@@ -234,7 +234,10 @@ export async function saveAiRouterConnection(connection: CreateAiRouterConnectio
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(connection),
   });
-  if (!response.ok) throw new Error(`AI Router could not save the connection (${response.status})`);
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null) as { error?: string } | null;
+    throw new Error(payload?.error || `AI Router could not save the connection (${response.status})`);
+  }
   const payload = (await response.json()) as { connection?: AiRouterConnection };
   if (!payload.connection) throw new Error("AI Router did not return the saved connection");
   return payload.connection;
@@ -395,6 +398,10 @@ function routerOAuthProvider(provider: string): string {
   return normalized === "chatgpt" || normalized === "openai" ? "codex" : normalized;
 }
 
+function aiRouterConnectionProvider(provider: string, authType: "subscription" | "api-key"): string {
+  return authType === "subscription" ? routerOAuthProvider(provider) : provider.toLowerCase();
+}
+
 export async function exchangeAiRouterOAuthCallbackUrl(
   provider: string,
   fullCallbackUrl: string
@@ -489,15 +496,16 @@ export async function saveConnectionAndCleanupDuplicates(
   callbackUrlStr?: string,
   customBaseUrl?: string
 ): Promise<string> {
+  const routerProviderId = aiRouterConnectionProvider(providerId, authType);
   const vendorAcc = await fetchVendorAccount(providerId as ProviderId, key).catch(() => null);
   const targetEmail =
     vendorAcc?.label && vendorAcc.label.includes("@")
       ? vendorAcc.label
       : tokenData?.email || parseEmailFromTokenData(tokenData, callbackUrlStr);
 
-  const matchedProviderKeys = [providerId.toLowerCase()];
+  const matchedProviderKeys = [providerId.toLowerCase(), routerProviderId.toLowerCase()];
   if (providerId === "grok-cli" || providerId === "grok") matchedProviderKeys.push("grok-cli", "grok", "xai");
-  if (providerId === "codex" || providerId === "chatgpt" || providerId === "openai") matchedProviderKeys.push("codex", "chatgpt", "openai");
+  if (authType === "subscription" && (providerId === "codex" || providerId === "chatgpt" || providerId === "openai")) matchedProviderKeys.push("codex", "chatgpt", "openai");
   if (providerId === "antigravity" || providerId === "gemini") matchedProviderKeys.push("antigravity", "gemini");
 
   const connections = await getAiRouterConnections().catch(() => []);
@@ -510,7 +518,7 @@ export async function saveConnectionAndCleanupDuplicates(
         c.credentialRef === key)
   );
 
-  const connId = existingConn ? existingConn.id : `${providerId}_${Date.now()}`;
+  const connId = existingConn ? existingConn.id : `${routerProviderId}_${Date.now()}`;
   const credentialRef = `ai-router:credential:${connId}`;
   const countForProv = connections.filter((c) =>
     matchedProviderKeys.some((p) => c.provider.toLowerCase() === p || c.id.toLowerCase().startsWith(p))
@@ -538,7 +546,7 @@ export async function saveConnectionAndCleanupDuplicates(
 
   await saveAiRouterConnection({
     id: connId,
-    provider: providerId,
+    provider: routerProviderId,
     name: providerName,
     accountLabel,
     email: targetEmail || existingConn?.email,

@@ -57,7 +57,7 @@ const tauriLibSource = fs.readFileSync(tauriLib, "utf8");
 // component: onboarding signs in too, and both paths must mint ids the same
 // way. Assert against the client so moving the UI cannot silently drop it.
 assert(
-  aiRouterClient.includes("existingConn ? existingConn.id : `${providerId}_${Date.now()}`"),
+  aiRouterClient.includes("existingConn ? existingConn.id : `${routerProviderId}_${Date.now()}`"),
   "Provider login does not derive a stable per-account connection ID",
 );
 assert(

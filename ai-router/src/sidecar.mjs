@@ -1340,7 +1340,9 @@ const server = createServer((request, response) => {
         credentialRef,
         defaultModel: typeof input.defaultModel === "string" ? input.defaultModel : undefined,
         isActive: typeof input.isActive === "boolean" ? input.isActive : (existing?.isActive !== false),
-        testStatus: existing?.testStatus || "Pending test",
+        testStatus: "Pending test",
+        lastError: undefined,
+        lastErrorAt: undefined,
         connectedAt: existing?.connectedAt || new Date().toISOString(),
       };
       const connections = currentConnections.filter((item) => item.id !== id);
