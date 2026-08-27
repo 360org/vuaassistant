@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const workflow = readFileSync(new URL("../.github/workflows/release.yml", import.meta.url), "utf8");
+const packagedSmoke = readFileSync(new URL("../.github/workflows/packaged-smoke.yml", import.meta.url), "utf8");
 
 assert(!workflow.includes("build -- --ci"), "Tauri --ci must be passed to Tauri, not Cargo.");
 assert(!workflow.includes("--no-sign"), "Public release must never disable macOS signing.");
@@ -15,5 +16,7 @@ assert(workflow.includes("codesign --verify --deep --strict"), "Release workflow
 assert(workflow.includes("spctl -a -vv -t exec"), "Release workflow must pass Gatekeeper before upload.");
 assert(workflow.includes("security set-key-partition-list"), "Release workflow must grant non-interactive codesign key access.");
 assert(!workflow.includes("swatinem/rust-cache@v2"), "Release workflow must not hang in rust-cache post job cleanup.");
+assert(!packagedSmoke.includes('tags: ["v*"]'), "Packaged smoke must not run automatically on release tags.");
+assert(packagedSmoke.includes("workflow_dispatch:"), "Packaged smoke must remain manually runnable.");
 
 console.log("release workflow contract ok");

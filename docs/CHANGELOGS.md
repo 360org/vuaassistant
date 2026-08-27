@@ -9,6 +9,8 @@ Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu tr
     *   Bản `v1.1.74` đã build, ký Developer ID, pass `spctl` và upload macOS Intel nhưng bị kẹt ở bước post-job cache cleanup, khiến matrix Apple Silicon không được chạy tiếp.
 *   **[SECURITY] Giữ nguyên gate chữ ký bắt buộc trước upload:**
     *   macOS artifact vẫn chỉ được upload sau khi pass `codesign --verify --deep --strict`, đúng Developer ID, đúng `TeamIdentifier=ZC3H8887XS`, không ad-hoc và pass `spctl`.
+*   **[IMPROVE] Chặn workflow smoke chạy trùng khi push tag release:**
+    *   `Packaged Smoke` chuyển về chạy thủ công, tránh mỗi tag `v*` kích hoạt thêm một build bản cài song song với `Production Release`.
 
 ## [1.1.74] — 2026-08-27
 

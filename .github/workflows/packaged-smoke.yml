@@ -13,13 +13,11 @@ name: Packaged Smoke
 # không chat được" (#5/#7/#9), trong khi mọi bài kiểm tra trong repo vẫn xanh.
 #
 # Job này build bản cài thật rồi chạy nó, nên lớp lỗi đó không lọt được nữa.
-# Không chạy mỗi push vì `tauri build` rất lâu: chạy khi phát hành, và bấm tay
-# được bất cứ lúc nào.
+# Không chạy mỗi push/tag vì `tauri build` rất lâu và release workflow đã build
+# installer chính thức. Job này chỉ bấm tay khi cần điều tra bản cài.
 
 on:
   workflow_dispatch:
-  push:
-    tags: ["v*"]
 
 jobs:
   packaged:
