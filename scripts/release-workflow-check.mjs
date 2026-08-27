@@ -14,5 +14,6 @@ assert(workflow.includes("! grep -F \"Signature=adhoc\""), "Release workflow mus
 assert(workflow.includes("codesign --verify --deep --strict"), "Release workflow must verify codesign before upload.");
 assert(workflow.includes("spctl -a -vv -t exec"), "Release workflow must pass Gatekeeper before upload.");
 assert(workflow.includes("security set-key-partition-list"), "Release workflow must grant non-interactive codesign key access.");
+assert(!workflow.includes("swatinem/rust-cache@v2"), "Release workflow must not hang in rust-cache post job cleanup.");
 
 console.log("release workflow contract ok");
