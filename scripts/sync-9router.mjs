@@ -46,6 +46,12 @@ function copyRecursive(src, dest, exclude = []) {
       /import\s+\{\s*machineIdSync\s*\}\s+from\s+["']node-machine-id["'];/g,
       'import pkgNodeMachineId from "node-machine-id";\nconst machineIdSync = pkgNodeMachineId.machineIdSync || pkgNodeMachineId;',
     );
+    if (path.basename(src) === "codex.js") {
+      newContent = newContent.replace(
+        'scope: "openid profile email offline_access",',
+        'scope: "openid profile email offline_access api.connectors.read api.connectors.invoke",',
+      );
+    }
   }
 
   if (fs.existsSync(dest)) {
