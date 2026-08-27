@@ -2,6 +2,16 @@
 
 Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu trúc hệ thống.
 
+## [1.1.77] — 2026-08-27
+
+### Popup Trạng Thái Kiểm Tra Cập Nhật
+*   **[IMPROVE] Hiển thị popup khi bấm kiểm tra cập nhật:**
+    *   Màn Settings hiện trạng thái rõ ràng khi đang kiểm tra, khi đã là bản mới nhất, khi có bản mới hoặc khi lỗi kết nối release server.
+*   **[IMPROVE] Giữ popup đang kiểm tra đến khi có kết quả:**
+    *   Người dùng không còn bấm nút xong mà không biết app đang kiểm tra gì; popup chỉ cho đóng sau khi hoàn tất.
+*   **[FIX] Khóa regression bằng contract check:**
+    *   Thêm `scripts/update-popup-check.mjs` vào `npm run check` để không mất popup trạng thái ở các bản sau.
+
 ## [1.1.76] — 2026-08-27
 
 ### Vá Lỗi ChatGPT Lưu Kết Nối & Load Models
