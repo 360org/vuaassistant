@@ -188,7 +188,7 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
         run: |
-          npm run tauri -- build -- --ci ${{ matrix.args }} --bundles app,dmg --verbose \
+          npm run tauri -- build ${{ matrix.args }} --bundles app,dmg --verbose \
             --config '{"bundle":{"createUpdaterArtifacts":true,"macOS":{"signingIdentity":"Developer ID Application: W360S JOINT STOCK COMPANY (ZC3H8887XS)","hardenedRuntime":true,"providerShortName":"W360S JOINT STOCK COMPANY"}}}'
 
       - name: Verify packaged AI Router runtime

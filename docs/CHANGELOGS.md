@@ -2,6 +2,14 @@
 
 Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu trúc hệ thống.
 
+## [1.1.72] — 2026-08-27
+
+### Vá Lỗi Tham Số Build Release macOS
+*   **[FIX] Sửa lỗi Tauri build nhận nhầm tham số `--ci`:**
+    *   Bỏ dấu `-- --ci` trong workflow release để `--target`, `--bundles`, `--verbose` được Tauri CLI xử lý đúng, không bị forward xuống `cargo build` gây lỗi `unexpected argument '--ci'`.
+*   **[SECURITY] Giữ nguyên cổng chặn public release lỗi chữ ký:**
+    *   Artifact macOS chỉ được upload sau khi pass `codesign --verify --deep --strict`, đúng Developer ID `W360S JOINT STOCK COMPANY (ZC3H8887XS)`, đúng `TeamIdentifier=ZC3H8887XS`, không ad-hoc và pass `spctl`.
+
 ## [1.1.71] — 2026-08-27
 
 ### Release Chính Thức Có Chữ Ký Bắt Buộc
