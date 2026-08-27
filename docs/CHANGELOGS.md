@@ -2,6 +2,15 @@
 
 Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu trúc hệ thống.
 
+## [1.1.69] — 2026-08-26
+
+### Khôi Phục Chữ Ký macOS Developer ID
+*   **[FIX] Bắt buộc ký macOS bằng Developer ID trong Production Release:**
+    *   Cấu hình `bundle.macOS.signingIdentity` trỏ đúng chứng chỉ `Developer ID Application: W360S JOINT STOCK COMPANY (ZC3H8887XS)` thay vì để Tauri fallback ad-hoc signature.
+    *   Workflow release fail-fast nếu thiếu `APPLE_CERTIFICATE` hoặc keychain không có đúng identity, tránh phát hành lại bản macOS bị Gatekeeper chặn.
+*   **[IMPROVE] Thêm bước kiểm chứng chữ ký trong CI release:**
+    *   Kiểm tra `codesign --verify`, `TeamIdentifier=ZC3H8887XS`, không có `Signature=adhoc`, và `spctl` trước khi upload DMG/updater artifact.
+
 ## [1.1.68] — 2026-08-26
 
 ### Vá Lỗi Approval Loop & Chặn Lộ Vault Credential

@@ -170,9 +170,12 @@ jobs:
             security unlock-keychain -p "" build.keychain
             security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "" build.keychain
+            security find-identity -v -p codesigning build.keychain
+            security find-identity -v -p codesigning build.keychain | grep -F "Developer ID Application: W360S JOINT STOCK COMPANY (ZC3H8887XS)"
             echo "✅ Apple Certificate installed successfully."
           else
-            echo "⚠️ No Apple Certificate configured. Skipping keychain setup."
+            echo "❌ APPLE_CERTIFICATE is required for public macOS releases."
+            exit 1
           fi
 
       - name: Build signed installers
@@ -182,7 +185,10 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: npm run tauri -- build ${{ matrix.args }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+        run: |
+          npm run tauri -- build ${{ matrix.args }} \
+            --config '{"bundle":{"macOS":{"signingIdentity":"Developer ID Application: W360S JOINT STOCK COMPANY (ZC3H8887XS)","hardenedRuntime":true}}}'
 
       - name: Verify packaged AI Router runtime
         shell: bash
@@ -196,6 +202,19 @@ jobs:
           test -x "$app_path/Contents/Resources/_up_/runtime/node/node"
           test -f "$app_path/Contents/Resources/_up_/agent-runner/dist/index.js"
           ! grep -rqE "from [\"']better-sqlite3|require\([\"']better-sqlite3" "$app_path/Contents/Resources/_up_/agent-runner/dist"
+
+      - name: Verify macOS Developer ID signature
+        shell: bash
+        run: |
+          app_path="$(find "src-tauri/target/${{ matrix.target }}/release/bundle/macos" -name 'VuaAssistant.app' -type d -print -quit)"
+          test -n "$app_path"
+          codesign --verify --deep --strict --verbose=4 "$app_path"
+          codesign -dv --verbose=4 "$app_path" 2> codesign.txt
+          cat codesign.txt
+          grep -F "Authority=Developer ID Application: W360S JOINT STOCK COMPANY (ZC3H8887XS)" codesign.txt
+          grep -F "TeamIdentifier=ZC3H8887XS" codesign.txt
+          ! grep -F "Signature=adhoc" codesign.txt
+          spctl -a -vv -t exec "$app_path"
 
       - name: Verify updater artifacts
         shell: bash
