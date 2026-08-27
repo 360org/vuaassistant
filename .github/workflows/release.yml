@@ -89,6 +89,7 @@ jobs:
             asset_suffix: "macOS-Apple-Silicon"
 
     runs-on: ${{ matrix.platform }}
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v5
 
@@ -187,8 +188,8 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
         run: |
-          npm run tauri -- build ${{ matrix.args }} \
-            --config '{"bundle":{"macOS":{"signingIdentity":"Developer ID Application: W360S JOINT STOCK COMPANY (ZC3H8887XS)","hardenedRuntime":true}}}'
+          npm run tauri -- build -- --ci ${{ matrix.args }} --bundles app,dmg --verbose \
+            --config '{"bundle":{"createUpdaterArtifacts":true,"macOS":{"signingIdentity":"Developer ID Application: W360S JOINT STOCK COMPANY (ZC3H8887XS)","hardenedRuntime":true,"providerShortName":"W360S JOINT STOCK COMPANY"}}}'
 
       - name: Verify packaged AI Router runtime
         shell: bash
