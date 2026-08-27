@@ -2,15 +2,23 @@
 
 Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu trúc hệ thống.
 
-## [1.1.73] — 2026-08-27
+## [1.1.74] — 2026-08-27
 
-### Gỡ Treo Build Release macOS Có Ký Developer ID
+### Vá Lỗi YAML Release & Gỡ Treo Ký macOS
+*   **[FIX] Sửa lỗi workflow không khởi tạo job do giá trị env YAML:**
+    *   Bọc quote `CI="true"` và `APPLE_SIGNING_IDENTITY="Developer ID Application: W360S JOINT STOCK COMPANY (ZC3H8887XS)"` để GitHub Actions parse workflow hợp lệ.
 *   **[FIX] Sửa bước import keychain cho GitHub Actions macOS:**
     *   Dùng keychain tạm trong `$RUNNER_TEMP`, bật quyền truy cập codesign/security/productbuild và đặt keychain làm default để Tauri không treo ở prompt truy cập private key khi ký `VuaAssistant.app`.
 *   **[IMPROVE] Chặn treo im lặng ở bước build/sign:**
-    *   Thêm `timeout-minutes: 60`, `CI=true`, `--ci` đúng vị trí của Tauri CLI và `APPLE_SIGNING_IDENTITY` để build fail rõ ràng thay vì giữ release kẹt nhiều giờ.
+    *   Thêm `timeout-minutes: 60`, `CI="true"`, `--ci` đúng vị trí của Tauri CLI và `APPLE_SIGNING_IDENTITY` để build fail rõ ràng thay vì giữ release kẹt nhiều giờ.
 *   **[SECURITY] Giữ nguyên gate chữ ký bắt buộc trước upload:**
     *   macOS artifact vẫn chỉ được upload sau khi pass `codesign --verify --deep --strict`, đúng Developer ID, đúng `TeamIdentifier=ZC3H8887XS`, không ad-hoc và pass `spctl`.
+
+## [1.1.73] — 2026-08-27
+
+### Release Không Publish Do YAML Env Chưa Quote
+*   **[FIX] Bản tag không có artifact public:**
+    *   Tag `v1.1.73` được giữ làm mốc lỗi workflow parse GitHub Actions; không publish installer mới vì workflow chưa tạo job build.
 
 ## [1.1.72] — 2026-08-27
 
