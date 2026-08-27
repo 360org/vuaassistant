@@ -68,7 +68,7 @@ export default {
     clientId: "app_EMoamEEZ73f0CkXaXp7hrann",
     authorizeUrl: "https://auth.openai.com/oauth/authorize",
     tokenUrl: "https://auth.openai.com/oauth/token",
-    scope: "openid profile email offline_access",
+    scope: "openid profile email offline_access api.connectors.read api.connectors.invoke",
     codeChallengeMethod: "S256",
     fixedPort: 1455,
     callbackPath: "/auth/callback",

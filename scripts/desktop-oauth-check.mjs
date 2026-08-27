@@ -96,6 +96,7 @@ const codex = await post("/oauth/authorize", {
 });
 assert(codex.response.ok, `Codex authorize failed: ${codex.payload.error || codex.response.status}`);
 assert(codex.payload.authUrl?.includes("auth.openai.com"), "Codex did not return an OpenAI authorization URL.");
+assert(codex.payload.authUrl?.includes("api.connectors.invoke"), "Codex authorization is missing the official connector scope.");
 assert(codex.payload.redirectUri === "http://localhost:1455/auth/callback", "Codex callback URI changed unexpectedly.");
 assert(codex.payload.state && codex.payload.codeVerifier, "Codex authorization is missing PKCE state.");
 

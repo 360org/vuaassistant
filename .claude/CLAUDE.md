@@ -21,3 +21,4 @@
 - **Test native bắt buộc**: Chạy `npm run check` (18 root contract checks) và `cd agent-runner && npm run check` (26 runner tests) trước khi commit/release.
 - **Git workflow**: Commit kèm toàn bộ `.claude/` của project (sau khi quét secret).
 - **Release tag**: Tag `v*` (VD: `v1.1.62`) đẩy lên remote để kích hoạt build installer.
+- **Code sign macOS bắt buộc**: Public release macOS phải fail nếu thiếu Developer ID `Developer ID Application: W360S JOINT STOCK COMPANY (ZC3H8887XS)`, nếu `codesign --verify --deep --strict` lỗi, thiếu `TeamIdentifier=ZC3H8887XS`, có `Signature=adhoc`, hoặc `spctl -a -vv -t exec` không pass. Cấm skip bước này khi release.

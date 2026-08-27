@@ -147,6 +147,8 @@ const PROVIDERS = {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
           Accept: "application/json",
+          originator: config.extraParams?.originator || "codex_cli_rs",
+          "User-Agent": "codex_cli_rs/0.136.0",
         },
         body: new URLSearchParams({
           grant_type: "authorization_code",

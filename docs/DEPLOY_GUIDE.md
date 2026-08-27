@@ -52,6 +52,19 @@ npm run tauri build
 ```
 *Kết quả:* File bộ cài `.dmg` và ứng dụng `.app` nằm tại thư mục `src-tauri/target/release/bundle/dmg/`.
 
+### 3.2. Biên dịch trên Windows (MSI / EXE)
+Yêu cầu: WiX Toolset v3.
+```bash
+npm run tauri build
+```
+*Kết quả:* Bộ cài đặt Windows Installer `.msi` nằm tại thư mục `src-tauri/target/release/bundle/msi/`.
+
+### 3.3. Biên dịch trên Linux (DEB / AppImage)
+```bash
+npm run tauri build
+```
+*Kết quả:* Gói cài đặt `.deb` nằm tại thư mục `src-tauri/target/release/bundle/deb/`.
+
 ---
 
 ## 4. Code Signing & Notarization (Ký & Chứng thực ứng dụng trên macOS)
@@ -110,15 +123,21 @@ Nếu bạn tự đóng gói trực tiếp trên máy Mac của mình và đã c
 
 Sau khi cấu hình đầy đủ các secrets trên, mỗi khi sếp push thẻ phiên bản mới (`v*`), hệ thống CI/CD sẽ tự động tải chứng chỉ, ký ứng dụng và chứng thực hoàn tất với Apple. Bộ cài tải từ trang Release về sẽ không bao giờ bị hiện cảnh báo bảo mật nữa.
 
-### 3.2. Biên dịch trên Windows (MSI / EXE)
-Yêu cầu: WiX Toolset v3.
-```bash
-npm run tauri build
-```
-*Kết quả:* Bộ cài đặt Windows Installer `.msi` nằm tại thư mục `src-tauri/target/release/bundle/msi/`.
+### 4.3. Gate bắt buộc trước khi publish macOS Release
+Public release macOS **không được phép bỏ qua code sign gate**. Workflow phải dừng trước upload artifact nếu bất kỳ kiểm tra nào dưới đây lỗi:
 
-### 3.3. Biên dịch trên Linux (DEB / AppImage)
 ```bash
-npm run tauri build
+codesign --verify --deep --strict --verbose=4 "/path/to/VuaAssistant.app"
 ```
-*Kết quả:* Gói cài đặt `.deb` nằm tại thư mục `src-tauri/target/release/bundle/deb/`.
+
+```bash
+codesign -dv --verbose=4 "/path/to/VuaAssistant.app"
+```
+
+Kết quả bắt buộc phải có `Authority=Developer ID Application: W360S JOINT STOCK COMPANY (ZC3H8887XS)`, `TeamIdentifier=ZC3H8887XS`, và tuyệt đối không có `Signature=adhoc`.
+
+```bash
+spctl -a -vv -t exec "/path/to/VuaAssistant.app"
+```
+
+Nếu thiếu `APPLE_CERTIFICATE`, keychain không tìm thấy đúng Developer ID, `spctl` rejected hoặc signature rơi về ad-hoc thì release phải fail-fast; không upload DMG/updater artifact.

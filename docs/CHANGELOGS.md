@@ -2,6 +2,17 @@
 
 Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu trúc hệ thống.
 
+## [1.1.70] — 2026-08-27
+
+### Vá Lỗi ChatGPT/OpenAI OAuth & Khóa Gate Code Sign
+*   **[FIX] Khôi phục đăng nhập ChatGPT/OpenAI Codex:**
+    *   Chuẩn hóa callback manual của `chatgpt`/`openai` đi qua provider core `codex`, dùng đúng redirect URI `http://localhost:1455/auth/callback` khi exchange token thay vì gửi sai provider id tới AI Router.
+    *   Đồng bộ scope và header token exchange theo Codex CLI upstream: `api.connectors.read`, `api.connectors.invoke`, `originator=codex_cli_rs` và User-Agent Codex.
+*   **[IMPROVE] Thêm contract check chống tái lỗi OAuth:**
+    *   Bổ sung `scripts/codex-oauth-callback-check.mjs` vào `npm run check` để khóa mapping `chatgpt/openai -> codex`, callback URI và scope OAuth bắt buộc.
+*   **[SECURITY] Cập nhật quy chuẩn release macOS:**
+    *   Ghi rõ trong `.claude/CLAUDE.md` và `docs/DEPLOY_GUIDE.md`: public macOS release bắt buộc pass Developer ID code-sign gate, cấm skip `codesign`, `TeamIdentifier`, anti-ad-hoc và `spctl` trước khi publish.
+
 ## [1.1.69] — 2026-08-26
 
 ### Khôi Phục Chữ Ký macOS Developer ID

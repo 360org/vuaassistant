@@ -290,16 +290,17 @@ export async function signInWithAiRouterCore(
     if (!result?.apiKey) throw new Error("OpenRouter sign-in returned no user key.");
     return { apiKey: result.apiKey };
   }
+  const coreProvider = routerOAuthProvider(provider);
   // Google only accepts the loopback callback registered by the inherited
   // Antigravity OAuth client. The Tauri WebView origin is an internal app
   // transport origin and must never be sent to an OAuth provider.
-  const redirectUri = (provider === "antigravity" || provider === "gemini" || provider === "gemini-cli")
+  const redirectUri = (coreProvider === "antigravity" || coreProvider === "gemini" || coreProvider === "gemini-cli")
     ? "http://localhost:1420/callback"
     : `${window.location.origin}/callback`;
   const authorizeResponse = await fetch(`${AI_ROUTER_BASE_URL}/oauth/authorize`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ provider, redirectUri }),
+    body: JSON.stringify({ provider: coreProvider, redirectUri }),
   });
   const authorize = (await authorizeResponse.json()) as {
     authUrl?: string | null;
@@ -315,7 +316,7 @@ export async function signInWithAiRouterCore(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        provider,
+        provider: coreProvider,
         codeChallenge: authorize.codeChallenge || "",
       }),
     });
@@ -343,7 +344,7 @@ export async function signInWithAiRouterCore(
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          provider,
+          provider: coreProvider,
           deviceCode,
           codeVerifier: authorize.codeVerifier || "",
           extraData: device,
@@ -366,7 +367,7 @@ export async function signInWithAiRouterCore(
   if (!authorizeResponse.ok || !authorize.authUrl || !authorize.state || !authorize.redirectUri) {
     throw new Error(authorize.error || `AI Router OAuth requires ${authorize.flowType || "a different sign-in flow"} for this provider.`);
   }
-  const manualCallback = provider === "antigravity" || provider === "claude" || provider === "codex" || provider === "xai";
+  const manualCallback = coreProvider === "antigravity" || coreProvider === "claude" || coreProvider === "codex" || coreProvider === "xai";
   onManualAuthUrl?.(authorize.authUrl);
   const callback = await waitForPopupCallback(authorize.authUrl, authorize.state, manualCallback);
   const code = callback.code || callback.token;
@@ -375,7 +376,7 @@ export async function signInWithAiRouterCore(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      provider,
+      provider: coreProvider,
       code,
       redirectUri: authorize.redirectUri,
       codeVerifier: authorize.codeVerifier || "",
@@ -387,6 +388,11 @@ export async function signInWithAiRouterCore(
     throw new Error(exchange.error || `AI Router OAuth token exchange failed (${exchangeResponse.status})`);
   }
   return exchange.tokens;
+}
+
+function routerOAuthProvider(provider: string): string {
+  const normalized = provider.toLowerCase();
+  return normalized === "chatgpt" || normalized === "openai" ? "codex" : normalized;
 }
 
 export async function exchangeAiRouterOAuthCallbackUrl(
@@ -407,9 +413,10 @@ export async function exchangeAiRouterOAuthCallbackUrl(
     throw new Error("Không tìm thấy tham số 'code' hoặc 'token' trong URL callback.");
   }
 
-  const redirectUri = (provider === "antigravity" || provider === "gemini" || provider === "gemini-cli")
+  const coreProvider = routerOAuthProvider(provider);
+  const redirectUri = (coreProvider === "antigravity" || coreProvider === "gemini" || coreProvider === "gemini-cli")
     ? "http://localhost:1420/callback"
-    : (provider === "codex" || provider === "chatgpt" || provider === "openai")
+    : coreProvider === "codex"
     ? "http://localhost:1455/auth/callback"
     : `${window.location.origin}/callback`;
 
@@ -417,7 +424,7 @@ export async function exchangeAiRouterOAuthCallbackUrl(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      provider,
+      provider: coreProvider,
       code,
       redirectUri,
       state,
