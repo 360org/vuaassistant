@@ -160,27 +160,35 @@ jobs:
           test ! -d agent-runner/node_modules/better-sqlite3
 
       - name: Install Apple Certificate for Code Signing
+        shell: bash
         env:
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
         run: |
-          if [ -n "$APPLE_CERTIFICATE" ]; then
-            echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
-            security create-keychain -p "" build.keychain
-            security default-keychain -s build.keychain
-            security unlock-keychain -p "" build.keychain
-            security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
-            security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "" build.keychain
-            security find-identity -v -p codesigning build.keychain
-            security find-identity -v -p codesigning build.keychain | grep -F "Developer ID Application: W360S JOINT STOCK COMPANY (ZC3H8887XS)"
-            echo "✅ Apple Certificate installed successfully."
-          else
+          if [ -z "$APPLE_CERTIFICATE" ]; then
             echo "❌ APPLE_CERTIFICATE is required for public macOS releases."
             exit 1
           fi
+          keychain_path="$RUNNER_TEMP/build-signing.keychain-db"
+          keychain_password="$(uuidgen)"
+          certificate_path="$RUNNER_TEMP/certificate.p12"
+          echo "$APPLE_CERTIFICATE" | base64 --decode > "$certificate_path"
+          security create-keychain -p "$keychain_password" "$keychain_path"
+          security set-keychain-settings -lut 21600 "$keychain_path"
+          security unlock-keychain -p "$keychain_password" "$keychain_path"
+          security list-keychains -d user -s "$keychain_path"
+          security default-keychain -s "$keychain_path"
+          security import "$certificate_path" -k "$keychain_path" -P "$APPLE_CERTIFICATE_PASSWORD" -A -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$keychain_password" "$keychain_path"
+          security find-identity -v -p codesigning "$keychain_path"
+          security find-identity -v -p codesigning "$keychain_path" | grep -F "Developer ID Application: W360S JOINT STOCK COMPANY (ZC3H8887XS)"
+          echo "✅ Apple Certificate installed successfully."
 
       - name: Build signed installers
+        timeout-minutes: 60
         env:
+          CI: true
+          APPLE_SIGNING_IDENTITY: Developer ID Application: W360S JOINT STOCK COMPANY (ZC3H8887XS)
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -188,7 +196,7 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
         run: |
-          npm run tauri -- build ${{ matrix.args }} --bundles app,dmg --verbose \
+          npm run tauri -- build --ci ${{ matrix.args }} --bundles app,dmg --verbose \
             --config '{"bundle":{"createUpdaterArtifacts":true,"macOS":{"signingIdentity":"Developer ID Application: W360S JOINT STOCK COMPANY (ZC3H8887XS)","hardenedRuntime":true,"providerShortName":"W360S JOINT STOCK COMPANY"}}}'
 
       - name: Verify packaged AI Router runtime

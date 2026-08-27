@@ -2,6 +2,16 @@
 
 Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu trúc hệ thống.
 
+## [1.1.73] — 2026-08-27
+
+### Gỡ Treo Build Release macOS Có Ký Developer ID
+*   **[FIX] Sửa bước import keychain cho GitHub Actions macOS:**
+    *   Dùng keychain tạm trong `$RUNNER_TEMP`, bật quyền truy cập codesign/security/productbuild và đặt keychain làm default để Tauri không treo ở prompt truy cập private key khi ký `VuaAssistant.app`.
+*   **[IMPROVE] Chặn treo im lặng ở bước build/sign:**
+    *   Thêm `timeout-minutes: 60`, `CI=true`, `--ci` đúng vị trí của Tauri CLI và `APPLE_SIGNING_IDENTITY` để build fail rõ ràng thay vì giữ release kẹt nhiều giờ.
+*   **[SECURITY] Giữ nguyên gate chữ ký bắt buộc trước upload:**
+    *   macOS artifact vẫn chỉ được upload sau khi pass `codesign --verify --deep --strict`, đúng Developer ID, đúng `TeamIdentifier=ZC3H8887XS`, không ad-hoc và pass `spctl`.
+
 ## [1.1.72] — 2026-08-27
 
 ### Vá Lỗi Tham Số Build Release macOS
