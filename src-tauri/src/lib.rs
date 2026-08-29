@@ -507,16 +507,16 @@ pub fn run() {
                     &MenuItem::new(app, "Save Conversation...", true, Some("Cmd+S"))?,
                 ])?;
 
-                // Edit Menu - use MenuItem::new for standard items to avoid macOS auto-placing them in app menu
+                // Edit Menu - must use PredefinedMenuItem so macOS routes Cmd+C/V/X/Z/A to WKWebView responder chain
                 let edit_menu = Submenu::new(app, "Edit", true)?;
                 edit_menu.append_items(&[
-                    &MenuItem::new(app, "Undo", true, Some("Cmd+Z"))?,
-                    &MenuItem::new(app, "Redo", true, Some("Cmd+Shift+Z"))?,
+                    &PredefinedMenuItem::undo(app, Some("Undo"))?,
+                    &PredefinedMenuItem::redo(app, Some("Redo"))?,
                     &PredefinedMenuItem::separator(app)?,
-                    &MenuItem::new(app, "Cut", true, Some("Cmd+X"))?,
-                    &MenuItem::new(app, "Copy", true, Some("Cmd+C"))?,
-                    &MenuItem::new(app, "Paste", true, Some("Cmd+V"))?,
-                    &MenuItem::new(app, "Select All", true, Some("Cmd+A"))?,
+                    &PredefinedMenuItem::cut(app, Some("Cut"))?,
+                    &PredefinedMenuItem::copy(app, Some("Copy"))?,
+                    &PredefinedMenuItem::paste(app, Some("Paste"))?,
+                    &PredefinedMenuItem::select_all(app, Some("Select All"))?,
                     &PredefinedMenuItem::separator(app)?,
                     &MenuItem::new(app, "Find...", true, Some("Cmd+F"))?,
                     &MenuItem::new(app, "Find Next", true, Some("Cmd+G"))?,

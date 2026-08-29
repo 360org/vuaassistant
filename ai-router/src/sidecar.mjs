@@ -400,6 +400,7 @@ function modelAccount(modelId) {
 function packModelsForConnections(models, connections) {
   const live = connections.filter(isUsableConnection);
   return models.map((modelId) => {
+    if (modelId === "auto") return "auto";
     const pinIndex = modelId.indexOf("?account=");
     const bare = pinIndex < 0 ? modelId : modelId.slice(0, pinIndex);
     if (pinIndex >= 0) {
@@ -677,6 +678,19 @@ async function resolveModel(modelId) {
       );
       return { provider: provider.id, model: model.id, connection, candidates };
     }
+    if (provider?.passthroughModels || connection.provider === "ai-compatible") {
+      const dynamic = await dynamicModelsForConnection(connection).catch(() => []);
+      const firstDynamic = dynamic[0];
+      if (firstDynamic) {
+        const parsed = modelAccount(firstDynamic.id);
+        const slash = parsed.modelId.indexOf("/");
+        const dynamicModelId = slash > 0 ? parsed.modelId.slice(slash + 1) : parsed.modelId;
+        const candidates = connections.filter((item) =>
+          item.provider === provider.id && isUsableConnection(item)
+        );
+        return { provider: provider.id, model: dynamicModelId, connection, candidates };
+      }
+    }
   }
   return null;
 }
@@ -932,10 +946,15 @@ async function handleChat(request, response, input) {
     ? packs.find((item) => item.id === modelId.slice(5))
     : null;
   const routeModel = async (body, selectedModel) => {
-    const resolved = await resolveModel(selectedModel);
+    let resolved = await resolveModel(selectedModel);
+    if (!resolved && pack) {
+      // Auto-fallback in pack: if a specific pinned model has no active connection,
+      // try resolving dynamically without connection pin or fallback to any active model
+      resolved = await resolveModel("auto");
+    }
     if (!resolved) {
       return new Response(JSON.stringify({ error: { message: "The selected model has no active AI Router connection." } }), {
-        status: 400,
+        status: 503,
         headers: { "content-type": "application/json" },
       });
     }
@@ -1278,10 +1297,13 @@ const server = createServer((request, response) => {
     void readJson(request).then(async (input) => {
       const name = typeof input.name === "string" ? input.name.trim() : "";
       const models = Array.isArray(input.models)
-        ? [...new Set(input.models.filter((model) => typeof model === "string" && model.includes("/")))]
+        ? [...new Set(input.models.filter((model) => typeof model === "string" && (model.includes("/") || model === "auto")))]
         : [];
       if (!name || models.length < 2) throw new Error("A pack needs a name and at least two models.");
-      const available = new Set((await allModelsForConnections(await readConnections())).map((model) => model.id));
+      const available = new Set([
+        "auto",
+        ...(await allModelsForConnections(await readConnections())).map((model) => model.id),
+      ]);
       if (models.some((model) => !available.has(model))) throw new Error("Pack contains a model without a Verified connection.");
       const packs = readPacks();
       const id = typeof input.id === "string" && input.id

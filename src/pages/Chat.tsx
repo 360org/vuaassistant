@@ -129,6 +129,7 @@ export function Chat() {
   const [editingPackId, setEditingPackId] = useState<string | null>(null);
   const [packName, setPackName] = useState("");
   const [packModels, setPackModels] = useState<string[]>([]);
+  const [packSearchQuery, setPackSearchQuery] = useState("");
   const [packStrategy, setPackStrategy] = useState<"fallback" | "round-robin">("fallback");
   const [packAccountFilters, setPackAccountFilters] = useState<string[]>([]);
   const [packError, setPackError] = useState<string | null>(null);
@@ -152,9 +153,18 @@ export function Chat() {
     }
     return [...accounts.values()];
   }, [individualModels]);
-  const filteredPackModels = individualModels.filter((model) =>
-    !packExpanded || !model.connectionId || packAccountFilters.includes(model.connectionId)
-  );
+  const filteredPackModels = individualModels.filter((model) => {
+    const matchesAccount = !packExpanded || !model.connectionId || packAccountFilters.includes(model.connectionId);
+    if (!matchesAccount) return false;
+    if (!packSearchQuery.trim()) return true;
+    const query = packSearchQuery.toLowerCase();
+    return (
+      model.name.toLowerCase().includes(query) ||
+      model.id.toLowerCase().includes(query) ||
+      (model.provider && model.provider.toLowerCase().includes(query)) ||
+      (model.accountLabel && model.accountLabel.toLowerCase().includes(query))
+    );
+  });
   const routerConfig: ProviderConfig = {
     baseUrl: AI_ROUTER_BASE_URL,
     model: activeModel,
@@ -318,6 +328,7 @@ export function Chat() {
     // here is genuinely gone.
     const selectable = new Set(individualModels.map((model) => model.id));
     setPackModels((pack?.models ?? []).filter((id) => selectable.has(id)));
+    setPackSearchQuery("");
     setPackStrategy(pack?.strategy ?? "fallback");
     setPackAccountFilters(connectedModelAccounts.map((account) => account.id));
     setPackError(null);
@@ -942,6 +953,37 @@ export function Chat() {
                           </div>
                         </div>
                       </details>}
+                      <div className="relative mt-2">
+                        <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-neutral-500" />
+                        <input
+                          value={packSearchQuery}
+                          onChange={(e) => setPackSearchQuery(e.target.value)}
+                          placeholder="Search models or providers..."
+                          className="w-full border border-neutral-700 bg-neutral-900 py-1.5 pl-8 pr-2 text-xs outline-none focus:border-gold-400/60"
+                        />
+                      </div>
+                      <div className="mt-2 flex items-center justify-between border-b border-neutral-800 pb-1.5 pt-1 px-1">
+                        <span className="text-[10px] font-semibold uppercase text-neutral-400">
+                          Models ({packModels.filter((id) => filteredPackModels.some((m) => m.id === id)).length}/{filteredPackModels.length})
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const filteredIds = filteredPackModels.map((m) => m.id);
+                            const allSelected = filteredIds.length > 0 && filteredIds.every((id) => packModels.includes(id));
+                            if (allSelected) {
+                              setPackModels((curr) => curr.filter((id) => !filteredIds.includes(id)));
+                            } else {
+                              setPackModels((curr) => [...new Set([...curr, ...filteredIds])]);
+                            }
+                          }}
+                          className="cursor-pointer text-[10px] text-gold-300 hover:text-gold-200"
+                        >
+                          {filteredPackModels.length > 0 && filteredPackModels.every((m) => packModels.includes(m.id))
+                            ? "Deselect all"
+                            : "Select all"}
+                        </button>
+                      </div>
                       <div className={cn(
                         "mt-2 overflow-y-auto border border-neutral-800",
                         packExpanded ? "grid min-h-0 flex-1 grid-cols-1 content-start sm:grid-cols-2" : "max-h-48",

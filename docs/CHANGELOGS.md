@@ -2,6 +2,18 @@
 
 Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu trúc hệ thống.
 
+## [1.1.78] — 2026-08-29
+
+### Sửa Lỗi Tương Thích Model ChatGPT Plus Trên Môi Trường Mới
+*   **[FIX] Đưa model ChatGPT Plus tương thích (`gpt-5.4`, `gpt-5.4-mini`, `gpt-5.5`) lên mặc định:**
+    *   Sắp xếp lại thứ tự danh mục model của provider Codex trong AI Router registry; tránh việc máy cài mới (Windows/macOS) tự động chọn model preview `gpt-5.6-sol` gây lỗi HTTP 400 Unsupported Model khi chat bằng tài khoản ChatGPT Plus.
+*   **[IMPROVE] Tự động Fallback trong AI Router Model Pack:**
+    *   Hỗ trợ cơ chế tự động fallback sang kết nối live hợp lệ khi model được ghim trong Pack chưa kích hoạt hoặc gặp lỗi model không được hỗ trợ.
+*   **[IMPROVE] Tìm kiếm và chọn nhanh model trong Pack Creator:**
+    *   Bổ sung ô tìm kiếm realtime và nút Select All / Deselect All giúp người dùng dễ dàng tạo model pack từ nhiều tài khoản.
+*   **[FIX] Khôi phục phím tắt Undo/Redo/Cut/Copy/Paste chuẩn macOS:**
+    *   Sử dụng `PredefinedMenuItem` trong menu Edit native để macOS route đầy đủ phím tắt vào responder chain của WKWebView.
+
 ## [1.1.77] — 2026-08-27
 
 ### Popup Trạng Thái Kiểm Tra Cập Nhật
