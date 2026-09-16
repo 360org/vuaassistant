@@ -2,6 +2,20 @@
 
 Nhật ký ghi lại các cột mốc thay đổi kiến trúc và tái cấu trúc hệ thống.
 
+## [1.1.79] — 2026-09-16
+
+### Vá Lỗi Load Models Antigravity / Gemini & Chat 503
+*   **[FIX] Khôi phục danh mục Static Models làm Baseline cho AI Router:**
+    *   Sửa `modelsForConnections` không còn loại bỏ danh mục models tĩnh của các provider có cờ `passthroughModels` (Antigravity, Gemini). Đảm bảo luôn giữ đủ 13 model tĩnh làm baseline ngay cả khi quota API động gặp sự cố mạng hoặc thiếu token.
+    *   Bổ sung truyền credentials từ Vault (`credentialsFromVault`) vào `dynamicModelsForConnection` khi gọi `getUsageForProvider` để lấy quota động chính xác.
+*   **[FIX] Tự động Re-bind & Fallback Model Tránh Lỗi 503 Trong Chat:**
+    *   Nâng cấp `resolveModel` tự động phục hồi và re-bind sang kết nối đang hoạt động của provider khi account pin bị cũ (`?account=...`), đồng thời hỗ trợ tra cứu bare model ID không cần tiền tố provider.
+    *   Thêm cơ chế tự động fallback sang model `"auto"` trước khi trả về HTTP 503, đảm bảo luồng chat không bị gián đoạn khi model pin bị lệch.
+*   **[FIX] Re-bind Model Tự Động Khi Lưu Model Pack:**
+    *   Tự động chuẩn hoá và re-bind danh sách model sang kết nối live khi lưu Pack qua `POST /v1/packs`, kiểm tra hợp lệ đồng thời cả model có account pin và không pin.
+*   **[IMPROVE] Cải Tiến Trải Nghiệm & Thông Báo Cập Nhật Phần Mềm:**
+    *   Bổ sung xử lý lỗi và tự động chuyển sang trang tải bản cập nhật thủ công nếu tiến trình tải/cài đặt in-app gặp lỗi.
+
 ## [1.1.78] — 2026-08-29
 
 ### Sửa Lỗi Tương Thích Model ChatGPT Plus Trên Môi Trường Mới

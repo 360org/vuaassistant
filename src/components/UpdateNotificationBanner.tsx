@@ -28,6 +28,9 @@ export function UpdateNotificationBanner() {
         if (total) setProgress(Math.min(100, Math.round((downloaded / total) * 100)));
       });
       dismiss();
+    } catch {
+      // Fallback tải thủ công đã mở trong installAppUpdate
+      dismiss();
     } finally {
       setInstalling(false);
     }

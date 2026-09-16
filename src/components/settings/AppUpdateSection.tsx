@@ -48,8 +48,21 @@ export function AppUpdateSection() {
     if (!appUpdate?.hasUpdate) return;
     setInstalling(true);
     try {
-      await installAppUpdate(appUpdate, ({ downloaded, total }) => {
+      const result = await installAppUpdate(appUpdate, ({ downloaded, total }) => {
         if (total) setProgress(Math.min(100, Math.round((downloaded / total) * 100)));
+      });
+      if (result === "manual") {
+        setCheckStatus({
+          title: "Đã mở trang tải bản cập nhật",
+          message: "VuaAssistant đã mở trình duyệt để Sếp tải và cài đặt bản cập nhật mới nhất.",
+          tone: "gold",
+        });
+      }
+    } catch (err) {
+      setCheckStatus({
+        title: "Không thể cài đặt cập nhật",
+        message: err instanceof Error ? err.message : String(err),
+        tone: "red",
       });
     } finally {
       setInstalling(false);

@@ -138,20 +138,26 @@ export async function installAppUpdate(
   onProgress?: (progress: { downloaded: number; total?: number }) => void,
 ): Promise<InstallUpdateResult> {
   if (info.canInstallInApp && pendingNativeUpdate) {
-    let downloaded = 0;
-    let total: number | undefined;
-    await pendingNativeUpdate.downloadAndInstall((event: DownloadEvent) => {
-      if (event.event === "Started") {
-        downloaded = 0;
-        total = event.data.contentLength;
-      } else if (event.event === "Progress") {
-        downloaded += event.data.chunkLength;
-      }
-      onProgress?.({ downloaded, total });
-    });
-    const { relaunch } = await import("@tauri-apps/plugin-process");
-    await relaunch();
-    return "native";
+    try {
+      let downloaded = 0;
+      let total: number | undefined;
+      await pendingNativeUpdate.downloadAndInstall((event: DownloadEvent) => {
+        if (event.event === "Started") {
+          downloaded = 0;
+          total = event.data.contentLength;
+        } else if (event.event === "Progress") {
+          downloaded += event.data.chunkLength;
+        }
+        onProgress?.({ downloaded, total });
+      });
+      const { relaunch } = await import("@tauri-apps/plugin-process");
+      await relaunch();
+      return "native";
+    } catch (error) {
+      console.warn("Cài đặt in-app thất bại, chuyển sang tải thủ công:", error);
+      await openManualUpdate(info);
+      return "manual";
+    }
   }
 
   await openManualUpdate(info);

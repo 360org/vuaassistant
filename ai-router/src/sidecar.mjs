@@ -432,7 +432,7 @@ function modelsForConnections(connections, packs = []) {
     // away; only a connection the smoke test rejected is withheld.
     if (!isUsableConnection(connection)) continue;
     const provider = REGISTRY.find((entry) => entry.id === connection.provider);
-    if (!provider || !Array.isArray(provider.models) || provider.passthroughModels) continue;
+    if (!provider || !Array.isArray(provider.models)) continue;
     for (const model of provider.models
       .filter((model) => !model.kind || model.kind === "llm")
       .map((model) => ({
@@ -455,7 +455,7 @@ async function dynamicModelsForConnection(connection) {
     const credentials = await credentialsFromVault(connection);
     if (isGoogleCloudCode) {
       // Fetch dynamic quota from Google Cloud Code Assist API and return as model items
-      const usage = await getUsageForProvider(connection).catch(() => null);
+      const usage = await getUsageForProvider({ ...connection, ...credentials }).catch(() => null);
       if (usage && usage.quotas) {
         return Object.keys(usage.quotas).map((modelId) => ({
           id: accountModelId(connection.provider, modelId, connection.id),
@@ -656,12 +656,22 @@ async function resolveModel(modelId) {
     if (separator > 0) {
       const provider = accountVariant.modelId.slice(0, separator);
       const model = accountVariant.modelId.slice(separator + 1);
-      const candidates = connections.filter((item) =>
-        item.provider === provider
-        && isUsableConnection(item)
-        && (!accountVariant.connectionId || item.id === accountVariant.connectionId)
+      const providerCandidates = connections.filter((item) =>
+        item.provider === provider && isUsableConnection(item)
       );
-      if (candidates.length) return { provider, model, connection: candidates[0], candidates };
+      if (providerCandidates.length) {
+        const connection = providerCandidates.find((item) => item.id === accountVariant.connectionId) || providerCandidates[0];
+        return { provider, model, connection, candidates: providerCandidates };
+      }
+    } else {
+      for (const conn of connections) {
+        if (!isUsableConnection(conn)) continue;
+        const prov = REGISTRY.find((entry) => entry.id === conn.provider);
+        if (prov?.models?.some((m) => m.id === accountVariant.modelId)) {
+          const providerCandidates = connections.filter((item) => item.provider === prov.id && isUsableConnection(item));
+          return { provider: prov.id, model: accountVariant.modelId, connection: conn, candidates: providerCandidates };
+        }
+      }
     }
   }
 
@@ -947,9 +957,9 @@ async function handleChat(request, response, input) {
     : null;
   const routeModel = async (body, selectedModel) => {
     let resolved = await resolveModel(selectedModel);
-    if (!resolved && pack) {
-      // Auto-fallback in pack: if a specific pinned model has no active connection,
-      // try resolving dynamically without connection pin or fallback to any active model
+    if (!resolved) {
+      // Auto-fallback: if a specific pinned or requested model has no active connection,
+      // fallback dynamically to any active model instead of failing with 503
       resolved = await resolveModel("auto");
     }
     if (!resolved) {
@@ -1300,11 +1310,17 @@ const server = createServer((request, response) => {
         ? [...new Set(input.models.filter((model) => typeof model === "string" && (model.includes("/") || model === "auto")))]
         : [];
       if (!name || models.length < 2) throw new Error("A pack needs a name and at least two models.");
+      const liveConnections = await readConnections();
+      const allModels = await allModelsForConnections(liveConnections);
       const available = new Set([
         "auto",
-        ...(await allModelsForConnections(await readConnections())).map((model) => model.id),
+        ...allModels.map((model) => model.id),
+        ...allModels.map((model) => modelAccount(model.id).modelId),
       ]);
-      if (models.some((model) => !available.has(model))) throw new Error("Pack contains a model without a Verified connection.");
+      const reboundModels = packModelsForConnections(models, liveConnections);
+      if (reboundModels.some((model) => !available.has(model) && !available.has(modelAccount(model).modelId))) {
+        throw new Error("Pack contains a model without a Verified connection.");
+      }
       const packs = readPacks();
       const id = typeof input.id === "string" && input.id
         ? input.id
@@ -1312,7 +1328,7 @@ const server = createServer((request, response) => {
       const pack = {
         id,
         name,
-        models,
+        models: reboundModels,
         strategy: input.strategy === "round-robin" ? "round-robin" : "fallback",
         stickyLimit: Math.max(1, Number(input.stickyLimit) || 1),
         autoSwitch: input.autoSwitch !== false,
